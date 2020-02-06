@@ -1,46 +1,50 @@
-library(ggplot2)
+#Importing Libraries
+library(readr)
 library(dplyr)
-library(scales)
+library(tidyr)
+library(stringr)
 
-zoo.data = read.csv("report_study_1579790635.csv")
-table(zoo.data$Year)
-table(zoo.data$Focal.Name)
-table(zoo.data$Interval.Channel.1.Name)
-table(zoo.data$Interval.Channel.2.Name)
-table(zoo.data$Interval.Channel.1.Value)
-table(zoo.data$Interval.Channel.2.Value)
-table(zoo.data$Hour)
-table(zoo.data$Month)
-table(zoo.data$Project.Animals)
-table(zoo.data$Duration)
-table(zoo.data$Configuration.Name)
-table(zoo.data$DeviceID)
-table(zoo.data$Observer)
-table(zoo.data$Notes)
-table(zoo.data$Channel.Type)
+#Run Data cleaning script
+source("ZooMonitor/cleaning.R")
 
-# Get rid of columns with unuseful or repetitive information (Configuration.Name, Observer, DeviceID, 
-# DateTime, Project.Animals, Grid.Size, Image.Size, Channel.Type)
-zoo.data.truncated <- zoo.data[-c(2:4, 7, 15:16, 18)]
+#Structuring Data to Create Dog Activity Visualization
+dogs_data_visual <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)                              
 
-# Get rid of rows without a channel 1 value or a channel 2 value
-zoo.data.cleaned <- zoo.data.truncated[!zoo.data.truncated$Interval.Channel.1.Value=="" | !zoo.data.truncated$Interval.Channel.2.Value=="", ]
+dogs_data_visual <- dogs_data_visual %>% filter(str_detect(Activity, "NA") == TRUE) 
+dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("NA_", "", Activity))
+dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity))                                  
+dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity)) 
+dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
+dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Interacting with object", "Obj Int", Activity))
+
+#Subsetting Data for each Dog
+dogs_data_visual_Hunter <- dogs_data_visual %>% filter(Name == "Hunter")
+dogs_data_visual_Minzi <- dogs_data_visual %>% filter(Name == "Minzi")
+dogs_data_visual_Akilah <- dogs_data_visual %>% filter(Name == "Akilah")
+dogs_data_visual_Amara <- dogs_data_visual %>% filter(Name == "Amara")
+dogs_data_visual_JT <- dogs_data_visual %>% filter(Name == "JT")
+
+
+#Plot of Activity of Dogs in each Hour
+ggplot(data = dogs_data_visual) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(Name ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Bar Plots of Activity (Dog/Time)", y = "Frequency")
+
+#Individual Plots of the Dogs from the above visualization
+ggplot(data = dogs_data_visual_Hunter) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Hunter: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_visual_Minzi) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Minzi: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_visual_Akilah) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Akilah: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_visual_Amara) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Amara: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_visual_JT) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "JT: Barplots of Activity per Hour", y = "Frequency")
 
 # Group by Inactive behavior
-inactive.data.grouped <- group_by(zoo.data.cleaned[!zoo.data.cleaned$Interval.Channel.2.Name == "",], Interval.Channel.2.Value)
-inactive.group.count <- count(inactive.data.grouped, Interval.Channel.2.Name)
-inactive.group.prop <- inactive.group.count %>% mutate(freq = n / sum(n))
+inactive_data_grouped <- group_by(dogs_data[!dogs_data$IC2_Name == "",], IC2_Value)
+inactive_group_count <- count(inactive_data_grouped, IC2_Name)
+inactive_group_prop <- inactive_group_count %>% mutate(freq = n / sum(n))
   
 
 # Bar plots
-active.behaviors <- table(zoo.data.cleaned$Interval.Channel.1.Value)
-inactive.behaviors <- table(zoo.data.cleaned$Interval.Channel.2.Value)
-active.plot <- qplot(data=zoo.data.cleaned[!zoo.data.cleaned$Interval.Channel.1.Name == "",], x=Interval.Channel.1.Value, geom="bar", fill = "coral") + labs(x = "Dogs' behavior when active")
+active.behaviors <- table(dogs_data$IC1_Value)
+inactive.behaviors <- table(dogs_data$IC2_Value)
+active.plot <- qplot(data=dogs_data[!dogs_data$IC1_Name == "",], x=IC1_Value, geom="bar", fill = "coral") + labs(x = "Dogs' behavior when active")
 
 
-ggplot(data=inactive.summary, aes(Interval.Channel.2.Value)) + geom_bar(fill = "coral", alpha = 0.7) + labs(x = "Dogs' behavior when inactive")
-
-active.plot
-inactive.plot
-
-# Bar plot per dog per hour
+ggplot(data=inactive_group_prop, aes(IC2_Value)) + geom_bar(fill = "coral", alpha = 0.7) + labs(x = "Dogs' behavior when inactive")
