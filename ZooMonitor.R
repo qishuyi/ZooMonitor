@@ -4,10 +4,6 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 
-
-#Testing for github
-table(dogs_data)
-
 #Run Data cleaning script
 source("ZooMonitor/cleaning.R")
 
