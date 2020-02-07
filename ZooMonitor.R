@@ -3,6 +3,8 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(magrittr)
+library(ggplot2)
 
 #Run Data cleaning script
 source("ZooMonitor/cleaning.R")
