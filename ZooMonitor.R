@@ -7,7 +7,7 @@ library(magrittr)
 library(ggplot2)
 
 #Run Data cleaning script
-source("ZooMonitor/cleaning.R")
+source("cleaning.R")
 
 #Structuring Data to Create Dog Activity Visualization
 dogs_data_visual <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)                              
