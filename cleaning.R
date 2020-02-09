@@ -11,7 +11,7 @@ dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/mast
 #Data Cleaning
 dogs_data <- dogs_data %>% select(-`Configuration Name`, -Observer,-DeviceID,
                                   -DateTime, -`Grid Size`, -`Image Size`,-`Channel Type`,
-                                  -`Project Animals`) 
+                                  -`Project Animals`, -Duration) 
 
 dogs_data <- dogs_data %>% rename(Session_Start_Time = `Session Start Time`,
                                   Session_End_Time = `Session End Time`, 
