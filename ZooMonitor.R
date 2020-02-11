@@ -5,6 +5,7 @@ library(tidyr)
 library(stringr)
 library(magrittr)
 library(ggplot2)
+library(lubridate)
 
 #Run Data cleaning script
 source("cleaning.R")
@@ -53,3 +54,42 @@ active_prop <-
 # Bar plots
 ggplot(data=active_prop, aes(x=IC1_Value, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
 ggplot(data=inactive_prop, aes(x=IC2_Value, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Percentage (%)")
+
+#Adding the column "Day.of.Week"
+dogs_dataH <- dogs_data
+dogs_dataH$Date <- as.POSIXct(dogs_dataH$Date, format = "%m/%d/%y")
+dogs_dataH <- mutate(dogs_dataH, Day.of.Week = wday(Date, label = TRUE))
+
+#Omitting overlapping Active and Inactive
+dogs_dataH <- subset(dogs_dataH, (is.na(IC1_Name) | is.na(IC2_Name)))
+
+#Creating the column "Activeness"
+dogs_dataH$Activeness <- ifelse(is.na(dogs_dataH$IC1_Name), "Inactive", "Active")
+
+#Grouping the data by name, day of week, and activeness
+dogs_dataH_grouped <- group_by(dogs_dataH, Name, Day.of.Week, Activeness)
+
+#Making the summary a data frame
+summary <- as.data.frame(summarise(dogs_dataH_grouped, n()))
+names(summary)[names(summary) == "n()"] <- "counts"
+
+#group_by summarise data table and making the sum of counts by each dog each day
+summary <- summary %>% group_by(Name, Day.of.Week) %>%
+  mutate(sum = sum(counts))
+
+#Merging the summary data frame into the dogs data frame to have the column "coutns"
+dogs_dataH <- left_join(dogs_dataH, summary, by = c("Name", "Day.of.Week", "Activeness"))
+
+#creating a percentage column
+dogs_dataH <- mutate(dogs_dataH, percent = dogs_dataH$counts/dogs_dataH$sum*100)
+dogs_dataH$percent <- round(dogs_dataH$percent, digits = 1)
+dogs_dataH$percent <- paste(dogs_dataH$percent, "%")
+
+##Plots of activeness by dogs by day
+ggplot(dogs_dataH, aes(x = Day.of.Week, y = counts, fill = Activeness)) + 
+  geom_bar(stat="identity", position=position_dodge()) +
+  labs(x = "Day of Week", y="Counts") +
+  geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
+  facet_grid(~ Name) 
+  
+  
