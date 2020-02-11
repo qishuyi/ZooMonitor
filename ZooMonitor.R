@@ -7,7 +7,7 @@ library(magrittr)
 library(ggplot2)
 
 #Run Data cleaning script
-source("ZooMonitor/cleaning.R")
+source("cleaning.R")
 
 #Structuring Data to Create Dog Activity Visualization
 dogs_data_visual <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)                              
@@ -38,15 +38,18 @@ ggplot(data = dogs_data_visual_Amara) + geom_bar(aes(x = Activity), fill = "salm
 ggplot(data = dogs_data_visual_JT) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "JT: Barplots of Activity per Hour", y = "Frequency")
 
 # Group by Inactive behavior
-inactive_data_grouped <- group_by(dogs_data[!dogs_data$IC2_Name == "",], IC2_Value)
-inactive_group_count <- count(inactive_data_grouped, IC2_Name)
-inactive_group_prop <- inactive_group_count %>% mutate(freq = n / sum(n))
-  
+inactive_prop <- 
+  dogs_data[!is.na(dogs_data$IC2_Value),] %>%
+  group_by(IC2_Value) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100)
+
+active_prop <- 
+  dogs_data[!is.na(dogs_data$IC1_Value),] %>%
+  group_by(IC1_Value) %>%
+  summarise(n = n()) %>%
+  mutate(freq = n / sum(n) * 100)
 
 # Bar plots
-active.behaviors <- table(dogs_data$IC1_Value)
-inactive.behaviors <- table(dogs_data$IC2_Value)
-active.plot <- qplot(data=dogs_data[!dogs_data$IC1_Name == "",], x=IC1_Value, geom="bar", fill = "coral") + labs(x = "Dogs' behavior when active")
-
-
-ggplot(data=inactive_group_prop, aes(IC2_Value)) + geom_bar(fill = "coral", alpha = 0.7) + labs(x = "Dogs' behavior when inactive")
+ggplot(data=active_prop, aes(x=IC1_Value, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
+ggplot(data=inactive_prop, aes(x=IC2_Value, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Percentage (%)")
