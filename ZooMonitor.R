@@ -6,14 +6,16 @@ library(stringr)
 library(magrittr)
 library(ggplot2)
 library(lubridate)
+library(gridExtra)
+library(grid)
 
 #Run Data cleaning script
 source("cleaning.R")
 
-#Structuring Data to Create Dog Activity Visualization
+#Creating an Activity Column for the data
 dogs_data_visual <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)                              
 
-dogs_data_visual <- dogs_data_visual %>% filter(str_detect(Activity, "NA") == TRUE) 
+#dogs_data_visual <- dogs_data_visual %>% filter(str_detect(Activity, "NA") == TRUE) 
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("NA_", "", Activity))
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity))                                  
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity)) 
@@ -38,6 +40,7 @@ ggplot(data = dogs_data_visual_Akilah) + geom_bar(aes(x = Activity), fill = "sal
 ggplot(data = dogs_data_visual_Amara) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Amara: Barplots of Activity per Hour", y = "Frequency")
 ggplot(data = dogs_data_visual_JT) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "JT: Barplots of Activity per Hour", y = "Frequency")
 
+
 # Group by Inactive behavior
 inactive_prop <- 
   dogs_data[!is.na(dogs_data$IC2_Value),] %>%
@@ -61,7 +64,8 @@ dogs_dataH$Date <- as.POSIXct(dogs_dataH$Date, format = "%m/%d/%y")
 dogs_dataH <- mutate(dogs_dataH, Day.of.Week = wday(Date, label = TRUE))
 
 #Omitting overlapping Active and Inactive
-dogs_dataH <- subset(dogs_dataH, (is.na(IC1_Name) | is.na(IC2_Name)))
+#(I don't think we need this anymore)
+#dogs_dataH <- subset(dogs_dataH, (is.na(IC1_Name) | is.na(IC2_Name)))
 
 #Creating the column "Activeness"
 dogs_dataH$Activeness <- ifelse(is.na(dogs_dataH$IC1_Name), "Inactive", "Active")
@@ -80,7 +84,7 @@ summary <- summary %>% group_by(Name, Day.of.Week) %>%
 #Merging the summary data frame into the dogs data frame to have the column "coutns"
 dogs_dataH <- left_join(dogs_dataH, summary, by = c("Name", "Day.of.Week", "Activeness"))
 
-#creating a percentage column
+#Creating a percentage column
 dogs_dataH <- mutate(dogs_dataH, percent = dogs_dataH$counts/dogs_dataH$sum*100)
 dogs_dataH$percent <- round(dogs_dataH$percent, digits = 1)
 dogs_dataH$percent <- paste(dogs_dataH$percent, "%")
@@ -92,4 +96,21 @@ ggplot(dogs_dataH, aes(x = Day.of.Week, y = counts, fill = Activeness)) +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
   facet_grid(~ Name) 
   
-  
+
+
+#For 3/3/2020
+
+#Percentage of observations (Time of day)
+ggplot(data = dogs_data_visual, aes(x = Hour)) + 
+  geom_bar(aes(y = ..count../nrow(dogs_data_visual)*100), fill = "steelblue", width = .75) + 
+  scale_x_discrete(limits = 9:16) +
+  scale_y_continuous(limits = c(0,25)) + 
+  geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+  labs(title = "Percentage of Observations (Per Hour of Day) ", x = "Hour of Day", y = "Percentage (%)") +
+  annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25)
+
+
+
+
+
+
