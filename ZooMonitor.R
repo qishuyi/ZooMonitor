@@ -90,6 +90,6 @@ ggplot(dogs_dataH, aes(x = Day.of.Week, y = counts, fill = Activeness)) +
   geom_bar(stat="identity", position=position_dodge()) +
   labs(x = "Day of Week", y="Counts") +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
-  facet_grid(~ Name) 
+  facet_grid(Name ~ .) 
   
   
