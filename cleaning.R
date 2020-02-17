@@ -24,3 +24,16 @@ dogs_data <- dogs_data %>% rename(Session_Start_Time = `Session Start Time`,
                                   IC2_Value = `Interval Channel 2 Value`)
 
 dogs_data <- dogs_data %>% filter(!(is.na(IC1_Value) & is.na(IC2_Value)))
+
+#Split each row with both active and inactive behaviors into two rows
+duplicate_indices <- which((!is.na(dogs_data$IC1_Value)) & (!is.na(dogs_data$IC2_Value)))
+for (row_num in duplicate_indices) {
+  duplicate_row <- dogs_data[row_num,]
+  dogs_data[row_num, 15] <- NA
+  dogs_data[row_num, 16] <- NA
+  duplicate_row[, 12] <- NA
+  duplicate_row[, 13] <- NA
+  dogs_data <- rbind(dogs_data, duplicate_row)
+}
+
+
