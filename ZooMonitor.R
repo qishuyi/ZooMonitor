@@ -106,7 +106,7 @@ ggplot(data = dogs_data_visual, aes(x = Hour)) +
   scale_x_discrete(limits = 9:16) +
   scale_y_continuous(limits = c(0,25)) + 
   geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-  labs(title = "Percentage of Observations (Per Hour of Day) ", x = "Hour of Day", y = "Percentage (%)") +
+  labs(title = "Percentage of Observations (Per Time of Day)", x = "Time of Day", y = "Percentage (%)") +
   annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25)
 
 
