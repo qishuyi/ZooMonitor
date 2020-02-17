@@ -14,11 +14,9 @@ source("cleaning.R")
 
 #Creating an Activity Column for the data
 dogs_data_visual <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)                              
-
 #dogs_data_visual <- dogs_data_visual %>% filter(str_detect(Activity, "NA") == TRUE) 
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("NA_", "", Activity))
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity))                                  
-dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activity)) 
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Interacting with object", "Obj Int", Activity))
 
@@ -110,7 +108,10 @@ ggplot(data = dogs_data_visual, aes(x = Hour)) +
   annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25)
 
 
+#Association B/W Food and Dog Behavior
 
-
+#Incorporate Day of Week into the data frame
+dogs_data_comp <- dogs_data_visual
+dogs_data_comp <- dogs_data_comp %>% mutate(Day_of_Week = wday(Date, label = T))
 
 
