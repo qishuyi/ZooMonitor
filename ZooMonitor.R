@@ -98,9 +98,14 @@ ggplot(dogs_dataH, aes(x = Day.of.Week, y = counts, fill = Activeness)) +
 
 #For 3/3/2020
 
+#Incorporate Day of Week into the data frame (Df with Activity Column)
+dogs_data_comp <- dogs_data_visual
+dogs_data_comp <- dogs_data_comp %>% mutate(Day_of_Week = wday(Date, label = T))
+
+
 #Percentage of observations (Time of day)
-ggplot(data = dogs_data_visual, aes(x = Hour)) + 
-  geom_bar(aes(y = ..count../nrow(dogs_data_visual)*100), fill = "steelblue", width = .75) + 
+time_of_day_viz <- ggplot(data = dogs_data_comp, aes(x = Hour)) + 
+  geom_bar(aes(y = ..count../nrow(dogs_data_comp)*100), fill = "steelblue", width = .75) + 
   scale_x_discrete(limits = 9:16) +
   scale_y_continuous(limits = c(0,25)) + 
   geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
@@ -108,10 +113,18 @@ ggplot(data = dogs_data_visual, aes(x = Hour)) +
   annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25)
 
 
+day_of_week_viz <- ggplot(data = dogs_data_comp, aes(x = Day_of_Week)) +
+  geom_bar(aes(y = ..count../nrow(dogs_data_comp)*100), fill = "steelblue2", width = .75) +
+  scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
+  scale_y_continuous(limits = c(0,60)) +
+  labs(title = "Percentage of Observations (Per Day of Week)", x = "Day of Week", y = "Percentage (%)") +
+  geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") + 
+  annotate("text", x= 1.5, y = 16.5 , label = "14.28%", color = "darkmagenta", size = 3.25)
+
+grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
+
+
 #Association B/W Food and Dog Behavior
 
-#Incorporate Day of Week into the data frame
-dogs_data_comp <- dogs_data_visual
-dogs_data_comp <- dogs_data_comp %>% mutate(Day_of_Week = wday(Date, label = T))
 
 
