@@ -20,6 +20,12 @@ dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("_NA", "", Activ
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
 dogs_data_visual <- dogs_data_visual %>% mutate(Activity = gsub("Interacting with object", "Obj Int", Activity))
 
+
+#Creating an Activeness Column for the data 
+dogs_data_visual <- dogs_data_visual %>% unite("Activeness", c(IC1_Name, IC2_Name), remove = T)
+dogs_data_visual <- dogs_data_visual %>% mutate(Activeness = gsub("NA_", "", Activeness))
+dogs_data_visual <- dogs_data_visual %>% mutate(Activeness = gsub("_NA", "", Activeness))       
+
 #Subsetting Data for each Dog
 dogs_data_visual_Hunter <- dogs_data_visual %>% filter(Name == "Hunter")
 dogs_data_visual_Minzi <- dogs_data_visual %>% filter(Name == "Minzi")
@@ -125,6 +131,20 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 
 #Association B/W Food and Dog Behavior
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
