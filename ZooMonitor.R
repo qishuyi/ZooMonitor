@@ -153,8 +153,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #Bones
 ggplot(data = dogs_data_comp %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. /nrow(dogs_data_comp %>% filter(Food == "Bones"))*100, color = Day_of_Week), 
-           fill = "steelblue") +
+  geom_bar(aes(y = ..count.. /nrow(dogs_data_comp %>% filter(Food == "Bones"))*100, fill = Day_of_Week)) +
   labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
        , y = "Percentage (%)")
 
@@ -170,6 +169,7 @@ ggplot(data = dogs_data_comp %>% filter(Food == "Guinea Pig"), aes(x = Activity)
   geom_bar(aes(y = ..count.. / nrow(dogs_data_comp %>% filter(Food == "Guinea Pig")) *100))
 
 
+ggplot(data = dogs_data_comp) + geom_bar(aes(x = Activity, fill = Day_of_Week))
 
 
 table(dogs_data_comp$Food)
