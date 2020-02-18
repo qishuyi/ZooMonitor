@@ -60,9 +60,8 @@ ggplot(data=inactive_prop, aes(x=IC2_Value, y=freq)) + geom_bar(fill = "coral", 
 
 #Adding the column "Day.of.Week"
 dogs_dataH <- dogs_data
-dogs_dataH$Date <- as.POSIXct(dogs_dataH$Date, format = "%m/%d/%y")
 dogs_dataH <- mutate(dogs_dataH, Day.of.Week = wday(Date, label = TRUE))
-
+table(dogs_dataH$Day.of.Week)
 #Omitting overlapping Active and Inactive
 #(I don't think we need this anymore)
 #dogs_dataH <- subset(dogs_dataH, (is.na(IC1_Name) | is.na(IC2_Name)))
@@ -108,8 +107,6 @@ ggplot(data = dogs_data_visual, aes(x = Hour)) +
   geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
   labs(title = "Percentage of Observations (Per Time of Day)", x = "Time of Day", y = "Percentage (%)") +
   annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25)
-
-
 
 
 
