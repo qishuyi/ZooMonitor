@@ -113,8 +113,9 @@ dogs_data_comp <- cbind(dogs_data_comp, Food = dogs_data_comp$Day_of_Week)
 dogs_data_comp$Food <- as.character(dogs_data_comp$Food)
 
 for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
+  
   if(day == "Fri"){
-    dogs_data_comp$Food[dogs_data_comp$Food == day] <- "Guniea Pig"
+    dogs_data_comp$Food[dogs_data_comp$Food == day] <- "Guinea Pig"
   }
   
   else if(day == "Wed" | day == "Sat"){
@@ -150,19 +151,26 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #Association B/W Food and Dog Behavior
 
+#Bones
 ggplot(data = dogs_data_comp %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. /nrow(dogs_data_comp)*100)) 
+  geom_bar(aes(y = ..count.. /nrow(dogs_data_comp %>% filter(Food == "Bones"))*100, color = Day_of_Week), 
+           fill = "steelblue") +
+  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
+       , y = "Percentage (%)")
 
-
+#Ground Meat
 ggplot(data = dogs_data_comp %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. /nrow(dogs_data_comp)*100)) 
+  geom_bar(aes(y = ..count.. / nrow(dogs_data_comp %>% filter(Food == "Ground Meat")) *100), 
+           fill = "steelblue2") +
+  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Ground Meat"
+       , y = "Percentage (%)")
+
+#Guinea Pigs (Not a large enough sample)
+ggplot(data = dogs_data_comp %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count.. / nrow(dogs_data_comp %>% filter(Food == "Guinea Pig")) *100))
 
 
 
 
-
-
-
-
-
+table(dogs_data_comp$Food)
 
