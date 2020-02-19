@@ -49,9 +49,16 @@ for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
   }
 }
 
-##Weather Column
+##Temperature/Weather Columns
 
-##Temperature Column
+#Cleaning weather_temp dataset
+weather_temp <- read_csv("Weather_Temperature.csv")
+weather_temp$DATE <- as.Date(weather_temp$DATE, format = "%m/%d/%y")
+weather_temp <- weather_temp %>% select(-c(STATION, NAME, TOBS))
+
+#Merging
+#dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
+
 
 
 
