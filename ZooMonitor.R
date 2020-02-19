@@ -55,6 +55,8 @@ for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
 
 
 
+################# For 2/18/2020
+
 ################## Plot of Activity of Dogs in each Hour (V_R)
 
 #Subsetting Data for each Dog
@@ -109,7 +111,7 @@ names(summary)[names(summary) == "n()"] <- "counts"
 summary <- summary %>% group_by(Name, Day_of_Week) %>%
   mutate(sum = sum(counts))
 
-#Merging the summary data frame into the dogs data frame to have the column "coutns"
+#Merging the summary data frame into the dogs data frame to have the column "counts"
 dogs_data_DW <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
 
 #Creating a percentage column
@@ -155,7 +157,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count.. /nrow(dogs_data %>% filter(Food == "Bones"))*100, fill = Day_of_Week)) +
   labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
-       , y = "Percentage (%)")
+       , y = "Percentage (%)") + facet_grid(. ~ Hour)
 
 #Ground Meat
 ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
