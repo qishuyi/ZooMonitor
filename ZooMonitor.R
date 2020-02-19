@@ -49,15 +49,33 @@ for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
   }
 }
 
-##Temperature/Weather Columns
+##Season Column
+dogs_data <- cbind(dogs_data, Season = dogs_data$Month)
+dogs_data$Month <- as.character(dogs_data$Month)
 
+for(month in c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")){
+  
+  if(month == "1" | month == "2" | month == "12"){
+    dogs_data$Season[dogs_data$Season == month] <- "Winter"
+  }
+  else if(month == "3" | month == "4" | month == "5"){
+    dogs_data$Season[dogs_data$Season == month] <- "Spring"
+  }
+  else if(month == "6" | month == "7" | month == "8"){
+    dogs_data$Season[dogs_data$Season == month] <- "Summer"
+  }
+  
+  else{
+    dogs_data$Season[dogs_data$Season == month] <- "Fall"
+  }}
+
+##Temperature/Weather Columns
 #Cleaning weather_temp dataset
 weather_temp <- read_csv("Weather_Temperature.csv")
 weather_temp$DATE <- as.Date(weather_temp$DATE, format = "%m/%d/%y")
 weather_temp <- weather_temp %>% select(-c(STATION, NAME, TOBS))
-
 #Merging
-#dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
+dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 
 
 
