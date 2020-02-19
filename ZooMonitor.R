@@ -74,6 +74,12 @@ for(month in c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")){
 weather_temp <- read_csv("Weather_Temperature.csv")
 weather_temp$DATE <- as.Date(weather_temp$DATE, format = "%m/%d/%y")
 weather_temp <- weather_temp %>% select(-c(STATION, NAME, TOBS))
+weather_temp <- weather_temp %>%
+  mutate(TAVG_C = round((TAVG-32)*5/9)) %>%
+  mutate(TMAX_C = round((TMAX-32)*5/9)) %>%
+  mutate(TMIN_C = round((TMIN-32)*5/9))
+weather_temp <- weather_temp %>% slice(1:717)
+
 #Merging
 dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 
