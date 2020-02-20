@@ -192,22 +192,27 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 behavior_order <- c("Dog Int","Eating","Object Int", 
                     "Running", "Walking", "Alert", "Other", 
                     "Out of View", "Resting", "Sleeping")
-#Bones
-ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count..), fill = "steelblue") +
-  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
-       , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  scale_y_continuous(limits = c(0,200)) +
-  scale_x_discrete(limits = behavior_order)
 
 #Ground Meat
-ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
+ground_meat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count..), fill = "purple2") +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
        , y = "Frequency") + facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_x_discrete(limits = behavior_order)
+
+#Bones
+bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "steelblue", width = .55) +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_y_continuous(limits = c(0,500)) +
+  scale_x_discrete(limits = behavior_order) +
+  
+
+#Plotting Food Graph
+grid.arrange(ground_meat, bones, nrow = 2)
 
 #Guinea Pigs (Not a large enough sample)
 ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
