@@ -84,6 +84,9 @@ dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 #Omitting weather type that has no case
 dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
+##Temperature Level Column
+dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG, quantile(TAVG, probs=0:10/10), include.lowest=TRUE)))
+dogs_data$Temp_Level <- as.character(dogs_data$Temp_Level)
 
 
 ################# For 2/18/2020
@@ -201,7 +204,12 @@ ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) +
 ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Guinea Pig")) *100))
 
-
 ggplot(data = dogs_data) + geom_bar(aes(x = Activity, fill = Day_of_Week))
+
+
+
+
+
+
 
 
