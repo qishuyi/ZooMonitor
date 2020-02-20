@@ -81,6 +81,8 @@ weather_temp <- weather_temp %>%
 weather_temp <- weather_temp %>% slice(1:717)
 #Merging
 dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
+#Omitting weather type that has no case
+dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
 
 
