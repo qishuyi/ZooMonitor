@@ -84,9 +84,6 @@ dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 #Omitting weather type that has no case
 dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
-##Temperature Level Column
-dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG, quantile(TAVG, probs=0:10/10), include.lowest=TRUE)))
-dogs_data$Temp_Level <- as.character(dogs_data$Temp_Level)
 
 
 ################# For 2/18/2020
@@ -189,27 +186,26 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #Bones
 ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. /nrow(dogs_data %>% filter(Food == "Bones"))*100, fill = Day_of_Week)) +
+  geom_bar(aes(y = ..count..), fill = "steelblue") +
   labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
-       , y = "Percentage (%)") + facet_grid(. ~ Hour)
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_y_continuous(limits = c(0,200))+
+  scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
 
 #Ground Meat
 ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Ground Meat")) *100), 
-           fill = "steelblue2") +
+  geom_bar(aes(y = ..count..), fill = "steelblue2") +
   labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Ground Meat"
-       , y = "Percentage (%)")
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) 
+  
 
 #Guinea Pigs (Not a large enough sample)
 ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Guinea Pig")) *100))
 
+
 ggplot(data = dogs_data) + geom_bar(aes(x = Activity, fill = Day_of_Week))
-
-
-
-
-
-
 
 
