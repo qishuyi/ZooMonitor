@@ -20,12 +20,16 @@ dogs_data <- dogs_data %>% unite("Activeness", c(IC1_Name, IC2_Name), remove = T
 dogs_data <- dogs_data %>% mutate(Activeness = gsub("NA_", "", Activeness))
 dogs_data <- dogs_data %>% mutate(Activeness = gsub("_NA", "", Activeness))       
 
-##Activity Column and Changing Long Column Names
+##Activity Column 
 dogs_data <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)
 dogs_data <- dogs_data %>% mutate(Activity = gsub("NA_", "", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("_NA", "", Activity))                                  
+dogs_data <- dogs_data %>% mutate(Activity = gsub("_NA", "", Activity))   
+
+##Changing Name of Behavior in Activity Column
 dogs_data <- dogs_data %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Interacting with object", "Obj Int", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Interacting with object", "Object Int", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Walking Around", "Walking", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Out of view", "Out of View", Activity))
 
 ##Day_of_Week Column
 dogs_data <- mutate(dogs_data, Day_of_Week = wday(Date, label = TRUE))
@@ -40,7 +44,7 @@ for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
     dogs_data$Food[dogs_data$Food == day] <- "Guinea Pig"
   }
   
-  else if(day == "Wed" | day == "Sat"){
+  else if(day == "Wed" | day == "Sun"){
     dogs_data$Food[dogs_data$Food == day] <- "Bones"
   }
   
@@ -184,22 +188,26 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #Association B/W Food and Dog Behavior
 
+#Vector for relabeling barplots
+behavior_order <- c("Dog Int","Eating","Object Int", 
+                    "Running", "Walking", "Alert", "Other", 
+                    "Out of View", "Resting", "Sleeping")
 #Bones
 ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count..), fill = "steelblue") +
-  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
        , y = "Frequency") + facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90)) +
-  scale_y_continuous(limits = c(0,200))+
-  scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
+  scale_y_continuous(limits = c(0,200)) +
+  scale_x_discrete(limits = behavior_order)
 
 #Ground Meat
 ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count..), fill = "steelblue2") +
-  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Ground Meat"
+  geom_bar(aes(y = ..count..), fill = "purple2") +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90)) 
-  
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(limits = behavior_order)
 
 #Guinea Pigs (Not a large enough sample)
 ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
