@@ -8,7 +8,7 @@ library(ggplot2)
 library(lubridate)
 library(gridExtra)
 library(grid)
-library(formattable)
+library(formattable) #To make a nice table
 
 #Run Data cleaning script
 source("cleaning.R")
