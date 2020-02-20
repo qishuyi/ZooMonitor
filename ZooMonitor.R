@@ -84,9 +84,21 @@ dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 #Omitting weather type that has no case
 dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
-##Temperature Level Column
+##Average Temperature Level Column
 dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG, quantile(TAVG, probs=0:10/10), include.lowest=TRUE)))
 dogs_data$Temp_Level <- as.character(dogs_data$Temp_Level)
+dogs_data$Temp_Level <- factor(dogs_data$Temp_Level, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+
+##Average of Average-max Temperature column and its temperature level
+dogs_data <- mutate(dogs_data, TAVG_TMAX_avg = (dogs_data$TMAX + dogs_data$TAVG)/2)
+dogs_data <- within(dogs_data, Temp_Level2 <- as.integer(cut(TAVG_TMAX_avg, quantile(TAVG_TMAX_avg, probs=0:10/10), include.lowest=TRUE)))
+dogs_data$Temp_Level2 <- as.character(dogs_data$Temp_Level2)
+dogs_data$Temp_Level2 <- factor(dogs_data$Temp_Level2, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+
+
+
+
+
 
 
 ################# For 2/18/2020
@@ -207,6 +219,31 @@ ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) +
 ggplot(data = dogs_data) + geom_bar(aes(x = Activity, fill = Day_of_Week))
 
 
+##Association Between Dogs' Behavior with Temperature 
+dogs_data_grouped2 <- group_by(dogs_data, Temp_Level, Activeness)
+summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Temp_Level) %>%
+  mutate(sum = sum(counts))
+dogs_data_TL <- left_join(dogs_data, summary2, by = c("Temp_Level", "Activeness"))
+dogs_data_TL <- mutate(dogs_data_TL, percent = dogs_data_TL$counts/dogs_data_TL$sum*100)
+dogs_data_TL$percent <- round(dogs_data_TL$percent, digits = 1)
+dogs_data_TL$percent <- paste(dogs_data_TL$percent, "%")
+##Plots of activeness by dogs by day
+ggplot(data = dogs_data_TL) + 
+  geom_bar(aes(x = Temp_Level), fill = "salmon") + 
+  facet_grid(.~ Activity) + 
+  theme(axis.text.x = element_text(angle = 90),
+    legend.position = c(0.95, 0.95),
+    legend.justification = c("right", "top")) +
+  labs(title = "Activity Based on Temperature", x = "Temperature Level", y="Counts")
+  
+
+ggplot(data = dogs_data_TL) + 
+  geom_bar(aes(x = Temp_Level), fill = "salmon") + 
+  facet_grid(.~ Activity) + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(title = "Activity Based on Temperature", x = "Activity", y="Counts") +
 
 
 
