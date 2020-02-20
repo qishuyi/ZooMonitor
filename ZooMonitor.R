@@ -113,14 +113,14 @@ dogs_data_Amara <- dogs_data %>% filter(Name == "Amara")
 dogs_data_JT <- dogs_data %>% filter(Name == "JT")
 
 ##Plot of Activity of Dogs in each Hour
-ggplot(data = dogs_data) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(Name ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Bar Plots of Activity (Dog/Time)", y = "Frequency")
+ggplot(data = dogs_data) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(Name Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Bar Plots of Activity (Dog/Time)", y = "Frequency")
 
 ##Plot of Activity of Dogs in each Hour (Individual)
-ggplot(data = dogs_data_Hunter) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Hunter: Barplots of Activity per Hour", y = "Frequency")
-ggplot(data = dogs_data_Minzi) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Minzi: Barplots of Activity per Hour", y = "Frequency")
-ggplot(data = dogs_data_Akilah) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Akilah: Barplots of Activity per Hour", y = "Frequency")
-ggplot(data = dogs_data_Amara) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Amara: Barplots of Activity per Hour", y = "Frequency")
-ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. ~ Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "JT: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_Hunter) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Hunter: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_Minzi) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Minzi: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_Akilah) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Akilah: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_Amara) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "Amara: Barplots of Activity per Hour", y = "Frequency")
+ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + facet_grid(. Hour) + theme(axis.text.x = element_text(angle = 90)) + labs(title = "JT: Barplots of Activity per Hour", y = "Frequency")
 
 ################## Other's Frequency (V_S)
 
@@ -170,7 +170,7 @@ ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) +
   geom_bar(stat="identity", position=position_dodge()) +
   labs(x = "Day of Week", y="Counts") +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
-  facet_grid(Name ~ .) 
+  facet_grid(Name .) 
   
 
 
@@ -203,7 +203,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count.. /nrow(dogs_data %>% filter(Food == "Bones"))*100, fill = Day_of_Week)) +
   labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
-       , y = "Percentage (%)") + facet_grid(. ~ Hour)
+       , y = "Percentage (%)") + facet_grid(. Hour)
 
 #Ground Meat
 ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
@@ -236,14 +236,15 @@ ggplot(data = dogs_data_TL) +
   theme(axis.text.x = element_text(angle = 90),
     legend.position = c(0.95, 0.95),
     legend.justification = c("right", "top")) +
-  labs(title = "Activity Based on Temperature", x = "Temperature Level", y="Counts")
+  labs(title = "Activity Based on Temperature", x = "Temperature Level", y="Counts", caption = "1 = 21° ~33°, 2 = 34°~ 38°, 3 = 39°~ 45°, 4 = 46° ~50°, 5 = 51° ~ 57°, 6 = 58° ~ 62°, 7 = 63° ~ 69°, 8 = 70° ~ 72°, 9 = 73° ~ 77°, 10 = 77.7℉ ~ 86℉")
   
+quantile(dogs_data$TAVG, 0:10/10)
 
 ggplot(data = dogs_data_TL) + 
   geom_bar(aes(x = Temp_Level), fill = "salmon") + 
   facet_grid(.~ Activity) + 
   theme(axis.text.x = element_text(angle = 90)) +
-  labs(title = "Activity Based on Temperature", x = "Activity", y="Counts") +
+  labs(title = "Activity Based on Temperature", x = "Activity", y="Counts") 
 
 
 
