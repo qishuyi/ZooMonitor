@@ -208,7 +208,7 @@ bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity))
        , y = "Frequency") + facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_y_continuous(limits = c(0,500)) +
-  scale_x_discrete(limits = behavior_order) +
+  scale_x_discrete(limits = behavior_order) 
   
 
 #Plotting Food Graph
