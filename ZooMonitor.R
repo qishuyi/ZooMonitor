@@ -79,10 +79,8 @@ weather_temp <- weather_temp %>%
   mutate(TMAX_C = round((TMAX-32)*5/9)) %>%
   mutate(TMIN_C = round((TMIN-32)*5/9))
 weather_temp <- weather_temp %>% slice(1:717)
-
 #Merging
 dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
-
 
 
 
