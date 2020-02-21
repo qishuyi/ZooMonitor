@@ -1,8 +1,8 @@
 ---
-title: "Data Cleaning Report"
+title: "Data_Cleaning_Report"
 author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
 date: "2/19/2020"
-output: html_document 
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,4 +13,3 @@ library(tidyr)
 library(stringr)
 ```
 
-### **Introduction:**
