@@ -304,4 +304,6 @@ formattable(Temp_Level_Reference2)
 ##Combined Visuals (TAVG and TAVG_TMAX_avg)
 grid.arrange(a, b, nrow = 2)
 
+test
+
 
