@@ -13,7 +13,6 @@ library(formattable) #To make a nice table
 #Run Data cleaning script
 source("cleaning.R")
 
-
 ################## Master Data Frame
 
 ##Activeness Column
@@ -25,8 +24,12 @@ dogs_data <- dogs_data %>% mutate(Activeness = gsub("_NA", "", Activeness))
 dogs_data <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)
 dogs_data <- dogs_data %>% mutate(Activity = gsub("NA_", "", Activity))
 dogs_data <- dogs_data %>% mutate(Activity = gsub("_NA", "", Activity))                                  
+
+##Changing Name of Behavior in Activity Column
 dogs_data <- dogs_data %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Interacting with object", "Obj Int", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Interacting with object", "Object Int", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Walking Around", "Walking", Activity))
+dogs_data <- dogs_data %>% mutate(Activity = gsub("Out of view", "Out of View", Activity))
 
 ##Day_of_Week Column
 dogs_data <- mutate(dogs_data, Day_of_Week = wday(Date, label = TRUE))
@@ -41,7 +44,7 @@ for(day in c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")){
     dogs_data$Food[dogs_data$Food == day] <- "Guinea Pig"
   }
   
-  else if(day == "Wed" | day == "Sat"){
+  else if(day == "Wed" | day == "Sun"){
     dogs_data$Food[dogs_data$Food == day] <- "Bones"
   }
   
@@ -200,24 +203,38 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #Association B/W Food and Dog Behavior
 
-#Bones
-ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. /nrow(dogs_data %>% filter(Food == "Bones"))*100, fill = Day_of_Week)) +
-  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Bones"
-       , y = "Percentage (%)") + facet_grid(.~Hour)
+#Vector for relabeling barplots
+behavior_order <- c("Dog Int","Eating","Object Int", 
+                    "Running", "Walking", "Alert", "Other", 
+                    "Out of View", "Resting", "Sleeping")
 
 #Ground Meat
-ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Ground Meat")) *100), 
-           fill = "steelblue2") +
-  labs(title = "Bar Plot of Dog Behavior", subtitle  = "Food: Ground Meat"
-       , y = "Percentage (%)")
+ground_meat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "steelblue") +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_x_discrete(limits = behavior_order)
+
+#Bones
+bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "purple2", width = .55) +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_y_continuous(limits = c(0,500)) +
+  scale_x_discrete(limits = behavior_order) 
+
+
+#Plotting Food Graph
+grid.arrange(ground_meat, bones, nrow = 2)
+
 
 #Guinea Pigs (Not a large enough sample)
 ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Guinea Pig")) *100))
 
-ggplot(data = dogs_data) + geom_bar(aes(x = Activity, fill = Day_of_Week))
+
 
 
 #################### Association Between Dogs' Behavior with Temperature(Using TAVG)
