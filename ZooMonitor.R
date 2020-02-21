@@ -222,4 +222,3 @@ ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) +
 ggplot(data = dogs_data) + geom_bar(aes(x = Activity, fill = Day_of_Week))
 
 
-
