@@ -180,7 +180,7 @@ ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) +
 
 ################## For 3/3/2020
 
-#Percentage of observations (Time of day)
+################## Percentage of observations (Time of day)
 time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) + 
   geom_bar(aes(y = ..count../nrow(dogs_data)*100), fill = "steelblue", width = .75) + 
   scale_x_discrete(limits = 9:16) +
@@ -201,20 +201,21 @@ day_of_week_viz <- ggplot(data = dogs_data, aes(x = Day_of_Week)) +
 grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 
-#Association B/W Food and Dog Behavior
+################## Association B/W Food and Dog Behavior (Including Saturday)
 
 #Vector for relabeling barplots
 behavior_order <- c("Dog Int","Eating","Object Int", 
                     "Running", "Walking", "Alert", "Other", 
                     "Out of View", "Resting", "Sleeping")
 
-#Ground Meat
+#Ground Meat (Including Saturday)
 ground_meat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count..), fill = "steelblue") +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
        , y = "Frequency") + facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90)) +
-  scale_x_discrete(limits = behavior_order)
+  scale_x_discrete(limits = behavior_order) +
+  geom_vline(xintercept = 5.5, color = "black", alpha = .5, linetype = "dashed", size = .3)
 
 #Bones
 bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
@@ -223,17 +224,41 @@ bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity))
        , y = "Frequency") + facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90)) +
   scale_y_continuous(limits = c(0,500)) +
-  scale_x_discrete(limits = behavior_order) 
+  scale_x_discrete(limits = behavior_order) +
+  geom_vline(xintercept = 5.5, color = "black", alpha = .5, linetype = "dashed", size = .3)
 
 
-#Plotting Food Graph
+#Plotting Food Graph (Including Saturday)
 grid.arrange(ground_meat, bones, nrow = 2)
 
 
-#Guinea Pigs (Not a large enough sample)
-ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Guinea Pig")) *100))
+################### Association B/W Food and Dog Behavior (NOT Including Saturday)
 
+
+#Ground Meat (NOT Including Saturday)
+ground_meat_nosat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat", Day_of_Week != "Sat"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "steelblue") +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)" 
+       , subtitle  = "Food: Ground Meat (Excluding Saturdays)"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_y_continuous(limits = c(0,200)) + 
+  scale_x_discrete(limits = behavior_order) +
+  geom_vline(xintercept = 5.5, color = "black", alpha = .5, linetype = "dashed", size = .3)
+
+#Bones
+bones_nosat <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "purple2", width = .65) +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_y_continuous(limits = c(0,200)) +
+  scale_x_discrete(limits = behavior_order) +
+  geom_vline(xintercept = 5.5, color = "black", alpha = .5, linetype = "dashed", size = .3)
+
+
+#Plotting Food Graph (NOT Including Saturday)
+grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 
 
