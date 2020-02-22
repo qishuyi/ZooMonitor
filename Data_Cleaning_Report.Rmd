@@ -70,8 +70,8 @@ First, we will guide you through the process of installing R.
 
 2. On the newly opened page, there are various blue links on the left hand side of the page. 
 + We will later select one of the three links that are given in this format *(____.pkg)*. 
-+ The approrpaite link to install R will depend on the version of the operating system for your Mac. 
-+ Beside the three blue links in the *(____.pkg)* format, the website provides a description of the MacOS compatible with that installtion link. 
++ The appropriate link to install R will depend on the version of the operating system for your Mac. 
++ Beside the three blue links in the *(____.pkg)* format, the website provides a description of the MacOS compatible with that installation link. 
 
 3. Click on the appropriate link to continue with the installation. 
 + If you are unsure which MacOS version your Mac is currently running, this [website](https://support.apple.com/en-us/HT201260) provides support on how to check the version. 
