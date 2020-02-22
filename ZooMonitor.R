@@ -118,6 +118,15 @@ active_prop <-
   summarise(n = n()) %>%
   mutate(freq = n / sum(n) * 100)
 
+# Add a column for six-month intervals
+
+# Get start year of the dataset
+start_year <- min(dogs_data[,'Year'])
+
+diff_in_days = difftime(datetimes[2], datetimes[1], units = "days") # days
+diff_in_months = as.double(diff_in_days)/365*12 # absolute years
+floor(diff_in_months)
+
 ## Other's Frequency
 ggplot(data=active_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
 ggplot(data=inactive_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Percentage (%)")
