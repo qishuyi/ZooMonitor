@@ -1,16 +1,84 @@
 ---
 title: "Data Cleaning Report for Pueblo Zoo"
 author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
-date: "2/27/2020"
+date: "February 27 2020"
 output: 
   html_document:
-    theme: sandstone
-    toc: true
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
+    smooth_scroll: TRUE
+    
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
 ```
+\
 
-#### **Introduction**
+#### **Introduction:**
+
+\
+
+\
+
+\
+
+***
+
+#### **Instructions for Installing R and R Studio:**
+
+First, we will guide you through the process of installing R.
+
+1. To begin, click on this [link](https://cloud.r-project.org/bin/windows/base/) to install R on a Windows device, or this [link](https://cloud.r-project.org/bin/macosx/) to install R on a Mac device. 
+
+2. **[For Windows]** 
++ On the newly opened page, click *"Download R 3.6.2 for Windows"* to continue with the installation. 
++ After clicking on the download link, follow any other directions given by the installation manual. 
+
+3. **[For Mac]** 
++ On the newly opened page, there are various blue links on the left hand side of the page. 
++ We will later select one of the three links that are given in this format *(____.pkg)*. 
++ The approrpaite link to install R will depend on the version of the operating system for your Mac. 
++ Beside the three blue links in the *(____.pkg)* format, the website provides a description of the MacOS compatible with that installtion link. 
++ Click on the appropriate link to continue with the installation. 
++ If you are unsure which MacOS version your Mac is currently running, this [website](https://support.apple.com/en-us/HT201260) provides support on how to check the version. + An alternative is to update your MacOS to the latest version and click on *"R-3.6.2.pkg"*. 
++ After selecting the correct download link for your Mac, follow any other directions given by the installation manual. 
+
+\
+
+Now that R has been successfully installed on your computer, we will guide you through the process of installing R Studio. 
+
+1. To begin, first click on this [link](https://rstudio.com/products/rstudio/download/#download)
+
+2. Scroll down on the page below the section titled All Installers. 
+
+3. Select the download link that is approrpiate for your operating system.
+
+4. Follow any other direction given by the installation manual. 
+
+\
+
+***
+
+#### **Data Cleaning Procedure:**
+
+\
+
+\
+
+\
+
+
+
+
+**Removing Unnecessary Columns: **
+
+
+
+
+
+
+
