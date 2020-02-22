@@ -38,7 +38,7 @@ dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/mast
 
 \
 
-#### **Introduction:**
+#### **Introduction**
 
 \
 
@@ -48,7 +48,7 @@ dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/mast
 
 ***
 
-#### **Instructions for Installing R and R Studio:**
+#### **Instructions for Installing R and R Studio**
 
 
 
@@ -97,7 +97,26 @@ Congratulations! R and R Studio should now be succesfully installed on your comp
 
 ***
 
-#### **Data Cleaning Procedure:**
+
+#### **Using R Studio**
+
+\
+
+\
+
+\
+
+\
+
+\
+
+\
+
+\
+
+***
+
+#### **Data Cleaning Procedure**
 
 \
 
