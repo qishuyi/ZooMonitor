@@ -144,13 +144,30 @@ active_prop <-
   mutate(freq = n / sum(n) * 100)
 
 # Add a column for six-month intervals
+# Get start and end dates of the dataset
+start_date <- min(dogs_data[,'Date'])
+end_date <- max(dogs_data[,'Date'])
 
-# Get start year of the dataset
-start_year <- min(dogs_data[,'Year'])
+get_six_month_interval <- function(inputDates) {
+  for (n in length(inputDates)) {
+    
+  }
+  cur <- start_date # Create a copy of start date
+  cur2 <- cur
+  month(cur2) = month(cur2) + 6
+  while (as.numeric(inputDate) >= as.numeric(cur2)) {
+    month(cur) <- month(cur) + 6
+    month(cur2) = month(cur2) + 6
+  }
+  if (cur2 > end_date) cur2 <- end_date
+  interval <- paste(toString(cur), "~", toString(cur2)) # Create a string in the format "YYYY-MM-DD ~ YYYY-MM-DD"
+  return(interval)
+}
 
-diff_in_days = difftime(datetimes[2], datetimes[1], units = "days") # days
-diff_in_months = as.double(diff_in_days)/365*12 # absolute years
-floor(diff_in_months)
+get_six_month_interval(dogs_data[,'Date'][1000])
+
+temp <- mutate(dogs_data, Six_Month_Interval = get_six_month_interval(Date))
+table(temp$Six_Month_Interval)
 
 ## Other's Frequency
 ggplot(data=active_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
