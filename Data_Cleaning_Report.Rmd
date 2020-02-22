@@ -1,15 +1,267 @@
 ---
-title: "Data_Cleaning_Report"
+title: "Data Cleaning Report for Pueblo Zoo"
 author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
-date: "2/19/2020"
-output: html_document
+date: "February 27 2020"
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
+    smooth_scroll: TRUE
+    
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+
+```
+
+```{r Delete Later}
+#Only so that I can work on data cleaning part before the installing of packages and importing data
+library(knitr)
 library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(tibble)
+
+
+
+dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1579790635.csv", col_types = cols(Notes = col_character()))
+
+
 ```
+
+
+
+
+\
+
+#### **Introduction**
+
+\
+
+\
+
+\
+
+***
+
+#### **Instructions for Installing R and R Studio**
+
+
+
+First, we will guide you through the process of installing R.
+
+**[For Windows]** 
+
+1. To begin, click on this [link](https://cran.rstudio.com/bin/windows/base/) to install R on a Windows device. 
+
+2. On the newly opened page, click *"Download R 3.6.2 for Windows"* to continue with the installation. 
+
+3. After clicking on the download link, follow any other directions given by the installation manual. 
+
+\
+
+ **[For Mac]** 
+
+1. To begin, click on this [link](https://cran.rstudio.com/bin/macosx/) to install R on a Mac device. 
+
+2. On the newly opened page, there are various blue links on the left hand side of the page. 
++ We will later select one of the three links that are given in this format *(____.pkg)*. 
++ The approrpaite link to install R will depend on the version of the operating system for your Mac. 
++ Beside the three blue links in the *(____.pkg)* format, the website provides a description of the MacOS compatible with that installtion link. 
+
+3. Click on the appropriate link to continue with the installation. 
++ If you are unsure which MacOS version your Mac is currently running, this [website](https://support.apple.com/en-us/HT201260) provides support on how to check the version. 
++ An alternative is to update your MacOS to the latest version and click on *"R-3.6.2.pkg"*. 
+
+4. After selecting the correct download link for your Mac, follow any other directions given by the installation manual. 
+
+\
+
+Now that R has been successfully installed on your computer, we will guide you through the process of installing R Studio. 
+
+1. To begin, first click on this [link](https://rstudio.com/products/rstudio/download/#download)
+
+2. Scroll down on the page below the section titled All Installers. 
+
+3. Select the download link that is approrpiate for your operating system.
+
+4. Follow any other directions given by the installation manual. 
+
+\
+
+Congratulations! R and R Studio should now be succesfully installed on your computer. 
+
+***
+
+
+#### **Using R Studio**
+
+\
+
+\
+
+\
+
+\
+
+\
+
+\
+
+\
+
+***
+
+#### **Data Cleaning Procedure**
+
+\
+
+##### **Installing Packages**
+
+\
+
+\
+
+##### **Loading in Libraries**
+
+\
+
+\
+
+##### **Importing Data**
+
+\
+
+\
+
+
+##### **Inspecting the Data**
+
+We have successfully installed necessary packages, loaded the libraries, and imported our data. Before beginning the data cleaning process, we must inspect the data. We begin by checking the number of rows the columns the data contains.
+
+```{r}
+dim(dogs_data)
+```
+We used the *dim()* function, and passed in the name of the data frame as the argument. The values that the function returned suggest that the raw data consists of 3409 observations and 25 different columns. 
+
+
+\
+
+Now, we will inspect the entire data frame. The *view()* function can be used to examine the entire data frame. Other functions such as *head()* and *tail()* can be used to examine the first or last couple of rows of the data frame, respectively. 
+
+```{r, eval = F}
+view(dogs_data)
+head(dogs_data)
+tails(dog_data)
+```
+
+\
+
+Upon carefully exploration of the data, we compiled a list of actions to take in order to make the data easier to work with. 
+
+- Remove columns that don't contain any useful information.
+- Change some of the column names to make it easier to work with.
+- Remove rows that don't contain any behavioral observations for the dog.
+- Split rows that contain multiple behavioral observation.
+
+\
+
+##### **Removing Irrelevant Columns **
+
+From here, we will finally begin the process of data cleaning. We will first remove columns that don't contain useful information for the purposes of anayzing the data. For the data on Painted African Dogs, we decided to remove the following columns:
+
+- *Confirguration Name*
+- *Observer*
+- *Device ID*
+- *DataTime*
+- *Grid Size*
+- *Image Size*
+- *Channel Type*
+- *Project Animals*
+- *Duration*
+
+\
+
+To remove these columns, we will use the *select()* function from the dplyr package. This function will allow us to select columns we want to keep in the data frame, or alternatively select columns we want to remove from the data frame. In our case, there are more columns we want to keep than remove, so we will pursue the latter option. 
+
+```{r}
+dogs_data <- select(dogs_data, -`Configuration Name`, -Observer,-DeviceID,
+                                  -DateTime, -`Grid Size`, -`Image Size`,-`Channel Type`,
+                                  -`Project Animals`, -Duration) 
+
+```
+
+\
+
+The first argument of the *select()* function is the data frame name of our concern. Since we want to remove columns from the data frame called *dogs_data*, we passed dogs_data as the first argument. Now, we want to pass in all the names of the columns we want to remove as arguments, separated by commas. In addition, we need to make sure to include a minus sign (-) infront of the column name to indicate that we want to remove these columns. Note that all column names consisting of two different words (I.e *Configuration Name*) must be sandwiched between **`**. These types of column names are tiresome to work with, and is partly the focus of the next section where we work on renaming column names. Lastly, we reassign the modified data frame back to *dogs_data*. Thus, *dogs_data* is now the modified version of the original data frame, containing everything besides the columns we removed above. 
+
+\
+
+Before moving on, we check to make sure that the columns were actually removed. A quick method is to check for the number of columns in the modified version of the data frame. Since we removed 9 columns from the original 25, we should be left with 16 columns. To do this, we can use the *ncol()* function, and pass in the name of the data frame as the argument. 
+
+```{r}
+ncol(dogs_data)
+```
+
+\
+
+Since the function returned a value of 16, it appears as though the columns were removed correctly. However, there is always a case in which we refered to the wrong column name, or accidentally removed a column that we intended to keep. Since there are only a limited number of columns, we can use the *colnames()* function to check the names of all columns in the data frame. Again, we pass the name of the data frame as the argument.
+
+
+```{r}
+colnames(dogs_data)
+```
+
+\
+
+The output suggests that all and only the columns we wished to remove were deleted from the data frame. While the two checks we performed above were not necessary, they can serve as a useful method for assuring that the columns were removed correctly. 
+
+\
+
+
+
+
+##### **Renaming Columns **
+
+
+\
+
+\
+
+
+##### **Omitting Rows**
+
+\
+
+\
+
+
+##### **Splitting Rows**
+
+
+\
+
+
+\
+
+#### **Extra Steps**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
