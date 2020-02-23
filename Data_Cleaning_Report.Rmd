@@ -220,9 +220,6 @@ Since the function returned a value of 16, it appears as though the columns were
 ```{r}
 colnames(dogs_data)
 ```
-
-### **Introduction:**
-=======
 \
 
 The output suggests that all and only the columns we wished to remove were deleted from the data frame. While the two checks we performed above were not necessary, they can serve as a useful method for assuring that the columns were removed correctly. 
