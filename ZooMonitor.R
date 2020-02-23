@@ -156,22 +156,14 @@ dogs_data <- mutate(dogs_data, Six_Month_Interval = get_interval(Date))
 
 ## Other's Frequency
 active_obs <- dogs_data %>% filter(Activeness == 'Active')
-active_obs <- active_obs %>% 
-  group_by(Six_Month_Interval, Activity) %>% 
-  summarise(count=n()) %>% 
-  mutate(Percentage=count/sum(count)*100)
 inactive_obs <- dogs_data %>% filter(Activeness == "Inactive")
-inactive_obs <- inactive_obs %>% 
-  group_by(Six_Month_Interval, Activity) %>% 
-  summarise(count=n()) %>% 
-  mutate(Percentage=count/sum(count)*100)
 ggplot(data=active_obs) + 
-  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = 'identity') + 
-  labs(title = "Frequency of recorded active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Percentage (%)") +
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "Frequency of recorded active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Frequency") +
   facet_grid(. ~Six_Month_Interval)
 ggplot(data=inactive_obs) + 
-  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = 'identity') + 
-  labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Frequency") +
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "Frequency of recorded inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
   facet_grid((. ~Six_Month_Interval))
 
 
