@@ -9,6 +9,7 @@ library(lubridate)
 library(gridExtra)
 library(grid)
 library(formattable) #To make a nice table
+library(zoo)
 
 #Run Data cleaning script
 source("cleaning.R")
@@ -128,50 +129,50 @@ ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + fac
 
 ################## Other's Frequency (V_S)
 
-# Group by Inactive behavior
-inactive_prop <- 
-  dogs_data %>%
-  filter(Activeness == "Inactive") %>%
-  group_by(Activity) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100)
-
-active_prop <- 
-  dogs_data %>%
-  filter(Activeness == "Active") %>%
-  group_by(Activity) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100)
-
-# Add a column for six-month intervals
+########## Add a column for six-month intervals
 # Get start and end dates of the dataset
 start_date <- min(dogs_data[,'Date'])
 end_date <- max(dogs_data[,'Date'])
 
-get_six_month_interval <- function(inputDates) {
-  for (n in length(inputDates)) {
-    
-  }
-  cur <- start_date # Create a copy of start date
-  cur2 <- cur
-  month(cur2) = month(cur2) + 6
-  while (as.numeric(inputDate) >= as.numeric(cur2)) {
-    month(cur) <- month(cur) + 6
-    month(cur2) = month(cur2) + 6
-  }
-  if (cur2 > end_date) cur2 <- end_date
-  interval <- paste(toString(cur), "~", toString(cur2)) # Create a string in the format "YYYY-MM-DD ~ YYYY-MM-DD"
-  return(interval)
+# Create a vector to hold all six-month intervals
+six_month_intervals <- c()
+# Add all intervals into the vector in a loop
+lower_bound <- start_date
+while (lower_bound <= end_date) {
+  upper_bound <- lower_bound
+  month(upper_bound) <- month(upper_bound) + 6
+  if(upper_bound > end_date) upper_bound <- end_date
+  six_month_intervals[length(six_month_intervals)+1] <- paste(lower_bound, upper_bound, sep = "~")
+  month(lower_bound) = month(lower_bound) + 6
 }
 
-get_six_month_interval(dogs_data[,'Date'][1000])
-
-temp <- mutate(dogs_data, Six_Month_Interval = get_six_month_interval(Date))
-table(temp$Six_Month_Interval)
+# Add column for six month intervals
+get_interval <- function(inputDate) {
+  six_month_intervals[(as.yearmon(inputDate)-
+                                 as.yearmon(start_date))*12/6 + 1]
+}
+get_interval <- Vectorize(get_interval)
+dogs_data <- mutate(dogs_data, Six_Month_Interval = get_interval(Date))
 
 ## Other's Frequency
-ggplot(data=active_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
-ggplot(data=inactive_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Percentage (%)")
+active_obs <- dogs_data %>% filter(Activeness == 'Active')
+active_obs <- active_obs %>% 
+  group_by(Six_Month_Interval, Activity) %>% 
+  summarise(count=n()) %>% 
+  mutate(Percentage=count/sum(count)*100)
+inactive_obs <- dogs_data %>% filter(Activeness == "Inactive")
+inactive_obs <- inactive_obs %>% 
+  group_by(Six_Month_Interval, Activity) %>% 
+  summarise(count=n()) %>% 
+  mutate(Percentage=count/sum(count)*100)
+ggplot(data=active_obs) + 
+  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = 'identity') + 
+  labs(title = "Frequency of recorded active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Percentage (%)") +
+  facet_grid(. ~Six_Month_Interval)
+ggplot(data=inactive_obs) + 
+  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = 'identity') + 
+  labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Frequency") +
+  facet_grid((. ~Six_Month_Interval))
 
 
 ################## Activeness Through Week (V_H)
