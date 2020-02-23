@@ -9,6 +9,7 @@ library(lubridate)
 library(gridExtra)
 library(grid)
 library(formattable) #To make a nice table
+library(zoo)
 
 #Run Data cleaning script
 source("cleaning.R")
@@ -128,24 +129,42 @@ ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + fac
 
 ################## Other's Frequency (V_S)
 
-# Group by Inactive behavior
-inactive_prop <- 
-  dogs_data %>%
-  filter(Activeness == "Inactive") %>%
-  group_by(Activity) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100)
+########## Add a column for six-month intervals
+# Get start and end dates of the dataset
+start_date <- min(dogs_data[,'Date'])
+end_date <- max(dogs_data[,'Date'])
 
-active_prop <- 
-  dogs_data %>%
-  filter(Activeness == "Active") %>%
-  group_by(Activity) %>%
-  summarise(n = n()) %>%
-  mutate(freq = n / sum(n) * 100)
+# Create a vector to hold all six-month intervals
+six_month_intervals <- c()
+# Add all intervals into the vector in a loop
+lower_bound <- start_date
+while (lower_bound <= end_date) {
+  upper_bound <- lower_bound
+  month(upper_bound) <- month(upper_bound) + 6
+  if(upper_bound > end_date) upper_bound <- end_date
+  six_month_intervals[length(six_month_intervals)+1] <- paste(lower_bound, upper_bound, sep = "~")
+  month(lower_bound) = month(lower_bound) + 6
+}
+
+# Add column for six month intervals
+get_interval <- function(inputDate) {
+  six_month_intervals[(as.yearmon(inputDate)-
+                                 as.yearmon(start_date))*12/6 + 1]
+}
+get_interval <- Vectorize(get_interval)
+dogs_data <- mutate(dogs_data, Six_Month_Interval = get_interval(Date))
 
 ## Other's Frequency
-ggplot(data=active_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of active behaviors", x = "Dogs' behavior when active", y = "Percentage (%)")
-ggplot(data=inactive_prop, aes(x=Activity, y=freq)) + geom_bar(fill = "coral", alpha = 0.7, stat = "identity") + labs(title = "Percentage of inactive behaviors", x = "Dogs' behavior when inactive", y = "Percentage (%)")
+active_obs <- dogs_data %>% filter(Activeness == 'Active')
+inactive_obs <- dogs_data %>% filter(Activeness == "Inactive")
+ggplot(data=active_obs) + 
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "Frequency of recorded active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Frequency") +
+  facet_grid(. ~Six_Month_Interval)
+ggplot(data=inactive_obs) + 
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "Frequency of recorded inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
+  facet_grid((. ~Six_Month_Interval))
 
 
 ################## Activeness Through Week (V_H)
@@ -180,7 +199,7 @@ ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) +
 
 ################## For 3/3/2020
 
-#Percentage of observations (Time of day)
+################## Percentage of observations (Time of day)
 time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) + 
   geom_bar(aes(y = ..count../nrow(dogs_data)*100), fill = "steelblue", width = .75) + 
   scale_x_discrete(limits = 9:16) +
@@ -201,39 +220,67 @@ day_of_week_viz <- ggplot(data = dogs_data, aes(x = Day_of_Week)) +
 grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 
-#Association B/W Food and Dog Behavior
+################## Association B/W Food and Dog Behavior (Including Saturday)
 
 #Vector for relabeling barplots
 behavior_order <- c("Dog Int","Eating","Object Int", 
                     "Running", "Walking", "Alert", "Other", 
                     "Out of View", "Resting", "Sleeping")
 
-#Ground Meat
+#Vector for coloring labels
+label_coloring <- rep(c("forestgreen","maroon"), times = c(5,5))
+
+#Ground Meat (Including Saturday)
 ground_meat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x = Activity)) + 
   geom_bar(aes(y = ..count..), fill = "steelblue") +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  scale_x_discrete(limits = behavior_order)
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  scale_x_discrete(limits = behavior_order) 
+ 
 
 #Bones
 bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count..), fill = "purple2", width = .55) +
+  geom_bar(aes(y = ..count..), fill = "steelblue2", width = .55) +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90)) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
   scale_y_continuous(limits = c(0,500)) +
   scale_x_discrete(limits = behavior_order) 
 
 
-#Plotting Food Graph
+
+#Plotting Food Graph (Including Saturday)
 grid.arrange(ground_meat, bones, nrow = 2)
 
 
-#Guinea Pigs (Not a large enough sample)
-ggplot(data = dogs_data %>% filter(Food == "Guinea Pig"), aes(x = Activity)) + 
-  geom_bar(aes(y = ..count.. / nrow(dogs_data %>% filter(Food == "Guinea Pig")) *100))
+################### Association B/W Food and Dog Behavior (NOT Including Saturday)
 
+
+#Ground Meat (NOT Including Saturday)
+ground_meat_nosat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat", Day_of_Week != "Sat"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "steelblue") +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)" 
+       , subtitle  = "Food: Ground Meat (Excluding Saturdays)"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  scale_y_continuous(limits = c(0,200)) + 
+  scale_x_discrete(limits = behavior_order) 
+ 
+
+#Bones
+bones_nosat <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity)) + 
+  geom_bar(aes(y = ..count..), fill = "steelblue2", width = .65) +
+  labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
+       , y = "Frequency") + facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  scale_y_continuous(limits = c(0,200)) +
+  scale_x_discrete(limits = behavior_order) 
+
+
+
+#Plotting Food Graph (NOT Including Saturday)
+grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 
 

@@ -1,10 +1,4 @@
 ---
-<<<<<<< HEAD
-title: "Data Cleaning Report"
-author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
-date: "2/19/2020"
-output: html_document 
-=======
 title: "Data Cleaning Report for Pueblo Zoo"
 author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
 date: "February 27 2020"
@@ -15,8 +9,6 @@ output:
     toc_depth: 5
     toc_float: TRUE
     smooth_scroll: TRUE
-    
->>>>>>> 46b45d4b016d6034c2bdb6be2b8608cdc732fe67
 ---
 
 ```{r setup, include=FALSE}
@@ -111,8 +103,10 @@ Congratulations! R and R Studio should now be succesfully installed on your comp
 
 #### **Using R Studio**
 
-\
+Once you opened R Studio, you will see four tabs "Console," "Terminals," "Markers," and "Jobs" at the top-left corner. After opening a new R Script, these four tabs will This "Console" is where you will be working on all the code-writing processes. 
 
+To begin a new R Script, please follow the following steps:
+1. Click on "File" on mac
 \
 
 \
@@ -227,7 +221,6 @@ Since the function returned a value of 16, it appears as though the columns were
 colnames(dogs_data)
 ```
 
-<<<<<<< HEAD
 ### **Introduction:**
 =======
 \
@@ -343,12 +336,3 @@ We hope that this report was helpful for you! The introduction highlights some b
 - Added a column for average temperature 
 - Added a column for weather
 
-
-
-
-
-
-
-
-
->>>>>>> 46b45d4b016d6034c2bdb6be2b8608cdc732fe67
