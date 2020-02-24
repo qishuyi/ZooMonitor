@@ -103,46 +103,118 @@ Congratulations! R and R Studio should now be succesfully installed on your comp
 
 #### **Using R Studio**
 
-Once you opened R Studio, you will see four tabs "Console," "Terminals," "Markers," and "Jobs" at the top-left corner. After opening a new R Script, these four tabs will This "Console" is where you will be working on all the code-writing processes. 
+From now on, all the instructions pertain to R Studio since it is where we write R programs and execute them, as we mentioned earlier.
 
-To begin a new R Script, please follow the following steps:
-1. Click on "File" on mac
-\
+R Studio mainly consists of four parts:
+1. Your RScript (top left)
+2. The Console (bottom left)
+3. Your Environment (top right)
+4. Plots/Help (bottom right)
 
-\
++ "RScript" is where you write and run (execute) codes. Notice that you need to actually run the codes to have them function. 
 
-\
++ "Console" has two functions.First, it indicates whethere your codes functioned properly; if they did, your codes will appear in blue, otherwise an error will appear in red underneath your codes. If you write a function, the outcome will also appear in this Console. The second function of "Console" is similar to that of RScript: you can write codes! Unlike RScript, Console does not require you to run the codes, but to just press enter after writing the codes. 
 
-\
++ "Environment" shows a list of data or objects you have read or created. You can view the data by clicking on those; they will appear as one of the tabs above the RScript.*
+*Remark that you can only open objects with a blue arrow sign on the left.
 
-\
++ "Plots" displays plots whenever they are created. "Help" takes you to the R Studio's instruction website by executing the command "help()". For example, if you struggled understading how to use the command "install.packages()," just put down "help(install.packages)" in either "RScript" or "Console" to know how it functions.
+  
+  
+To begin and save an RScript, please follow the following steps:
 
-\
+ 1. **Set the "Working Directory"** (where you will be storing your RScript)  
+ "Session" in R Studio menu bar -> "Set Working Directory" -> "Choose Working Directory" -> Select a file you want to store your RScript in.
+ 
+ 2. **Create a new RScript**  
+ "File" in R Studio menu bar -> "New File" -> "RScript"
+ 
+ 3. **Save your RScript**  
+ "File" in R Studio menu bar -> "Save" or "Save As ..."
+ 
+ 4. **Open an existing RScript**  
+ "File" R Studio menu bar -> "Open File" -> Select a file you want to open*  
+ *You can open as many RScripts simultaneously as you want!
+
+
+Now, let's start actually running some codes!
+
+**Running Codes**  
+First, **open a new RScript**. You will see a line of numbers on the left side, and these numbers indicate the line you are on. You can start writing a code from any line.   
+Now, on the RScript, let's practice by **writing the equation "3+5"**. To execute this, you would either want to **click on the "Run" bottom at the top-right corner of the RScript** or **highlight the code and press enter**! You should now be seeing "[1] 8" on your Console, which indicates the outcome of your equation. This is basically how you run (or execute) your codes.
+
+**Store the outcome**  
+Let's continue with this example. In the future, you may want to have this outcome 8 to be stored in your Environment. To do so you have to go over two steps: name the object and store it. To begin, **write the code "number <- 3+5"** and run it. You will have an object called "number" in your Environment with its content "8." In this case, you have named the object "number" and stored it in the Environment.
+
+Two basic things to remember:  
+
++ **"<-"** and **"="** have exactly the same meaning, which is "equal," and are completely interchangeable. Normally, on the left of this symbol, you will write the name under which you want to store the object and on the right, you will write the content of the object.  
+
++ **" + "** (addition), **" - "** (subtraction), **" * "** (multiplication), **" / "** (division), and **" ^ "** (power) are the algebraic symbols you would be using to conduct algebraic operations. 
+
++ Anything noted after the symbol **" # "** will not be run. These will appeaer in green on your RScript and are normally use to note what the code written under that does.  
+
+*For example:*
+```{r}
+# Operating 3+5
+3+5
+```
+For this, the "3+5" part will only be read.
 
 ***
 
 #### **Data Cleaning Procedure**
 
-\
+Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have gone through to clean the Painted African Dogs' data.
 
 ##### **Installing Packages**
+In our last example, we calculated 3+5 and stored the outcome only using a simple algebraic symbol. However, unfortunately, we will need to use **command** (or function) to conduct operations on data, unlike our example. Many of these commands live in a certain **package**, and to be able to use them in your R Studio, you will need to install the packages first. 
 
-\
+**Here's the command that let you install the package:**
+```{r, eval = F}
+install.packages()
+```
 
-\
+*After you have installed the package you needed, you will not want to run the code every time you open your RScript. Therefore, you can remove this code from your RScript after your done with installation.
+
+So, here are all the packages you need to clean the Painted African Dogs' data. 
+
++ readr: Contain commands that read rectangular data (like 'csv', 'tsv', and 'fwf')
++ dplyr: Contain commands that clean data (select columns, remove rows, etc.)
++ tidyr: Contain commands that clean data (unite several columns, spread a column, etc.)
+
+*And here are the codes that install these packages:*
+```{r, eval = F}
+install.packages("readr")
+install.packages("tidyr")
+install.packages("dplyr")
+```
+
+*During the installation, you have to wait until the line "Downlowded" appears in red on Console!
 
 ##### **Loading in Libraries**
 
-\
+Even though you do not need to install the packages that you already have every time, you still need call the package to be able to use the commands stored inside. That is to say, every time you open/reopen an RScript, whether the script is new or not, **you need to run the command that call/recall the packages.**
 
-\
+*Here are the commands that call the packages:*
+```{r}
+library(readr)
+library(tidyr)
+library(dplyr)
+```
+
+*Notice that you need not have the quotation marks in the parenthesis this time.  
+**You should keep these codes on your RScript since you have to run these every time you use the commands stored in these packages.
+
+You may have noticed that we did not install any packages before we used the commands "install.packages" and "library." This is because these commands are already stored in R, and there are many other basic commands that are like these!
 
 ##### **Importing Data**
 
-\
+Now, using the **"readr" package**, we will import the data of Painted African Dogs.
 
-\
+```{r}
 
+```
 
 ##### **Inspecting the Data**
 
