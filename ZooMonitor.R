@@ -15,7 +15,7 @@ library(zoo)
 source("cleaning.R")
 
 #Run column addition script
-source("column_addition.R")
+source("columns_addition.R")
 
 ################# For 2/18/2020
 
