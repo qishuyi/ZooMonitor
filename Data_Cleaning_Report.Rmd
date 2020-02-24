@@ -1,7 +1,5 @@
 ---
 title: "Data Cleaning Report for Pueblo Zoo"
-author: "Hinako Minagi, Riu Sakaguchi, Shuyi Qi"
-date: "February 27 2020"
 output: 
   html_document:
     theme: yeti
