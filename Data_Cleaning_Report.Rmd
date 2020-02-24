@@ -163,7 +163,7 @@ Two basic things to remember:
 *For example:*
 ```{r}
 # Operating 3+5
-# 3+5
+3+5
 ```
 For this, the "# Operating 3+5" part won't be read.
 
