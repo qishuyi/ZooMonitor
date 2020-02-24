@@ -424,6 +424,8 @@ Our newly modified data frame has a total of 3173 rows. Hence, there were 236 ro
 
 \
 
+***
+
 #### **Extra Steps**
 In our last section, we have introduced the basic data-cleaning procedure that is useful for and applicable to many datasets.  
 \
