@@ -1,6 +1,6 @@
 ---
 title: "Data Cleaning Report for Pueblo Zoo"
-output: 
+output:
   html_document:
     theme: yeti
     toc: TRUE
