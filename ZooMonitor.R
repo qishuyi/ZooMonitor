@@ -10,6 +10,7 @@ library(gridExtra)
 library(grid)
 library(formattable) #To make a nice table
 library(zoo)
+library(tibble)
 
 #Run Data cleaning script
 source("cleaning.R")
