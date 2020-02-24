@@ -41,23 +41,6 @@ ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + fac
 
 ################## Other's Frequency (V_S)
 
-########## Add a column for six-month intervals
-# Get start and end dates of the dataset
-start_date <- min(dogs_data[,'Date'])
-end_date <- max(dogs_data[,'Date'])
-
-# Create a vector to hold all six-month intervals
-six_month_intervals <- c()
-# Add all intervals into the vector in a loop
-lower_bound <- start_date
-while (lower_bound <= end_date) {
-  upper_bound <- lower_bound
-  month(upper_bound) <- month(upper_bound) + 6
-  if(upper_bound > end_date) upper_bound <- end_date
-  six_month_intervals[length(six_month_intervals)+1] <- paste(lower_bound, upper_bound, sep = "~")
-  month(lower_bound) = month(lower_bound) + 6
-}
-
 ## Other's Frequency (in six-month intervals)
 active_obs <- dogs_data %>% filter(Activeness == 'Active')
 inactive_obs <- dogs_data %>% filter(Activeness == "Inactive")
