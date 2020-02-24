@@ -217,7 +217,7 @@ You may have noticed that we did not install any packages before we used the com
 
 ##### **Importing Data**  
 
-Now, using the **"readr"** package, we will import the data we want to use.    
+Now, using the **readr** package, we will import the data we want to use.    
 Specifically, although we have otehr alternative options, we will use the **read_csv()** command in the this package because it is fast at reading large datasets.
 
 *Now, this is the basic format of "read_csv" or "read.csv" command:*
@@ -227,7 +227,7 @@ data_name <- read_csv("File name or URL")
 
 In the parenthesis, you will be navigating the function to where the data is located. There are mainly three ways you can format this:     
   
- 1. If you have the data stored in the *Working Direcoty*, then you can just enter the exact file name (including the part after the dot) in quptation marks. For example, if the data "data.csv" is stored in your working directory, you write as follows:
+ 1. If you have the data stored in the *Working Directory*, then you can just enter the exact file name (including the part after the dot) in quptation marks. For example, if the data "data.csv" is stored in your working directory, you write as follows:
 ```{r, eval=F}
 Example <- read_csv("data.csv")
 ```
@@ -258,7 +258,6 @@ dim(dogs_data)
 ```
 We used the *dim()* function, and passed in the name of the data frame as the argument. The values that the function returned suggest that the raw data consists of 3409 observations and 25 different columns. 
 
-
 \
 
 Now, we will inspect the entire data frame. The *view()* function can be used to examine the entire data frame. Other functions such as *head()* and *tail()* can be used to examine the first or last couple of rows of the data frame, respectively. 
@@ -277,6 +276,7 @@ Upon carefully exploration of the data, we compiled a list of actions to take in
 - Change some of the column names to make it easier to work with.
 - Remove rows that don't contain any behavioral observations for the dog.
 - Split rows that contain multiple behavioral observation.
+
 \
 
 ##### **Removing Irrelevant Columns **
@@ -440,7 +440,7 @@ dogs_data <- mutate(dogs_data, Activity = gsub("NA_", "", Activity))
 dogs_data <- mutate(dogs_data, Activity = gsub("_NA", "", Activity))  
 ```
 
-Here, basically, **unite()** combines the columns "IC1_Name" and "IC2_Name" or "IC1_Value" and "IC2_Value" and **mutate()** creates, or in this case replace the old one with, a new column; just like this case, by making the new column name the same as the one we have in the original dataset, the command "mutate()" just replaces all the values of the given column instead of creating a completely new one.  
+Here, basically, **unite()** combines the columns "IC1_Name" and "IC2_Name" or "IC1_Value" and "IC2_Value" and **mutate()** creates a new column. However, notice that if we make the new column name in the **mutate()** function exactly the same as the old one, as in this case, it just replaces all the values of the given column instead of creating a completely new one.  
 Lastly, **gsub()** removes the "NA_" and "_NA" we undesirably obtained from the combining process. 
 
 \
@@ -453,4 +453,3 @@ We hope that this report was helpful for you! The introduction highlights some b
 - Added a column for season *(I.e. Summer)*
 - Added a column for average temperature 
 - Added a column for weather
-
