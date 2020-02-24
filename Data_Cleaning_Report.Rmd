@@ -28,8 +28,6 @@ library(tibble)
 
 
 dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1579790635.csv", col_types = cols(Notes = col_character()))
-
-
 ```
 
 
@@ -140,11 +138,11 @@ To begin and save an RScript, please follow the following steps:
 Now, let's start actually running some codes!
 
 **Running Codes**  
-First, **open a new RScript**. You will see a line of numbers on the left side, and these numbers indicate the line you are on. You can start writing a code from any line.   
-Now, on the RScript, let's practice by **writing the equation "3+5"**. To execute this, you would either want to **click on the "Run" bottom at the top-right corner of the RScript** or **highlight the code and press enter**! You should now be seeing "[1] 8" on your Console, which indicates the outcome of your equation. This is basically how you run (or execute) your codes.
+First, open a new RScript. You will see a line of numbers on the left side, and these numbers indicate the line you are on. You can start writing a code from any line.   
+Now, on the RScript, let's practice by writing the equation "3+5". To execute this, you would either want to click on the "Run" bottom at the top-right corner of the RScript or highlight the code and press enter! You should now be seeing "[1] 8" on your Console, which indicates the outcome of your equation. This is basically how you run (or execute) your codes.
 
 **Store the outcome**  
-Let's continue with this example. In the future, you may want to have this outcome 8 to be stored in your Environment. To do so you have to go over two steps: name the object and store it. To begin, **write the code "number <- 3+5"** and run it. You will have an object called "number" in your Environment with its content "8." In this case, you have named the object "number" and stored it in the Environment.
+Let's continue with this example. In the future, you may want to have this outcome 8 to be stored in your Environment. To do so you have to go over two steps: name the object and store it. To begin, write the code "number <- 3+5" and run it. You will have an object called "number" in your Environment with its content "8." In this case, you have named the object "number" and stored it in the Environment.
 
 Two basic things to remember:  
 
@@ -159,18 +157,20 @@ Two basic things to remember:
 # Operating 3+5
 3+5
 ```
-For this, the "3+5" part will only be read.
+For this example, the "3+5" part will only be read and not the "# Operating 3+5" part.
 
 ***
 
 #### **Data Cleaning Procedure**
 
-Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have gone through to clean the Painted African Dogs' data.  
+Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have gone through to clean the Painted African Dogs' data.
+
+\
 
 ##### **Installing Packages**  
 In our last example, we calculated 3+5 and stored the outcome only using a simple algebraic symbol. However, unfortunately, we will need to use **command** (or function) to conduct operations on data, unlike our example. Many of these commands live in a certain **package**, and to be able to use them in your R Studio, you will need to install the packages first. 
 
-**Here's the command that let you install the package:**
+*Here's the command that lets you install the package:*
 ```{r, eval = F}
 install.packages()
 ```
@@ -182,15 +182,18 @@ So, here are all the packages you need to clean the Painted African Dogs' data.
 + readr: Contain commands that read rectangular data (like 'csv', 'tsv', and 'fwf')
 + dplyr: Contain commands that clean data (select columns, remove rows, etc.)
 + tidyr: Contain commands that clean data (unite several columns, spread a column, etc.)
++ tibble: Contain commands that view the data and plots.
 
-*And here are the codes that install these packages:*
+*And here's the command that installs these packages:*
 ```{r, eval = F}
 install.packages("readr")
 install.packages("tidyr")
 install.packages("dplyr")
+install.packages("tibble")
 ```
 
 *During the installation, you have to wait until the line "Downlowded" appears in red on Console!
+
 \
 
 ##### **Loading in Libraries**  
@@ -202,18 +205,20 @@ Even though you do not need to install the packages that you already have each t
 library(readr)
 library(tidyr)
 library(dplyr)
+library(tibble)
 ```
 
 *Notice that you need not have the quotation marks in the parenthesis this time.  
 **You should keep these codes on your RScript since you have to run these every time you use the commands stored in these packages.
 
 You may have noticed that we did not install any packages before we used the commands "install.packages()" and "library()". This is because these commands are already stored in R, and there are many other basic commands that are like these!
+
 \
 
 ##### **Importing Data**  
 
-Now, using the **"readr" package**, we will import the data we want to use.    
-Specifically, although we have otehr alternative options, we will use the **"read_csv()"** command in the this package because it is fast at reading large datasets.
+Now, using the **"readr"** package, we will import the data we want to use.    
+Specifically, although we have otehr alternative options, we will use the **read_csv()** command in the this package because it is fast at reading large datasets.
 
 *Now, this is the basic format of "read_csv" or "read.csv" command:*
 ```{r, eval=FALSE}
@@ -222,28 +227,28 @@ data_name <- read_csv("File name or URL")
 
 In the parenthesis, you will be navigating the function to where the data is located. There are mainly three ways you can format this:     
   
- 1. If you have the data stored in the **"Working Direcoty"**, then you can just **enter the exact file name (including the part after the dot) in quptation marks**. For example, if the data "data.csv" is stored in your working directory, you write as follows:
+ 1. If you have the data stored in the *Working Direcoty*, then you can just enter the exact file name (including the part after the dot) in quptation marks. For example, if the data "data.csv" is stored in your working directory, you write as follows:
 ```{r, eval=F}
 Example <- read_csv("data.csv")
 ```
  
- 2. If the data is stored in **some other file/folder on your PC**, you need to **navigate the function to the file/folder from your working directory**. So, if the data "data.csv" is in the file "A," which is in the folder "B," which is in your working directory, then you write as follows:
+ 2. If the data is stored in some other file/folder on your PC, you need to navigate the function to the file/folder from your working directory. So, if the data "data.csv" is in the file "A," which is in the folder "B," which is in your working directory, then you write as follows:
 ```{r, eval = F}
 Example2 <- read_csv("B/A/data.csv")
 ```
  
- 3. If the data is stored somewhere online, such as Github, you will **write in the URL in the parenthesis**. This time, if the data has the URL "http:// ... .csv," you will have something like the following:
+ 3. If the data is stored somewhere online, such as Github, you will write in the URL in the parenthesis. This time, if the data has the URL "http:// ... .csv," you will have something like the following:
 ```{r, eval=F}
 Example3 <- read_csv("http:// ... .csv")
 ```
 \
 You will repeat indicating the folders, dividing them by " / ", until you reach the dataset you want.
-Also, notice that **the name under which you store your data on R Studio has no space in-between**.  
+Also, notice that the name under which you store your data on R Studio has no space in-between.  
 \
-Finally, in our case, we decided to name the Painted African Dogs' data **"dogs_data"**. Please keep in mind that the following data-cleaning process will base off of this name.
-\
+Finally, in our case, we decided to name the Painted African Dogs' data *dogs_data*. Please keep in mind that the following data cleaning process will base off of this name.
 
 \
+
 ##### **Inspecting the Data**
 
 We have successfully installed necessary packages, loaded the libraries, and imported our data. Before beginning the data cleaning process, we must inspect the data. We begin by checking the number of rows the columns the data contains.
@@ -412,14 +417,14 @@ Our newly modified data frame has a total of 3173 rows. Hence, there were 236 ro
 \
 
 #### **Extra Steps**
-In our last section, we have introduced the basic data-cleaning procedure that is useful for and applicable to many datasets.  
+In our last section, we have introduced the basic data cleaning procedure that is useful for and applicable to many datasets.  
 \
 One last thing to be mentioned is that we have taken two more additional steps to further clean the data.  Those are:  
 
- 1.**Combining the columns "IC1_Name" and "IC2_Name"** so that we have the values "Active" and "Inactive" in a single column.  
- 2. **Combing the columns "IC1_Value" and "IC2_Value"** so that we have the values of activity, such as sleeping and eating, in a single columns.  
+ 1.Combining the columns *IC1_Name* and *IC2_Name* so that we have the values "Active" and "Inactive" in a single column.  
+ 2. Combing the columns *IC1_Value* and *IC2_Value* so that we have the values of activity, such as sleeping and eating, in a single columns.  
 \
-For these two steps, we use the command **"unite()"** from the "tidyr" package and **"mutate()"** from the "dplyr" package.   
+For these two steps, we use the command **unite()** from the "tidyr" package and **mutate()** from the "dplyr" package.   
 \
 
 *Here are how we use those commands:*
@@ -435,8 +440,8 @@ dogs_data <- mutate(dogs_data, Activity = gsub("NA_", "", Activity))
 dogs_data <- mutate(dogs_data, Activity = gsub("_NA", "", Activity))  
 ```
 
-Here, basically, **"unite()"** combines the columns "IC1_Name" and "IC2_Name" or "IC1_Value" and "IC2_Value" and **"mutate()"** creates, or in this case replace the old one with, a new column; just like this case, by making the new column name the same as the one we have in the original dataset, the command "mutate()" just replaces all the values of the given column instead of creating a completely new one.  
-Lastly, **"gsub()"** removes the "NA_" and "_NA" we undesirably obtained from the combining process. 
+Here, basically, **unite()** combines the columns "IC1_Name" and "IC2_Name" or "IC1_Value" and "IC2_Value" and **mutate()** creates, or in this case replace the old one with, a new column; just like this case, by making the new column name the same as the one we have in the original dataset, the command "mutate()" just replaces all the values of the given column instead of creating a completely new one.  
+Lastly, **gsub()** removes the "NA_" and "_NA" we undesirably obtained from the combining process. 
 
 \
 
