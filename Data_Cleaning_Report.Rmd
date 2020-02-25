@@ -29,6 +29,18 @@ dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/mast
 
 ```
 
+#### **Notes**
+Hello Anna, this document is created to facilitate your understanding of our how we cleaned the dataset on painted African dogs. The **Introduction** section contains an overview of the technologies we used to clean the dataset, the specific steps we took and the reasons why we took these steps.  
+
+If you would like to know our data cleaning process in more detail, you can proceed to the later sections but you should be able to get a general idea just by reading the Introduction.  
+
+After reading the Introduction, if you are potentially interested in learning to use the R programming language and R Studio, the **Instructions for Installing R and R Studio** and **Using R Studio** sections will help you get started.  
+
+If you just want to know more about the data cleaning process without using R/RStudio, feel free to skip these two sections and proceed to the later ones. 
+
+Hope this document is helpful and hope you enjoy reading it!
+
+***
 
 #### **Introduction**
 
@@ -173,7 +185,7 @@ For this, the "# Operating 3+5" part won't be read.
 
 Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have gone through to clean the Painted African Dogs' data.  
 
-\
+<br>
 
 ##### **Installing Packages**  
 In our last example, we calculated 3+5 and stored the outcome only using a simple algebraic symbol. However, unfortunately, we will need to use **command** (or function) to conduct operations on data, unlike our example. Many of these commands live in a certain **package**, and to be able to use them in your R Studio, you will need to install the packages first. 
@@ -204,7 +216,7 @@ install.packages("tibble")
 
 *During the installation, you have to wait until the line "Downlowded" appears in red on Console!
 
-\
+<br>
 
 ##### **Loading in Libraries**  
 
@@ -223,7 +235,7 @@ library(tibble)
 
 You may have noticed that we did not install any packages before we used the commands "install.packages()" and "library()". This is because these commands are already stored in R, and there are many other basic commands that are like these!
 
-\
+<br>
 
 ##### **Importing Data**  
 
@@ -262,7 +274,7 @@ Also, notice that the name under which you store your data on R Studio has no sp
 \
 Finally, in our case, we decided to name the Painted African Dogs' data *dogs_data*. Please keep in mind that the following data-cleaning process will base off of this name.
 
-\
+<br>
 
 ##### **Inspecting the Data**
 
@@ -293,7 +305,7 @@ Upon carefully exploration of the data, we compiled a list of actions to take in
 - Remove rows that don't contain any behavioral observations for the dog.
 - Split rows that contain multiple behavioral observation.
 
-\
+<br>
 
 ##### **Removing Irrelevant Columns **
 
@@ -344,7 +356,7 @@ colnames(dogs_data)
 
 The output suggests that all and only the columns we wished to remove were deleted from the data frame. While the two checks we performed above were not necessary, they can serve as a useful method for assuring that the columns were removed correctly. 
 
-\
+<br>
 
 ##### **Renaming Columns **
 
@@ -394,7 +406,7 @@ colnames(dogs_data)
 
 The output is the list of column names in the modified dogs data. By inspection, we can be assured that all of the desired changes were applied correctly.
 
-\
+<br>
 
 ##### **Omitting Rows**
 
@@ -422,15 +434,42 @@ nrow(dogs_data)
 
 Our newly modified data frame has a total of 3173 rows. Hence, there were 236 rows with missing observations. Now that we have successfully handled rows with missing values, we will address rows with multiple behavioral observations in the following section. 
 
-\
+<br>
 
 ##### **Splitting Rows**
 
+After removing rows with no behavioral observations, there are also rows with both active and inactive observations. Ideally we would want each row to contain just one behavior (either active or inactive) so that when we analyze a row in the dataset, we do not have to choose which behavior to count. Finding rows with data for two types of behaviors and splitting them are both time-consuming tasks, so we can employ R to automate the tasks for us. 
 
-\
+Recall that in the dataset the behaviors are recorded in two columns: *IC1_Value* and *IC2_Value*.  
 
+*IC1_Value* is either an active dog behavior or "*na*", and *IC2_Value* is either an inactive dog behavior or "*na*", where "*na*" indicates **missing value** for the variable.
 
-\
+Therefore, we would like find the rows with "*na*" in **neither** *IC1_Value* **nor** *IC2_Value*, make a copy of each of these rows, write "*na*" in the *IC2_Name* and *IC2_Value* columns for one of them and "*na*" in the *IC1_Name* and *IC1_Value* for the other.
+
+```
+duplicate_indices <- which((!is.na(dogs_data$IC1_Value)) & (!is.na(dogs_data$IC2_Value)))
+```
+We first ran the above command to find the rows that record both active and inactive behaviors. The row numbers are saved in a variable named *duplicate_indices*.
+
+```
+for (row_num in duplicate_indices) {
+  duplicate_row <- dogs_data[row_num,]
+  dogs_data[row_num, 15] <- NA
+  dogs_data[row_num, 16] <- NA
+  duplicate_row[, 12] <- NA
+  duplicate_row[, 13] <- NA
+  dogs_data <- rbind(dogs_data, duplicate_row)
+}
+```
+We then iterate through each row number in *duplicate_indices* and ask the program to do the following in each iteration:  
+
+- Get the observation at the given row number and make a copy of it  
+- Change *IC2_Name* and *IC2_Value* to "*na*" in the original row  
+- Change *IC1_Name* and *IC1_Value* to "*na*" in the copy  
+- Add the copy at the end of the dataset  
+
+Our modified data frame now has 3264 rows. At this point we have completed all the necessary data cleaning steps. In the next section we will talk about some additional steps we took to make the dataset easier to work with.
+
 
 ***
 
