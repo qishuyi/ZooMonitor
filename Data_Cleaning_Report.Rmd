@@ -28,16 +28,18 @@ dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/mast
 
 ```
 
+\
+
 #### **Notes**
-Hello Anna, this document is created to facilitate your understanding of our how we cleaned the dataset on painted African dogs. The **Introduction** section contains an overview of the technologies we used to clean the dataset, the specific steps we took and the reasons why we took these steps.  
+Hello! This document is created to facilitate your understanding of our how we cleaned the dataset on Painted African Dogs. The **Introduction** section contains an overview of the technologies we used to clean the dataset, the specific steps we took and the reasons why we took these steps.  
 
 If you would like to know our data cleaning process in more detail, you can proceed to the later sections but you should be able to get a general idea just by reading the Introduction.  
 
-After reading the Introduction, if you are potentially interested in learning to use the R programming language and R Studio, the **Instructions for Installing R and R Studio** and **Using R Studio** sections will help you get started.  
+After you read the Introduction and if you are potentially interested in learning to use the R programming language and R Studio, the **Instructions for Installing R and R Studio** and **Using R Studio** sections will help you get started.  
 
 If you just want to know more about the data cleaning process without using R/RStudio, feel free to skip these two sections and proceed to the later ones. 
 
-Hope this document is helpful and hope you enjoy reading it!
+We hope this document is helpful and you enjoy reading it!
 
 ***
 
