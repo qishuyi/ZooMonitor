@@ -243,8 +243,7 @@ ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
   labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
 
 
-
-
+#################### Association Between Dogs' Behavior with Weather 
 
 
 
