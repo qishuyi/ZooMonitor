@@ -1,9 +1,98 @@
 ---
 title: 'Progress Report #2'
+author: "Shuyi Qi, Hinako Minagi, Riu Sakaguchi"
 date: "2/27/2020"
-output: html_document
+output: 
+  html_document:
+    theme: yeti
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
+
+```{r Loading Libraries}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(formattable) #To make a nice table
+library(zoo)
+library(tibble)
+library(ggbeeswarm)
+```
+
+
+```{r Source}
+source("cleaning.R")
+source("columns_addition.R")
+```
+
+#### **Notes**
+Hello Anna! We have created some visualizations that you requested during the first meeting back in February and in the follow up email. Figure 1 is ... Figure 2 is ... We hope that this is helpful for you! 
+
+
+\
+
+#### **Figure 1.**
+
+```{r Inactivity Plot in 6 Month Intervals}
+
+```
+
+
+
+\
+
+#### **Figure 2.**
+
+```{r Percentage of Observations based on Day of Week/Time of Day, fig.height = 6, fig.width = 10}
+time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) + 
+  geom_bar(aes(y = ..count../nrow(dogs_data)*100), fill = "steelblue", width = .75) + 
+  scale_x_discrete(limits = 9:16) +
+  scale_y_continuous(limits = c(0,25)) + 
+  geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+  labs(title = "b. Percentage of Observations (Per Time of Day)", x = "Time of Day", y = "Percentage (%)") +
+  annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25) +
+  theme(plot.title = element_text(face = "bold"))
+
+day_of_week_viz <- ggplot(data = dogs_data, aes(x = Day_of_Week)) +
+  geom_bar(aes(y = ..count../nrow(dogs_data)*100), fill = "steelblue2", width = .75) +
+  scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
+  scale_y_continuous(limits = c(0,60)) +
+  labs(title = "a. Percentage of Observations (Per Day of Week)", x = "Day of Week", y = "Percentage (%)") +
+  geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +   annotate("text", x= 1.5, y = 16.5 , label = "14.28%", color = "darkmagenta", size = 3.25) +
+  theme(plot.title = element_text(face = "bold"))
+
+grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
+
+```
+
+**2a.**
+
+* The plot on the **left** illustrates the percentage of observations recorded on each day of the week. 
+* If observations were recorded equally throughout the days of the week, then the height of the bars should match the purple dashed line.
+  + That is, each day would consist of 14.28% of the total number of observations if there was equal representation for the days of the week.
+* The plot suggests that over 50% of all observations in the data are recorded on Saturdays.
+* Friday is the day of the week where the least number of observations were recorded. 
+
+
+**2b.**
+
+* The plot on the **right** displays the percentage of observations recorded on each hour of the day.
+* If equal numbers of observations were recorded on each hour of the day, the height of the bars should match up with the purple dashed line. 
+  + In otherwords, each hour of the day would consist of 12.5% of the total number of observations if there was equal representation for the times of the day.
+* The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are taken. 
+* It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
+
+
+
+
+
+
+
