@@ -71,16 +71,11 @@ weather_temp <- weather_temp %>% slice(1:717)
 dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
 dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
-##Average Temperature Level Column
-dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG, quantile(TAVG, probs=0:10/10), include.lowest=TRUE)))
-dogs_data$Temp_Level <- as.character(dogs_data$Temp_Level)
-dogs_data$Temp_Level <- factor(dogs_data$Temp_Level, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
-
 ##Average of Average-max Temperature column and its temperature level
 dogs_data <- mutate(dogs_data, TAVG_TMAX_avg = (dogs_data$TMAX + dogs_data$TAVG)/2)
-dogs_data <- within(dogs_data, Temp_Level2 <- as.integer(cut(TAVG_TMAX_avg, quantile(TAVG_TMAX_avg, probs=0:10/10), include.lowest=TRUE)))
-dogs_data$Temp_Level2 <- as.character(dogs_data$Temp_Level2)
-dogs_data$Temp_Level2 <- factor(dogs_data$Temp_Level2, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
+dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG_TMAX_avg, quantile(TAVG_TMAX_avg, probs=0:10/10), include.lowest=TRUE)))
+dogs_data$Temp_Level <- as.character(dogs_data$Temp_Level)
+dogs_data$Temp_Level <- factor(dogs_data$Temp_Level, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
 
 ##Add column for six month intervals
 get_interval <- function(inputDate) {
