@@ -11,6 +11,7 @@ library(grid)
 library(formattable) #To make a nice table
 library(zoo)
 library(tibble)
+library(ggbeeswarm)
 
 #Run Data cleaning script
 source("cleaning.R")
@@ -191,7 +192,7 @@ bones_nosat <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Acti
 grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 
-#################### Association Between Dogs' Behavior with Temperature(Using TAVG_TMAX_avg)
+#################### Association Between Dogs' Behavior with Temperature Level(Using TAVG_TMAX_avg)
 dogs_data_grouped2 <- group_by(dogs_data, Activity,Temp_Level)
 summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
@@ -201,11 +202,11 @@ summary2 <- summary2 %>% group_by(Activity) %>%
 summary2$percent <- round(summary2$percent, digits = 1)
 summary2 <- summary2 %>% mutate(percent_sub = paste(percent, "%"))
 
-##Activity by Temperature Plot (TAVG_TMAX_avg)
+##Activity by Temperature Level Plot (TAVG_TMAX_avg)
 ggplot(data = summary2, aes(x = Temp_Level, y = counts, fill = Temp_Level), show.legend = FALSE) + 
   geom_bar(stat = "identity", position=position_dodge()) + 
   facet_grid(.~ Activity) +
-  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature", y="Counts") 
+  labs(title = "Activity Based on Temperature Level (Average of TMAX and TAVG)", x = "Temperature", y="Counts") 
 
 #Temperature Level Reference Table (TAVG_TMAX_avg)
 Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
@@ -227,6 +228,25 @@ Temp_Level_Reference <- mutate(Temp_Level_Reference, Level = rownames(Temp_Level
 Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent) 
 Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
 formattable(Temp_Level_Reference)
+
+#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg) (Violin)
+dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
+ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
+  geom_violin() +
+  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Activity", y = "Temperature (F°)")
+
+#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg) (Beeswarm plot)
+ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
+  geom_quasirandom(groupOnX=FALSE) +
+  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
+
+
+
+
+
+
+
+
 
 
 
