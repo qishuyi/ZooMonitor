@@ -101,3 +101,26 @@ get_interval <- function(inputDate) {
 }
 get_interval <- Vectorize(get_interval)
 dogs_data <- mutate(dogs_data, Six_Month_Interval = get_interval(Date))
+
+##Add Column for weather type
+dogs_data$WT01[is.na(dogs_data$WT01)] <- 0
+dogs_data$WT03[is.na(dogs_data$WT03)] <- 0
+dogs_data$WT05[is.na(dogs_data$WT05)] <- 0
+dogs_data$WT08[is.na(dogs_data$WT08)] <- 0
+dogs_data$WT01 <- ifelse(dogs_data$WT01 == "1", "A", "0")
+dogs_data$WT03 <- ifelse(dogs_data$WT03 == "1", "B", "0")
+dogs_data$WT05 <- ifelse(dogs_data$WT05 == "1", "C", "0")
+dogs_data$WT08 <- ifelse(dogs_data$WT08 == "1", "D", "0")
+dogs_data$Weather_Type <- paste0(dogs_data$WT01, dogs_data$WT03, dogs_data$WT05, dogs_data$WT08)
+dogs_data$Weather_Type[dogs_data$Weather_Type == "0000"] <- 0
+dogs_data$Weather_Type[dogs_data$Weather_Type == "A000"] <- 1
+dogs_data$Weather_Type[dogs_data$Weather_Type == "0B00"] <- 2
+dogs_data$Weather_Type[dogs_data$Weather_Type == "000D"] <- 3
+dogs_data$Weather_Type[dogs_data$Weather_Type == "AB00"] <- 4
+dogs_data$Weather_Type[dogs_data$Weather_Type == "A00D"] <- 5
+dogs_data$Weather_Type[dogs_data$Weather_Type == "0BC0"] <- 6
+dogs_data$Weather_Type[dogs_data$Weather_Type == "AB0D"] <- 7
+dogs_data$Weather_Type <- as.character(dogs_data$Weather_Type)
+
+
+
