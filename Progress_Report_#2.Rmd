@@ -33,6 +33,10 @@ source("cleaning.R")
 source("columns_addition.R")
 ```
 
+#### **Notes**
+Hello Anna! We have created some visualizations that you requested during the first meeting back in February and in the follow up email. Figure 1 is ... Figure 2 is ... We hope that this is helpful for you! 
+
+
 \
 
 #### **Figure 1.**
