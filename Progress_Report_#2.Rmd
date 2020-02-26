@@ -87,7 +87,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 * The plot on the **right** displays the percentage of observations recorded on each hour of the day.
 * If equal numbers of observations were recorded on each hour of the day, the height of the bars should match up with the purple dashed line. 
   + In otherwords, each hour of the day would consist of 12.5% of the total number of observations if there was equal representation for the times of the day.
-* The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are taken. 
+* The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are recorded.
 * It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
 
 
