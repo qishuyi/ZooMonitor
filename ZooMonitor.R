@@ -229,13 +229,15 @@ Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent)
 Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
 formattable(Temp_Level_Reference)
 
-#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg) (Violin)
+#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg)
 dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
+
+##Activity by Temperature Plot (TAVG_TMAX_avg) (Violin)
 ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
   geom_violin() +
   labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Activity", y = "Temperature (F°)")
 
-#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg) (Beeswarm plot)
+##Activity by Temperature Plot (TAVG_TMAX_avg) (beeswarm)
 ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
   geom_quasirandom(groupOnX=FALSE) +
   labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
