@@ -257,8 +257,7 @@ ggplot(summary3, aes(x="", y=counts, fill=Activeness)) +
 Weather_Type_Reference <- as.data.frame(0:7)
 names(Weather_Type_Reference)[names(Weather_Type_Reference) == "0:7"] <- "Weather_Type"
 Weather_Type_Reference <- cbind(Weather_Type_Reference, Weather_Description = Weather_Type_Reference$Weather_Type)
-names(Weather_Type_Reference)[names(Weather_Type_Reference) == "`Weather_Type_Reference$Weather_Type"] <- "Weather_Description"
-for (a in Weather_Type_Reference$Weather_Despcription)
+for (a in c("0", "1", "2", "3", "4", "5", "6", "7"))
   if(a == "0"){
     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "0"] <- "No Special Weather Type"
     } else if(a == "1"){
@@ -276,7 +275,9 @@ for (a in Weather_Type_Reference$Weather_Despcription)
     } else{
      Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Thunder and Smoke or Haze"
     }
-  
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Type"] <- "Weather Type"
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Description"] <- "Weather Description" 
+formattable(Weather_Type_Reference)
   
   
   
