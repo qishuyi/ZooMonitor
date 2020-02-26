@@ -8,3 +8,27 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+```{r Loading Libraries}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(formattable) #To make a nice table
+library(zoo)
+library(tibble)
+library(ggbeeswarm)
+```
+
+
+```{r Source}
+source("cleaning.R")
+source("columns_addition.R")
+```
+
+
+
