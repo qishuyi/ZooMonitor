@@ -83,25 +83,15 @@ ggplot(data=inactive_obs2) +
 
 ################## Activeness Through Week (V_H)
 
-#Grouping the data by name, day of week, and activeness
 dogs_data_grouped <- group_by(dogs_data, Name, Day_of_Week, Activeness)
-
-#Making the summary a data frame
 summary <- as.data.frame(summarise(dogs_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
-
-#group_by summarise data table and making the sum of counts by each dog each day
 summary <- summary %>% group_by(Name, Day_of_Week) %>%
   mutate(sum = sum(counts))
-
-#Merging the summary data frame into the dogs data frame to have the column "counts"
 dogs_data_DW <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
-
-#Creating a percentage column
 dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
 dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
 dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
-
 ##Plots of activeness by dogs by day
 ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
   geom_bar(stat="identity", position=position_dodge()) +
@@ -247,16 +237,52 @@ ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
   geom_quasirandom(groupOnX=FALSE) +
   labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
 
+#################### Association Between Dogs' Behavior with Weather
+dogs_data_grouped3 <- group_by(dogs_data, Weather_Type, Activeness)
+summary3 <- as.data.frame(summarise(dogs_data_grouped3, n()))
+names(summary3)[names(summary3) == "n()"] <- "counts"
+summary3 <- summary3 %>% group_by(Weather_Type) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary3$percent <- round(summary3$percent, digits = 1)
+summary3 <- summary3 %>% mutate(percent_sub = paste(percent, "%"))
 
-#################### Association Between Dogs' Behavior with Weather 
-
-
-
-
-
-
-
-
+##Activity by Weather Type Plot
+ggplot(summary3, aes(x="", y=counts, fill=Activeness)) +
+  geom_bar(stat="identity", position = "dodge") +
+  facet_grid(.~Weather_Type) +
+  geom_text(aes(label = percent_sub), position = position_dodge(width = 0.9), size = 2.7) +
+  labs(title = "Activeness by Weather Type", x = "Activeness", y="Counts") 
+##Weather Type Reference
+Weather_Type_Reference <- as.data.frame(0:7)
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "0:7"] <- "Weather_Type"
+Weather_Type_Reference <- cbind(Weather_Type_Reference, Weather_Description = Weather_Type_Reference$Weather_Type)
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "`Weather_Type_Reference$Weather_Type"] <- "Weather_Description"
+for (a in Weather_Type_Reference$Weather_Despcription)
+  if(a == "0"){
+    Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "0"] <- "No Special Weather Type"
+    } else if(a == "1"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "1"] <- "Fog, ice fog, or freezing fog (may include heavy fog)"
+    } else if(a == "2"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "2"] <- "Thunder"
+    } else if(a == "3"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "3"] <- "Smoke or haze"
+    } else if(a == "4"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "4"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Thunder"
+    } else if(a == "5"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "5"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Smoke or haze"
+    } else if(a == "6"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "6"] <- "Thunder and Hail (may include small hail)"
+    } else{
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Thunder and Smoke or Haze"
+    }
+  
+  
+  
+  
+  
+  
+  
 ################## Association B/W Events and Dog Behavior
 ## Compare dogs' behavior between zoo boo and brew at the zoo
 ## Compare all Saturdays
