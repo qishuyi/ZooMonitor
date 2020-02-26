@@ -160,12 +160,12 @@ Now, let's start running some code!
 
 **Running Code**  
 First, open a new RScript. You will see a vertical line of numbers on the left, which indicates the line you are on. You can start from any line.   
-Now, let's practice by writing a command "3+5" in the "RScript" section. By doing so, you are asking R to calculate the result of "3+5" and display it. To execute the command, you would either want to click on the "Run" button at the top-right corner of the RScript or highlight the code and press **Ctrl-Enter** (Command-Enter if you are on Mac) ! You should now be seeing "[1] 8" on your Console, which indicates the outcome of running your command This is how you run (or execute) your code. 
+Now, let's practice by writing a command "3+5" in the "RScript" section. By doing so, you are asking R to calculate the result of "3+5" and display it. To execute the command, you would either want to click on the "Run" button at the top-right corner of the RScript or highlight the code and press Ctrl-Enter (Command-Enter if you are on Mac) ! You should now be seeing "[1] 8" on your Console, which indicates the outcome of running your command This is how you run (or execute) your code. 
 
 \
 
 **Store the outcome**  
-Let's continue with this example. In the future, you may want to have this outcome "8" stored in your Environment. To do so, you will be going over two steps: name the object, and store it. To begin, write the code "number <- 3+5" and run it. You will have an object called "number" in your Environment with its stored value "8." In this example, you have named the object "number" and stored the integer "8" within it.
+Let's continue with this example. In the future, you may want to have this outcome "8" stored in your Environment. To do so, you will be going over two steps: name the object, and store it. To begin, write the code "number <- 3+5" and run it. You will have an object called "number" in your Environment with its stored value "8." In this example, you have named the object "number" and stored the number "8" within it.
 
 Two basic things to remember:  
 
