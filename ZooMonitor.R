@@ -201,7 +201,7 @@ summary2 <- summary2 %>% mutate(percent_sub = paste(percent, "%"))
 ggplot(data = summary2, aes(x = Temp_Level, y = counts, fill = Temp_Level), show.legend = FALSE) + 
   geom_bar(stat = "identity", position=position_dodge()) + 
   facet_grid(.~ Activity) +
-  labs(title = "Activity Based on Temperature Level (Average of TMAX and TAVG)", x = "Temperature", y="Counts") 
+  labs(title = "Activity Based on Temperature Level", subtitle = "with Temperature Grouped into 10 Levels", x = "Temperature", y="Counts", fill = "Temperature Level") 
 
 #Temperature Level Reference Table (TAVG_TMAX_avg)
 Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
@@ -227,15 +227,15 @@ formattable(Temp_Level_Reference)
 #################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg)
 dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
 
-##Activity by Temperature Plot (TAVG_TMAX_avg) (Violin)
+##Activity by Numeric Temperature Plot(Violin)
 ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
   geom_violin() +
-  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Activity", y = "Temperature (F°)")
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Activity", y = "Temperature (F°)")
 
 ##Activity by Temperature Plot (TAVG_TMAX_avg) (beeswarm)
-ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
+ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity, color = Activity)) +
   geom_quasirandom(groupOnX=FALSE) +
-  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Temperature (F°)", y = "Activity")
 
 #################### Association Between Dogs' Behavior with Weather
 dogs_data_grouped3 <- group_by(dogs_data, Weather_Type, Activeness)
@@ -246,7 +246,6 @@ summary3 <- summary3 %>% group_by(Weather_Type) %>%
   mutate(percent = counts/sum*100)
 summary3$percent <- round(summary3$percent, digits = 1)
 summary3 <- summary3 %>% mutate(percent_sub = paste(percent, "%"))
-
 ##Activity by Weather Type Plot
 ggplot(summary3, aes(x="", y=counts, fill=Activeness)) +
   geom_bar(stat="identity", position = "dodge") +
