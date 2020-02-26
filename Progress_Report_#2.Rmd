@@ -35,9 +35,10 @@ source("columns_addition.R")
 
 #### **Notes**
 Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email. The figures include:  
-+ **Figure 1**: a barplot displaying the frequency of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' inactiveness throughout the observational period.
-+ **Figure 2**: a barplot displaying the percentage of observations per day of week, and time of day. This plot is helpful in identifying certian days of the week or times of the day where few/many observations have been recorded.   
-+ **Figure 3**: 
+\
+
++ **Figure 1**: a barplot displaying the frequency of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' inactiveness throughout the observational period.  
++ **Figure 2**: a barplot displaying the percentage of observations per day of week, and time of day. This plot is helpful in identifying certian days of the week or times of the day where few/many observations have been recorded.
 
 
 
@@ -118,13 +119,6 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
   + In otherwords, each hour of the day would consist of 12.5% of the total number of observations if there was equal representation for the times of the day.
 * The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are recorded.
 * It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
-
-#### **Figure 3.**
-
-```{r }
-
-```
-
 
 
 
