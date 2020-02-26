@@ -43,18 +43,21 @@ ggplot(data = dogs_data_JT) + geom_bar(aes(x = Activity), fill = "salmon") + fac
 ################## Other's Frequency (V_S)
 
 ## Other's Percentage (in six-month intervals)
+## Calculate percentage for each active behavior within each six-month interval
 active_obs <- dogs_data %>% 
   filter(Activeness == 'Active') %>% 
   group_by(Six_Month_Interval, Activity) %>%
   summarize(n = n()) %>%
   mutate(Percentage = n/sum(n)*100)
 
+## Calculate percentage for each inactive behavior within each six-month interval
 inactive_obs <- dogs_data %>% 
   filter(Activeness == 'Inactive') %>% 
   group_by(Six_Month_Interval, Activity) %>%
   summarize(n = n()) %>%
   mutate(Percentage = n/sum(n)*100)
 
+## Create stacked barplots for the percentages
 ggplot(active_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   geom_col(position = "stack", width = 0.4) +
   labs(title = "Percentage of active behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") + 
@@ -65,12 +68,14 @@ ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
   scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
 
+## Create barplots for the frequencies
 active_obs2 <- dogs_data %>% filter(Activeness == 'Active')
 inactive_obs2 <- dogs_data %>% filter(Activeness == "Inactive")
 ggplot(data=active_obs2) + 
   geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
   labs(title = "Frequency of recorded active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Frequency") +
   facet_grid(. ~Six_Month_Interval)
+
 ggplot(data=inactive_obs2) + 
   geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
   labs(title = "Frequency of recorded inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
@@ -251,5 +256,28 @@ ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
 
 
 
+
+
+################## Association B/W Events and Dog Behavior
+## Compare dogs' behavior between zoo boo and brew at the zoo
+## Compare all Saturdays
+
+# No data on Friday and Saturday between 2018-03-01 and 2019-03-01
+test_data <- dogs_data %>% filter(Six_Month_Interval != "2019-03-01~2019-09-01" & Six_Month_Interval != "2019-09-01~2020-01-11")
+test_data_1 <- dogs_data %>% filter(Six_Month_Interval == "2019-03-01~2019-09-01")
+test_data_2 <- dogs_data %>% filter(Six_Month_Interval == "2019-09-01~2020-01-11")
+table(test_data_2$Day_of_Week)
+table(test_data_1$Day_of_Week)
+table(test_data$Day_of_Week)
+
+third_interval_viz <- ggplot(data = test_data_1) + 
+  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
+  labs(title = "Number of Observations (Per month from 2019-03-01 to 2019-09-01)", x = "Day of Week", y = "Frequency") +
+  facet_grid(. ~ Month)
+fourth_interval_viz <- ggplot(data = test_data_2) + 
+  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
+  labs(title = "Number of Observations (Per month from 2019-09-01 to 2020-01-11)", x = "Day of Week", y = "Frequency") +
+  facet_grid(. ~ Month)
+grid.arrange(third_interval_viz, fourth_interval_viz, nrow = 2)
 
 
