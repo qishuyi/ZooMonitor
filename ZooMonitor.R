@@ -11,6 +11,7 @@ library(grid)
 library(formattable) #To make a nice table
 library(zoo)
 library(tibble)
+library(ggbeeswarm)
 
 #Run Data cleaning script
 source("cleaning.R")
@@ -196,39 +197,36 @@ bones_nosat <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Acti
 grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 
-
-#################### Association Between Dogs' Behavior with Temperature(Using TAVG)
-dogs_data_grouped2 <- group_by(dogs_data, Temp_Level, Activeness)
+#################### Association Between Dogs' Behavior with Temperature Level(Using TAVG_TMAX_avg)
+dogs_data_grouped2 <- group_by(dogs_data, Activity,Temp_Level)
 summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
-summary2 <- summary2 %>% group_by(Temp_Level) %>%
-  mutate(sum = sum(counts))
-dogs_data_TL <- left_join(dogs_data, summary2, by = c("Temp_Level", "Activeness"))
-dogs_data_TL <- mutate(dogs_data_TL, percent = dogs_data_TL$counts/dogs_data_TL$sum*100)
-dogs_data_TL$percent <- round(dogs_data_TL$percent, digits = 1)
-dogs_data_TL$percent <- paste(dogs_data_TL$percent, "%")
+summary2 <- summary2 %>% group_by(Activity) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary2$percent <- round(summary2$percent, digits = 1)
+summary2 <- summary2 %>% mutate(percent_sub = paste(percent, "%"))
 
-##Activity by Temperature Plot (TAVG)
-a <- ggplot(data = dogs_data_TL) + 
-  geom_bar(aes(x = Temp_Level), fill = "salmon") + 
-  facet_grid(.~ Activity) + 
-  theme(axis.text.x = element_text(angle = 90)) +
-  labs(title = "Activity Based on Temperature (TAVG)", x = "Temperature", y="Counts")
+##Activity by Temperature Level Plot (TAVG_TMAX_avg)
+ggplot(data = summary2, aes(x = Temp_Level, y = counts, fill = Temp_Level), show.legend = FALSE) + 
+  geom_bar(stat = "identity", position=position_dodge()) + 
+  facet_grid(.~ Activity) +
+  labs(title = "Activity Based on Temperature Level (Average of TMAX and TAVG)", x = "Temperature", y="Counts") 
 
-#Temperature Level Reference Table (TAVG)
-Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG, 0:10/10))
-names(Temp_Level_Reference)[names(Temp_Level_Reference) == "quantile(dogs_data$TAVG, 0:10/10)"] <- "Temperature (Fº)"
+#Temperature Level Reference Table (TAVG_TMAX_avg)
+Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
+names(Temp_Level_Reference)[names(Temp_Level_Reference) == "quantile(dogs_data$TAVG_TMAX_avg, 0:10/10)"] <- "Temperature (Fº)"
 Temp_Level_Reference$`Temperature (Fº)` <- round(Temp_Level_Reference$`Temperature (Fº)`)
-Temp_Level_Reference[1, 1] = "21 ~ 33"
-Temp_Level_Reference[2, 1] = "34 ~ 38"
-Temp_Level_Reference[3, 1] = "39 ~ 45"
-Temp_Level_Reference[4, 1] = "46 ~ 50"
-Temp_Level_Reference[5, 1] = "51 ~ 57"
-Temp_Level_Reference[6, 1] = "58 ~ 62"
-Temp_Level_Reference[7, 1] = "63 ~ 70"
-Temp_Level_Reference[8, 1] = "70 ~ 72"
-Temp_Level_Reference[9, 1] = "73 ~ 77"
-Temp_Level_Reference[10, 1] = "78 ~ 86"
+Temp_Level_Reference[1, 1] = "34 ~ 40"
+Temp_Level_Reference[2, 1] = "41 ~ 45"
+Temp_Level_Reference[3, 1] = "46 ~ 53"
+Temp_Level_Reference[4, 1] = "54 ~ 59"
+Temp_Level_Reference[5, 1] = "60 ~ 65"
+Temp_Level_Reference[6, 1] = "66 ~ 69"
+Temp_Level_Reference[7, 1] = "70 ~ 77"
+Temp_Level_Reference[8, 1] = "78 ~ 81"
+Temp_Level_Reference[9, 1] = "82 ~ 85"
+Temp_Level_Reference[10, 1] = "86 ~ 94"
 Temp_Level_Reference <- slice(Temp_Level_Reference, 1:10)
 Temp_Level_Reference <- mutate(Temp_Level_Reference, Percent = rownames(Temp_Level_Reference))
 Temp_Level_Reference <- mutate(Temp_Level_Reference, Level = rownames(Temp_Level_Reference))
@@ -236,52 +234,28 @@ Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent)
 Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
 formattable(Temp_Level_Reference)
 
- 
+#################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg)
+dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
+
+##Activity by Temperature Plot (TAVG_TMAX_avg) (Violin)
+ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
+  geom_violin() +
+  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Activity", y = "Temperature (F°)")
+
+##Activity by Temperature Plot (TAVG_TMAX_avg) (beeswarm)
+ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity)) +
+  geom_quasirandom(groupOnX=FALSE) +
+  labs(title = "Activity Based on Temperature (Average of TMAX and TAVG)", x = "Temperature (F°)", y = "Activity")
 
 
-#################### Association Between Dogs' Behavior with Temperature(Using TAVG_TMAX_avg)
-dogs_data_grouped3 <- group_by(dogs_data, Temp_Level2, Activeness)
-summary3 <- as.data.frame(summarise(dogs_data_grouped3, n()))
-names(summary3)[names(summary3) == "n()"] <- "counts"
-summary3 <- summary3 %>% group_by(Temp_Level2) %>%
-  mutate(sum = sum(counts))
-dogs_data_TL2 <- left_join(dogs_data, summary3, by = c("Temp_Level2", "Activeness"))
-dogs_data_TL2 <- mutate(dogs_data_TL2, percent = dogs_data_TL2$counts/dogs_data_TL2$sum*100)
-dogs_data_TL2$percent <- round(dogs_data_TL2$percent, digits = 1)
-dogs_data_TL2$percent <- paste(dogs_data_TL2$percent, "%")
 
-##Activity by Temperature Plot (TAVG_TMAX_avg)
-b <- ggplot(data = dogs_data_TL2) + 
-  geom_bar(aes(x = Temp_Level2), fill = "salmon") + 
-  facet_grid(.~ Activity) + 
-  theme(axis.text.x = element_text(angle = 90)) +
-  labs(title = "Activity Based on Temperature (TAVG_TMAX_avg)", x = "Temperature", y="Counts")
 
-#Temperature Level Reference Table (TAVG_TMAX_avg)
-Temp_Level_Reference2 <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
-names(Temp_Level_Reference2)[names(Temp_Level_Reference2) == "quantile(dogs_data$TAVG_TMAX_avg, 0:10/10)"] <- "Temperature (Fº)"
-Temp_Level_Reference2$`Temperature (Fº)` <- round(Temp_Level_Reference2$`Temperature (Fº)`)
-Temp_Level_Reference2[1, 1] = "34 ~ 40"
-Temp_Level_Reference2[2, 1] = "41 ~ 45"
-Temp_Level_Reference2[3, 1] = "46 ~ 53"
-Temp_Level_Reference2[4, 1] = "54 ~ 59"
-Temp_Level_Reference2[5, 1] = "60 ~ 65"
-Temp_Level_Reference2[6, 1] = "66 ~ 69"
-Temp_Level_Reference2[7, 1] = "70 ~ 77"
-Temp_Level_Reference2[8, 1] = "78 ~ 81"
-Temp_Level_Reference2[9, 1] = "82 ~ 85"
-Temp_Level_Reference2[10, 1] = "86 ~ 94"
-Temp_Level_Reference2 <- slice(Temp_Level_Reference2, 1:10)
-Temp_Level_Reference2 <- mutate(Temp_Level_Reference2, Percent = rownames(Temp_Level_Reference2))
-Temp_Level_Reference2 <- mutate(Temp_Level_Reference2, Level = rownames(Temp_Level_Reference2))
-Temp_Level_Reference2 <- Temp_Level_Reference2 %>% select(-Percent) 
-Temp_Level_Reference2 <- Temp_Level_Reference2[, c(2, 1)]
-formattable(Temp_Level_Reference2)
 
-##Combined Visuals (TAVG and TAVG_TMAX_avg)
-grid.arrange(a, b, nrow = 2)
 
-test
+
+
+
+
 
 
 ################## Association B/W Events and Dog Behavior
