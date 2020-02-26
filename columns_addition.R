@@ -83,6 +83,23 @@ dogs_data$Temp_Level2 <- as.character(dogs_data$Temp_Level2)
 dogs_data$Temp_Level2 <- factor(dogs_data$Temp_Level2, c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"))
 
 ##Add column for six month intervals
+start_date <- min(dogs_data[,'Date'])
+end_date <- max(dogs_data[,'Date'])
+
+# Create a vector to hold all six-month intervals
+six_month_intervals <- c()
+
+# Add all intervals into the vector in a loop
+lower_bound <- start_date
+while (lower_bound <= end_date) {
+  upper_bound <- lower_bound
+  month(upper_bound) <- month(upper_bound) + 6
+  if(upper_bound > end_date) upper_bound <- end_date
+  six_month_intervals[length(six_month_intervals)+1] <- paste(lower_bound, upper_bound, sep = "~")
+  month(lower_bound) = month(lower_bound) + 6
+}
+
+# Add the six-month interval column based on the Date column
 get_interval <- function(inputDate) {
   six_month_intervals[(as.yearmon(inputDate)-
                          as.yearmon(start_date))*12/6 + 1]
