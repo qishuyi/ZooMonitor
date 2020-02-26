@@ -120,8 +120,7 @@ dogs_data$Weather_Type[dogs_data$Weather_Type == "AB00"] <- 4
 dogs_data$Weather_Type[dogs_data$Weather_Type == "A00D"] <- 5
 dogs_data$Weather_Type[dogs_data$Weather_Type == "0BC0"] <- 6
 dogs_data$Weather_Type[dogs_data$Weather_Type == "AB0D"] <- 7
-
-
+dogs_data$Weather_Type <- as.character(dogs_data$Weather_Type)
 
 
 
