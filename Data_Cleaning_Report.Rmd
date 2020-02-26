@@ -184,12 +184,12 @@ For this case, "# Operating 3+5" will not be executed. In otherwords, anything t
 
 #### **Data Cleaning Procedure**
 
-Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have taken to clean the Painted African Dogs' data.  
+Now, let's proceed to the data cleaning process. Here, we will introduce the actual process we have taken to clean the Painted African Dogs data.  
 
 <br>
 
 ##### **Installing Packages**  
-In our last example, we calculated "3+5" only using a simple algebraic symbol and stored the outcome. However, we will in many cases need to use **command** (or function) to conduct operations on data, unlike our example. Many of these commands live in a certain **package**, and to be able to use them in your R Studio, you will need to install the packages first. 
+In our last example, we calculated "3+5" using only a simple algebraic symbol and stored the outcome. However, we will in many cases need to use **commands** (or function) to conduct operations on data. Many of these commands reside in a certain **package**, and to be able to use them in your R Studio, you will need to install the packages first. 
 
 *Here's the command that lets you install the package:*
 ```{r, eval = F}
@@ -200,14 +200,14 @@ install.packages("package name")
 
 \
 
-So, here are all the packages you need to clean the Painted African Dogs' data. 
+Here are all the packages you need to clean the Painted African Dogs data. 
 
-+ readr: Contain commands that read rectangular data (like 'csv', 'tsv', and 'fwf')
++ readr: Contain commands that read in data (like 'csv', 'tsv', and 'fwf')
 + dplyr: Contain commands that clean data (select columns, remove rows, etc.)
 + tidyr: Contain commands that clean data (unite several columns, spread a column, etc.)
-+ tibble: Contain commands that read data and plots
++ tibble: Contain commands that display and plots
 
-*And here are the codes that install these packages:*
+*And here is the code to install these packages:*
 ```{r, eval = F}
 install.packages("readr")
 install.packages("tidyr")
@@ -217,11 +217,11 @@ install.packages("tibble")
 
 *During the installation, you have to wait until the line "Downlowded" appears in red on Console!
 
-<br>
+\
 
 ##### **Loading in Libraries**  
 
-Even though you do not need to run the installation codes we just presented, you still need to call the packages you open R Studio to be able to use the commands stored inside. That is to say, every time you open/reopen an RScript, whether the script is new or not, **you need to run the command that calls the packages.**
+Even though you do not need to run the installation codes we just presented, you still need to call the packages every time you open R Studio to be able to use the commands stored inside. Thus, every time you open/reopen an RScript, whether the script is new or not, **you need to run the command that calls the packages.**
 
 *Here are the commands that call the packages:*
 ```{r}
@@ -232,63 +232,64 @@ library(tibble)
 ```
 
 *Notice that you need not have the quotation marks in the parenthesis this time.  
-**You should keep these codes on your RScript since you have to run these every time you want to use the commands stored in these packages.
+**It is a good practice to keep this code at the very beginning your RScript, since you will need to run it everytime you open/reopen an RScript.
 
-You may have noticed that we did not install any packages before we used the commands "install.packages()" and "library()". This is because these commands are already stored in R, and there are many other basic commands that you already have by default!
+You may have noticed that we did not install any packages before we used the commands **install.packages()** and **library()**. This is because these commands are some of the many basic commands that are provided to you by default. 
 
-<br>
+\
 
 ##### **Importing Data**  
 
 Now, using the **readr package**, we are going to import the data of our choice.    
-Specifically, although we have some alternatives, we will use the **read_csv()** command in the this package because it is fast at reading large datasets.
+While there are a couple of possible methods, we will use the **read_csv()** command in this package because it is fast at reading large datasets.
 
-*Now, this is the basic format of "read_csv" or "read.csv" command:*
+*This is the basic syntax of the "read_csv()" function:*
 ```{r, eval=FALSE}
 data_name <- read_csv("File name or URL")
 ```
 
 \
 
-In the parenthesis, you will be navigating the function to where the data is located. There are mainly three ways you can format this:     
+In the parenthesis, you will need to specify where the data is located. There are three main ways you can format this:     
   
- 1. If you have the data stored in the *Working Directory*, then you can just enter the exact file name (including the part after the dot) in quptation marks. For example, if the data "data.csv" is stored in your working directory, you should write as follows:
+ 1. If you have the data stored in the *Working Directory*, then you can just enter the exact file name (including the part after the dot) in quptation marks. For example, if the data named "my_data.csv" is stored in your working directory, you should write as follows:
 ```{r, eval=F}
-Example <- read_csv("data.csv")
+Example <- read_csv("my_data.csv")
 ```
 
 \
 
- 2. If the data is not stored in the *Working Directory* but in some other file/folder, you need to navigate the function to that specific file/folder from your *Working Directory*. So, if the data "data.csv" is in file "A," which is in folder "B," which is in your *Working Directory*, then you should write as follows:
+ 2. If the data is not stored in the *Working Directory* but in some other folder, you need to navigate the function to that specific folder from your *Working Directory*. For example, suppose that from your *Working Directory*, you need to click on folder "B", and then another folder "C", in order to access "my_data.csv". Then you should write as follows:
 ```{r, eval = F}
-Example2 <- read_csv("B/A/data.csv")
+Example2 <- read_csv("B/C/data.csv")
 ```
 
 \
 
-You will repeat indicating the folders, dividing them by " / ", until you reach the dataset you want.
+You will repeat this process, separating each folder along the way with " / ", until you reach the location of your data set. 
 
 \
 
- 3. If the data is stored somewhere online, such as Github, you will write the URL of the data in the parenthesis. This time, if the data has the URL "http:// ... .csv," you will have something like the following:
+ 3. If the data is stored somewhere online, such as Github, you need to write the URL of the data in the parenthesis. If the data has the URL "http:// ... .csv," you will need to type something like the following:
 ```{r, eval=F}
 Example3 <- read_csv("http:// ... .csv")
 ```
 \
-Notice that the name under which you store your data on R Studio has no space in-between.  
-\
-Finally, in our case, we decided to name the Painted African Dogs' data *dogs_data*. Please keep in mind that the following data-cleaning process will base off of this name.
 
-<br>
+*Notice that the name under which you store your data on R Studio has no space in-between. 
+
+Finally, in our case, we decided to name the Painted African Dogs data *dogs_data*. Please keep in mind that the following data-cleaning process will be based off of this name. (In otherwords, our data is stored in a variable called *dogs_data*, so whenever we want to refer to this data set, we will type *dogs_data*). 
+
+\
 
 ##### **Inspecting the Data**
 
-We have successfully installed necessary packages, loaded the libraries, and imported our data. Before beginning the data cleaning process, we must inspect the data. We begin by checking the number of rows the columns the data contains.
+We have successfully installed necessary packages, loaded the libraries, and imported our data. Before beginning the data cleaning process, we will need to inspect the data. We begin by checking the number of rows the columns the data contains.
 
 ```{r}
 dim(dogs_data)
 ```
-We used the **dim()** function, and passed in the name of the data frame as the argument. The values that the function returned suggest that the raw data consists of 3409 observations and 25 different columns. 
+We used the **dim()** function, and passed in the name of the data frame (*dogs_data*) as the argument. The values that the function returned suggest that the raw data consists of 3409 observations and 25 different columns. 
 
 
 \
@@ -314,7 +315,7 @@ Upon a careful exploration of the data, we compiled a list of actions to take in
 
 ##### **Removing Irrelevant Columns **
 
-From here, we will finally begin the process of data cleaning. We will first remove columns that don't contain useful information for the purposes of anayzing the data. For the data on Painted African Dogs, we decided to remove the following columns:
+From here, we will finally begin the actual process of data cleaning. We will first remove columns that don't contain useful information for the purposes of anayzing the data. For the data on Painted African Dogs, we decided to remove the following columns:
 
 - *Confirguration Name*
 - *Observer*
@@ -339,11 +340,11 @@ dogs_data <- select(dogs_data, -`Configuration Name`, -Observer,-DeviceID,
 
 \
 
-The first argument of the **select()** function is the data frame name of our concern. Since we want to remove columns from the data frame called *dogs_data*, we passed dogs_data as the first argument. Now, we want to pass in all the names of the columns we want to remove as arguments, separated by commas. In addition, we need to make sure to include a minus sign (-) in front of the column name to indicate that we want to remove these columns. Note that all column names consisting of two different words (I.e *Configuration Name*) must be sandwiched between **`**. These types of column names are tiresome to work with, and is the main focus of the next section where we work on renaming column names. Lastly, we reassign the modified data frame back to *dogs_data* so that *dogs_data* is now the modified version of the original data frame, containing everything besides the columns we removed above. 
+The first argument of the **select()** function is the data frame name of our concern. Since we want to remove columns from the data frame called *dogs_data*, we passed dogs_data as the first argument. Now, we want to pass in all the names of the columns we want to remove as arguments, separated by commas. In addition, we need to make sure to include a minus sign **(-)** in front of the column name to indicate that we want to remove these columns. Note that all column names consisting of two different words (I.e *Configuration Name*) must be sandwiched between **`**. Column names of this nature are tiresome to work with, and is the main focus of the next section where we work on renaming column names. Lastly, we reassign the modified data frame back to *dogs_data* so that *dogs_data* is now the modified version of the original data frame, containing everything besides the columns we removed above. 
 
 \
 
-Before moving on, we check to make sure that the columns were properly removed. A quick method is to check for the number of columns in the modified version of the data frame. Since we have removed 9 columns from the original 25, we should be left with 16 columns. To do this, we can use the **ncol()** function, and pass in the name of the data frame as the argument. 
+Before moving on, we check to make sure that the columns were properly removed. A quick check is to print the number of columns in the modified version of the data frame. Since we have removed 9 columns from the original 25, we should be left with 16 columns. To do this, we can use the **ncol()** function, and pass in the name of the data frame as the argument. 
 
 ```{r}
 ncol(dogs_data)
@@ -351,7 +352,7 @@ ncol(dogs_data)
 
 \
 
-Since the function returned a value of 16, it appears as though the columns were removed correctly. However, there is always the case in which we referred to the wrong column name, or accidentally removed a column that we intended to keep. Since there are only a limited number of columns, we can use the **colnames()** function to check the names of all columns in the data frame. Again, we pass the name of the data frame as the argument.
+Since the function returned a value of 16, it appears as though the columns were removed correctly. However, there is always a possibly that we referred to the wrong column name, or accidentally removed a column that we intended to keep. Since there are only a limited number of columns, we can use the **colnames()** function to check the names of all columns in the data frame (This would not be realistic if we had hundreds of columns). Again, we pass the name of the data frame as the argument.
 
 
 ```{r}
@@ -361,11 +362,11 @@ colnames(dogs_data)
 
 The output suggests that all and only the columns we wished to remove were deleted from the data frame. While the two checks we performed above were not necessary, they can serve as useful methods for assuring that the columns were removed correctly. 
 
-<br>
+\
 
 ##### **Renaming Columns **
 
-Now, we will rename some of the column names to simplify process of analyzing the data. In general, shorter column names that still effectively depict the information of themselves are most convinient. As mentioned earlier, column names consisting of multiple words are inefficient and troublesome to work with. Through this process, our aim is to get rid of the spaces in column names, as well as shorten them whenever appropriate. Upon examining the columns in the data set, we decided to make the following changes:
+Now, we will rename some of the column names to simplify process of analyzing the data. In general, shorter column names that still effectively depict information about the variable are most convinient. As mentioned earlier, column names consisting of multiple words are inefficient and troublesome to work with. Through this process, our aim is to get rid of the spaces in column names, as well as shorten them whenever appropriate. Upon examining the columns in the data set, we decided to make the following changes:
 
 
 Old Column Name                       | New Column Name
@@ -381,7 +382,7 @@ Old Column Name                       | New Column Name
 
 \
 
-To make these changes, we will use the **rename()** function from the **dplyr** package. This function allows us to precisely specify and change the columns that we wish to rename. **Some frequently used methods of removing spaces from column names include** replacing spaces with periods or underscores. While we will opt to use underscores, this choice is simply a matter of preference.
+To make these changes, we will use the **rename()** function from the **dplyr** package. This function allows us to precisely specify and change the names of columns. **Some frequently used methods of removing spaces from column names include** replacing spaces with periods or underscores. While we will opt to use underscores, this choice is simply a matter of preference.
 
 ```{r}
 dogs_data <-  rename(dogs_data, Session_Start_Time = `Session Start Time`,
@@ -397,7 +398,7 @@ dogs_data <-  rename(dogs_data, Session_Start_Time = `Session Start Time`,
 
 \
 
-Like the **select()** function we deployed earlier, the first argument we must pass in the function is the name of the data frame. This informs the function of where the column names are coming from. The general syntax for the succeeding arguments is *new column name = current column name*. We can rename as many columns as desired, as long as each instance is separated with a comma. Again, we reassign the modified data back into *dogs_data* so that it contains the updated column names. 
+Like the **select()** function we deployed earlier, the first argument we must pass in the function is the name of the data frame. This informs the function of where the column names are coming from. The general syntax for the succeeding arguments is *new column name = current column name*. We can rename as many columns as we desire, as long as each instance is separated by a comma. Again, we reassign the modified data back into *dogs_data* so that it contains the updated column names. 
 
 \
 
@@ -411,7 +412,7 @@ colnames(dogs_data)
 
 The output is the list of column names in the modified dogs data. By inspection, we can be assured that all of the desired changes were applied correctly.
 
-<br>
+\
 
 ##### **Omitting Rows**
 
@@ -419,14 +420,14 @@ Prior to this point, we have manipulated our data such that it consists of only 
 
 In the dogs data, behavioral observations are stored in two columns: *IC1_Value* and *IC2_Value*. Note that these are the renamed versions of Interval Channel 1 Value and Interval Channel 2 Value. We want to remove only the rows that are missing values for **both** of these columns. Later on, we will combine these two columns into a single column to visualize the data more easily. For now, however, we must consider active and inactive behaviors as two separate columns. 
 
-The **filter()** function from the **dplyr** package allows us to keep only a subset of rows we want from the data frame. Notice that removing rows that are missing values for **both** *IC1_Value* and *IC2_Value* is tantamount to keeping all rows that is **not** missing values for these two columns. 
+The **filter()** function from the **dplyr** package allows us to keep only a subset of rows we want from the data frame. Notice that removing rows that are missing values for **both** *IC1_Value* and *IC2_Value* is tantamount to keeping all rows that is **not** missing values for both of these columns. 
 
 ```{r}
 dogs_data <- filter(dogs_data, !(is.na(IC1_Value) & is.na(IC2_Value)))
 ```
 \
 
-Again, the first argument of the function specifies the data frame of our concern. The second argument is a little invovled, so we will first decompose and explain each part individually. The *is.na()* function esentially checks to see whether a value is missing. Hence, is.na(IC1_Value) is going through every row of the dogs data and checking whether there is a missing value in the *IC1_Value* column. is.na(IC2_Value) follows the exact same procedure, and verifies missing values in the *IC2_Value* column of the data frame. Combining these two expressions with **&**, we are now going through the data and checking for rows missing values for **both** columns. At this point, the function will keep all and only the rows with missing values for both *IC1_Value* and *IC2_Value*. By putting **!** in front of these expressions, we can achieve our goal of keeping all and only the rows **not** missing values for the two columns. Lastly, we reassign the modified version of the data back to *dogs_data*. 
+Again, the first argument of the function specifies the data frame of our concern. The second argument is a little invovled, so we will first decompose and explain each part individually. The *is.na()* function esentially checks to see whether a value is missing. Hence, is.na(IC1_Value) is going through every row of the dogs data and checking whether there is a missing value in the *IC1_Value* column. is.na(IC2_Value) follows the exact same procedure, and verifies missing values in the *IC2_Value* column of the data frame. By combining these two expressions with **&**, we are now going through the data and checking for rows missing values for **both** columns. At this point, the function will keep all and only the rows with missing values for both *IC1_Value* and *IC2_Value*. By putting **!** in front of these expressions, we can achieve our goal of keeping all and only the rows that are **not** missing values for the two columns. Lastly, we reassign the modified version of the data back to *dogs_data*. 
 
 \
 
@@ -439,22 +440,22 @@ nrow(dogs_data)
 
 Our newly modified data frame has a total of 3173 rows. Hence, there were 236 rows with missing observations. Now that we have successfully handled rows with missing values, we will address rows with multiple behavioral observations in the following section. 
 
-<br>
+\
 
 ##### **Splitting Rows**
 
-After removing rows with no behavioral observations, there are also rows with both active and inactive observations. Ideally we would want each row to contain just one behavior (either active or inactive) so that when we analyze a row in the dataset, we do not have to choose which behavior to count. Finding rows with data for two types of behaviors and splitting them are both time-consuming tasks, so we can employ R to automate the tasks for us. 
+After removing rows with no behavioral observations, there are also rows containing both active and inactive observations. Ideally, we would want each row to contain just one behavior (either active or inactive) so that when we analyze a row in the dataset, we do not have to vacillate between the two behaviors. Finding rows with data for two types of behaviors and splitting them are both time-consuming tasks, so we can employ R to automate the tasks for us. 
 
 Recall that in the dataset the behaviors are recorded in two columns: *IC1_Value* and *IC2_Value*.  
 
-*IC1_Value* is either an active dog behavior or "*na*", and *IC2_Value* is either an inactive dog behavior or "*na*", where "*na*" indicates **missing value** for the variable.
+*IC1_Value* is either an active dog behavior or "*na*", and *IC2_Value* is either an inactive dog behavior or "*na*". ("*na*" indicates **missing value** for the variable.)
 
 Therefore, we would like find the rows with "*na*" in **neither** *IC1_Value* **nor** *IC2_Value*, make a copy of each of these rows, write "*na*" in the *IC2_Name* and *IC2_Value* columns for one of them and "*na*" in the *IC1_Name* and *IC1_Value* for the other.
 
 ```
 duplicate_indices <- which((!is.na(dogs_data$IC1_Value)) & (!is.na(dogs_data$IC2_Value)))
 ```
-We first ran the above command to find the rows that record both active and inactive behaviors. The row numbers are saved in a variable named *duplicate_indices*.
+We first ran the above command to find the rows that contain both active and inactive behaviors. The row numbers are saved in a variable named *duplicate_indices*.
 
 ```
 for (row_num in duplicate_indices) {
@@ -473,24 +474,25 @@ We then iterate through each row number in *duplicate_indices* and ask the progr
 - Change *IC1_Name* and *IC1_Value* to "*na*" in the copy  
 - Add the copy at the end of the dataset  
 
-Our modified data frame now has 3264 rows. At this point we have completed all the necessary data cleaning steps. In the next section we will talk about some additional steps we took to make the dataset easier to work with.
+Our modified data frame now has 3264 rows. At this point we have completed all the necessary data cleaning steps. In the next section we will discuss some additional steps we took to make the dataset easier to work with.
 
 
 ***
 
 #### **Extra Steps**
-In our last section, we have introduced the basic data-cleaning procedure that is useful for and applicable to not only *dogs_data* but also many other datasets.  
-\
+In our last section, we have introduced the basic data-cleaning procedure that is useful for and applicable to not only *dogs_data* but also many other datasets with a similar structure. 
+
+
 One last thing we would like to mention is that we have actually taken two more additional steps to further clean the data.  
 Those are:  
 
- 1.Combining the columns *IC1_Name* and *IC2_Name* so that we have the values "*Active*" and "*Inactive*" in a single column.  
- 2. Combing the columns *IC1_Value* and *IC2_Value* so that we have the values of activity, such as sleeping and eating, in a single columns.  
+ 1.Combining the columns *IC1_Name* and *IC2_Name* so that we have the values "*Active*" and "*Inactive*" in a stored in a single column.  
+ 2. Combing the columns *IC1_Value* and *IC2_Value* so that we have the values of activity, such as sleeping, eating, etc, stored in a single column.  
 \
 For these two steps, we use the command **unite()** from the **tidyr** package and **mutate()** from the **dplyr** package.   
-\
 
-*Here are how we deploy those commands:*
+
+*Here are how we deploy these functions:*
 ```{r}
 #Step 1
 dogs_data <- unite(dogs_data, "Activeness", c(IC1_Name, IC2_Name), remove = T)
@@ -503,15 +505,23 @@ dogs_data <- mutate(dogs_data, Activity = gsub("NA_", "", Activity))
 dogs_data <- mutate(dogs_data, Activity = gsub("_NA", "", Activity))  
 ```
 
-Here, the function **unite()** combines the columns *IC1_Name* and *IC2_Name* or *IC1_Value* and *IC2_Value* and **mutate()** creates, or in this case replace the old one with, a new column. In the **mutate()** function, by assigning the old name to where we are supposed to put in a new name (before " = "), the command **mutate()** just replaces all the values of the given column instead of creating a completely new one.  
-Lastly, **gsub()** removes the "*NA_*" and "*_NA*," which we have undesirably obtained from the combining process. 
+Here, the function **unite()** combines the columns *IC1_Name* and *IC2_Name* or *IC1_Value* and *IC2_Value* and **mutate()** creates, or in this case replace the old one with, a new column. With the **mutate()** function, by assigning the old name (before " = "), the command just replaces all the values of the original column instead of creating a completely new one. Lastly, **gsub()** removes the "*NA_*" and "*_NA*," from the values of the merged columns. (For example, when we merged the columns, we got values such as *"NA_Sleeping"*, or *"Alert_NA"*. We used the **mutate()** and **gsub()** functions so that the values in the new column would appear as *"Sleeping"* and *"Alert"*, respectively).
 
-\
+***
 
-We hope that this report was helpful for you! The introduction highlights some big picture and the general process in which we cleaned the data. The later sections illustrate more technical details and provide explanations along the way. The data cleaning procedure covers the minimum necessary steps taken in order to create visualizations and analyze the data. While not explicitly presented in this document, there are a wide range of steps that can be taken to enrich the content of the data. The following are some additional modifications we have made using R to the *dogs_data* as of February 27th 2020:
+#### **Concluding Remarks**
+
+We hope that this report was helpful for you! The introduction highlights some big picture as well as the general process in which we cleaned the data. The later sections illustrate the more technical details and provide detailed explanations along the way. The data cleaning procedure covers the minimum necessary steps taken in order to create visualizations and analyze the data. While not explicitly presented in this document, there are a wide range of measures that can be taken to enrich the content of the data. The following are some additional modifications we have made using R to the *dogs_data* as of February 27th 2020:
 
 - Added a column for day of the week *(I.e Wednesday)*
 - Added a column for food *(I.e Bones)*
 - Added a column for season *(I.e. Summer)*
 - Added a column for average temperature 
 - Added a column for weather
+
+\
+
+
+**Authors: Shuyi Qi, Hinako Minagi, Riu Sakaguchi** 
+
+**Date: February 27 2020**
