@@ -38,7 +38,7 @@ source("columns_addition.R")
 Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email.  
 The figures include:  
 
-+ **Figure 1**: Barplots displaying the frequency and percentage of dogs' active and inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' different types of activeness and inactiveness throughout the observational period.  
++ **Figure 1**: Barplots displaying the frequency and percentage of dogs' active and inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in the dogs' behaviors throughout the observational period.  
 + **Figure 2**: Barplots displaying the percentage of observations per day of week, and time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations have been recorded.
 
 We hope that the visualizations we created in this progress report is helpful for you! 
