@@ -35,18 +35,50 @@ source("columns_addition.R")
 \
 
 #### **Notes**
-Hello Anna! We have created the visualizations that you requested during the first meeting back in the beginning of February and in the follow up email. Figure 1 is ... . Figure 2 is a barplot displaying the percentage of observations per day of week, and the time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations are recorded. We hope that the visualizations we created in this progress report is helpful for you! 
+
+Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email. The figures include:  
+
++ **Figure 1**: a barplot displaying the frequency of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' inactiveness throughout the observational period.  
++ **Figure 2**: a barplot displaying the percentage of observations per day of week, and time of day. This plot is helpful in identifying certian days of the week or times of the day where few/many observations have been recorded.
+
+We hope that the visualizations we created in this progress report is helpful for you! 
 
 
 \
 
 #### **Figure 1.**
 
-```{r Inactivity Plot in 6 Month Intervals}
+```{r Inactivity Plot in 6 Month Intervals, fig.height = 8, fig.width = 10}
+active_obs <- dogs_data %>% 
+  filter(Activeness == 'Active') %>% 
+  group_by(Six_Month_Interval, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
 
+inactive_obs <- dogs_data %>% 
+  filter(Activeness == 'Inactive') %>% 
+  group_by(Six_Month_Interval, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+active_six_month <- ggplot(active_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
+  geom_col(position = "stack", width = 0.4) +
+  labs(title = "Percentage of active behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") + 
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+inactive_six_month <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
+  geom_col(position = "stack", width = 0.4) +
+  labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+grid.arrange(active_six_month, inactive_six_month,  nrow = 2)
 ```
 
+\
 
+\
+
+\
 
 \
 
@@ -92,9 +124,5 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 * It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
 
 \
-
-
-
-
 
 
