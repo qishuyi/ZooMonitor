@@ -91,7 +91,7 @@ Cleaned through the shared cleaning script (Only the basic cleaning procedure)
 
 Column additions script (six column additions at once)  
 
-**Data Dictionary as of now** 
+**Added columns** 
 
 ![](Column_addition_dd.png)
 
@@ -119,12 +119,156 @@ Data obtained from *NOAA*
 
 
 #### **Goal 1**
+##### **Visual for Weather**
+
+* Merging Data
+  + Reduced weather types from 11 to 4 due to the absence of cases
+    + Fog  
+    + Thunder  
+    + Hail  
+    + Smoke or haze  
+  + 2/3 of the observations had no record of any of these abnormal weather types 
+  + Reclassified and created a column of weather types so that they include all existing combinations (Weather Type Reference)
+
+```{r Visual for Weather}
+#################### Association Between Dogs' Behavior with Weather
+dogs_data_grouped3 <- group_by(dogs_data, Weather_Type, Activeness)
+summary3 <- as.data.frame(summarise(dogs_data_grouped3, n()))
+names(summary3)[names(summary3) == "n()"] <- "counts"
+summary3 <- summary3 %>% group_by(Weather_Type) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary3$percent <- round(summary3$percent, digits = 1)
+summary3 <- summary3 %>% mutate(percent_sub = paste(percent, "%"))
+##Activity by Weather Type Plot
+ggplot(summary3, aes(x="", y=counts, fill=Activeness)) +
+  geom_bar(stat="identity", position = "dodge") +
+  facet_grid(.~Weather_Type) +
+  geom_text(aes(label = percent_sub), position = position_dodge(width = 0.9), size = 2.7) +
+  labs(title = "Activeness by Weather Type", x = "Activeness", y="Counts") 
+```
 
 \
 
+```{r Visual for Weather Type Reference}
+##Weather Type Reference
+Weather_Type_Reference <- as.data.frame(0:7)
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "0:7"] <- "Weather_Type"
+Weather_Type_Reference <- cbind(Weather_Type_Reference, Weather_Description = Weather_Type_Reference$Weather_Type)
+for (a in c("0", "1", "2", "3", "4", "5", "6", "7"))
+  if(a == "0"){
+    Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "0"] <- "No Special Weather Type"
+    } else if(a == "1"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "1"] <- "Fog"
+    } else if(a == "2"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "2"] <- "Thunder"
+    } else if(a == "3"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "3"] <- "Smoke or haze"
+    } else if(a == "4"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "4"] <- "Fog and Thunder"
+    } else if(a == "5"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "5"] <- "Fog and Smoke or haze"
+    } else if(a == "6"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "6"] <- "Thunder and Hail"
+    } else{
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog and Thunder and Smoke or Haze"
+    }
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Type"] <- "Weather Type"
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Description"] <- "Weather Description" 
+formattable(Weather_Type_Reference, align = c("l", "r"))
+```
 
 \
 
+##### **Visual for Temperature**
+Using the **average of the average temp. and maximum temp.**
+
+ **1. Categorical Temperature Level**
+
+```{r Visual for Temperature Level}
+dogs_data_grouped2 <- group_by(dogs_data, Activity,Temp_Level)
+summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Activity) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary2$percent <- round(summary2$percent, digits = 1)
+summary2 <- summary2 %>% mutate(percent_sub = paste(percent, "%"))
+
+##Activity by Temperature Level Plot (TAVG_TMAX_avg)
+ggplot(data = summary2, aes(x = Temp_Level, y = counts, fill = Temp_Level), show.legend = FALSE) + 
+  geom_bar(stat = "identity", position=position_dodge()) + 
+  facet_grid(.~ Activity) +
+  labs(title = "Activity Based on Temperature Level", subtitle = "with Temperature Grouped into 10 Levels", x = "Temperature", y="Counts", fill = "Temperature Level") 
+
+```
+
+\
+
+```{r Visual for Temperature Level Reference}
+#Temperature Level Reference Table (TAVG_TMAX_avg)
+Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
+names(Temp_Level_Reference)[names(Temp_Level_Reference) == "quantile(dogs_data$TAVG_TMAX_avg, 0:10/10)"] <- "Temperature (Fº)"
+Temp_Level_Reference$`Temperature (Fº)` <- round(Temp_Level_Reference$`Temperature (Fº)`)
+Temp_Level_Reference[1, 1] = "34 ~ 40"
+Temp_Level_Reference[2, 1] = "41 ~ 45"
+Temp_Level_Reference[3, 1] = "46 ~ 53"
+Temp_Level_Reference[4, 1] = "54 ~ 59"
+Temp_Level_Reference[5, 1] = "60 ~ 65"
+Temp_Level_Reference[6, 1] = "66 ~ 69"
+Temp_Level_Reference[7, 1] = "70 ~ 77"
+Temp_Level_Reference[8, 1] = "78 ~ 81"
+Temp_Level_Reference[9, 1] = "82 ~ 85"
+Temp_Level_Reference[10, 1] = "86 ~ 94"
+Temp_Level_Reference <- slice(Temp_Level_Reference, 1:10)
+Temp_Level_Reference <- mutate(Temp_Level_Reference, Percent = rownames(Temp_Level_Reference))
+Temp_Level_Reference <- mutate(Temp_Level_Reference, Level = rownames(Temp_Level_Reference))
+Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent) 
+Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
+formattable(Temp_Level_Reference, align = c("l", "r"))
+```
+
+
+* Out of view → extreme temperatures
+* Running → low temperatures
+* Sleeping → high temperatures
+  
+\
+
+ **2. Continuous Temperature (Violin)***
+ 
+```{r Visual for Continuous temperature (violin)}
+dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
+
+##Activity by Numeric Temperature Plot(Violin)
+ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
+  geom_violin() +
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Activity", y = "Temperature (F°)")
+```
+ 
+
+
+* Removed "Eating," "Interaction with Objects," and "Interaction with dogs"
+* Width showing the rough density
+* Running → low temperatures
+* Sleeping → high temperatures
+
+\
+
+ **3. Continuous Temperature (beeswarm)**
+ 
+```{r Visual for continuous temperature (beeswarm)}
+ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity, color = Activity)) +
+  geom_quasirandom(groupOnX=FALSE) +
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Temperature (F°)", y = "Activity")
+
+```
+ 
+
+* Showing the actual counts
+* Let us confirm the tendencies in sleeping/running
+
+\
 
 ##### **Visual for Food**
 
@@ -277,9 +421,18 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #### **Progress Reflection**
 
-\
+**1. Things that went well**
 
-\
+* Effective work distribution (using Trello)
+* Creation of visuals
+* Creation of the document
+* Meeting with our client 
+
+**2. Things that were difficult**
+
+* Github issue (as editing simultaneously)
+* A  difficulty explaining technical topics to our client
+* Finding a useful weather/temperature dataset
 
 \
 
