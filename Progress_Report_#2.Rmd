@@ -36,10 +36,11 @@ source("columns_addition.R")
 
 #### **Notes**
 
-Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email. The figures include:  
+Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email.  
+The figures include:  
 
-+ **Figure 1**: a barplot displaying the frequency of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' inactiveness throughout the observational period.  
-+ **Figure 2**: a barplot displaying the percentage of observations per day of week, and time of day. This plot is helpful in identifying certian days of the week or times of the day where few/many observations have been recorded.
++ **Figure 1**: Barplots displaying the frequency of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' inactiveness throughout the observational period.  
++ **Figure 2**: Barplots displaying the percentage of observations per day of week, and time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations have been recorded.
 
 We hope that the visualizations we created in this progress report is helpful for you! 
 
@@ -64,12 +65,14 @@ inactive_obs <- dogs_data %>%
 active_six_month <- ggplot(active_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   geom_col(position = "stack", width = 0.4) +
   labs(title = "Percentage of active behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") + 
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan")) +
+  theme(plot.title = element_text(face = "bold"))
 
 inactive_six_month <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   geom_col(position = "stack", width = 0.4) +
   labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan")) +
+  theme(plot.title = element_text(face = "bold"))
 
 grid.arrange(active_six_month, inactive_six_month,  nrow = 2)
 ```
