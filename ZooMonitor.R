@@ -222,7 +222,7 @@ Temp_Level_Reference <- mutate(Temp_Level_Reference, Percent = rownames(Temp_Lev
 Temp_Level_Reference <- mutate(Temp_Level_Reference, Level = rownames(Temp_Level_Reference))
 Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent) 
 Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
-formattable(Temp_Level_Reference)
+formattable(Temp_Level_Reference, align = c("l", "r"))
 
 #################### Association Between Dogs' Behavior with Temperature (Using TAVG_TMAX_avg)
 dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
@@ -260,27 +260,23 @@ for (a in c("0", "1", "2", "3", "4", "5", "6", "7"))
   if(a == "0"){
     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "0"] <- "No Special Weather Type"
     } else if(a == "1"){
-     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "1"] <- "Fog, ice fog, or freezing fog (may include heavy fog)"
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "1"] <- "Fog"
     } else if(a == "2"){
      Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "2"] <- "Thunder"
     } else if(a == "3"){
      Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "3"] <- "Smoke or haze"
     } else if(a == "4"){
-     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "4"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Thunder"
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "4"] <- "Fog and Thunder"
     } else if(a == "5"){
-     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "5"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Smoke or haze"
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "5"] <- "Fog and Smoke or haze"
     } else if(a == "6"){
-     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "6"] <- "Thunder and Hail (may include small hail)"
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "6"] <- "Thunder and Hail"
     } else{
-     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog, ice fog, or freezing fog (may include heavy fog) and Thunder and Smoke or Haze"
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog and Thunder and Smoke or Haze"
     }
 names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Type"] <- "Weather Type"
 names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Description"] <- "Weather Description" 
-formattable(Weather_Type_Reference)
-  
-  
-  
-  
+formattable(Weather_Type_Reference, align = c("l", "r"))
   
   
 ################## Association B/W Events and Dog Behavior
