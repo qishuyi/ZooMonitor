@@ -32,9 +32,10 @@ library(ggbeeswarm)
 source("cleaning.R")
 source("columns_addition.R")
 ```
+\
 
 #### **Notes**
-Hello Anna! We have created some visualizations that you requested during the first meeting back in the beginning of February and in the follow up email. Figure 1 is ... . Figure 2 is a barplot displaying the percentage of observations per day of week, and the time of day. This plot is helpful in identifying certian days of the week or times of the day where few/many observations are recorded. We hope that the visualizations we created in this progress report is helpful for you! 
+Hello Anna! We have created the visualizations that you requested during the first meeting back in the beginning of February and in the follow up email. Figure 1 is ... . Figure 2 is a barplot displaying the percentage of observations per day of week, and the time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations are recorded. We hope that the visualizations we created in this progress report is helpful for you! 
 
 
 \
@@ -90,6 +91,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 * The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are recorded.
 * It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
 
+\
 
 
 
