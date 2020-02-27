@@ -45,7 +45,7 @@ source("columns_addition.R")
 
 \
 
-* **Questions**  
+##### **Questions**  
   + Level of technology and whether they want to use R (data cleaning procedure report)
   + Format of the instruction document (Google Docs or R markdown)  
   + Expectation for the program (Visuals etc. )  
@@ -55,15 +55,17 @@ source("columns_addition.R")
 
 \
 
-* **Answers**  
-  + They're fairly unfamiliar with the data analysis tools/technologies beyond Excel, but willing to adopt R as a way to clean data in the future  
+##### **Answers**  
+  + Unfamiliar with the data analysis tools/technologies beyond Excel  
+    + Willing to adopt R as a way to clean data in the future  
   + R markdown with both codes and an instruction  
   + Three plots that we created:  
-    $\rightarrow$ Active vs. Inactive proportion throughout the week  
-    $\rightarrow$ Behavior frequencies throughout the day  
-    $\rightarrow$ Proportion of the inactive behaviors  
-  + Ideally all animals, 45 species in total 
-  + The data structure is fundamentally the same but there could be more columns depending on the animal's activeness
+    + Active vs. Inactive proportion throughout the week  
+    + Behavior frequencies throughout the day  
+    + Proportion of the inactive behaviors  
+  + Ideally all animals (45 species)  
+  + The data structure is fundamentally the same
+    + There could be more columns depending on the animal's activeness
   + ZooMonitor (not too troublesome to transfer the data to Google Drive)
 
 \
@@ -71,12 +73,33 @@ source("columns_addition.R")
 
 
 #### **Data**
+##### **Cleaning** (recap)  
+Cleaned through the shared cleaning script (Only the basic cleaning procedure)
 
+**Data Dictionary as of two weeks ago** 
+
+![](Initial_dd.png)
+
+**Column Additions**  
+
+Column additions script (six column additions at once)  
+
+**Data Dictionary as of now** 
+
+![](Column_addition_dd.png)
 \
 
-\
+##### **Weather/Temperature Data**
+Data obtained from *NOAA*
 
-\
+  + Recorded at the Pueblo Airport, which is 15 min away from the zoo
+  
+  + Main variables: date, average/max/min temperature, and (abnormal) weather types
+  
+  + Limits  
+    + Absence of the normal weathers such as sunny and rainy 
+    + A good portion of observed days had missing entries in  those weather types, and some days had multiple weather types simultaneously  
+    + Temperature of the recorded time didn't make sense  
 
 #### **Goal 1**
 
