@@ -217,7 +217,7 @@ grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 #### **Goal 2**
 
-Data Cleaning Report for Pueblo Zoo
+Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
 
 \
 
