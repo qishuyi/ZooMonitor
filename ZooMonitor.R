@@ -279,6 +279,10 @@ names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Descript
 formattable(Weather_Type_Reference)
   
   
+  
+  
+  
+  
 ################## Association B/W Events and Dog Behavior
 ## Compare dogs' behavior between zoo boo and brew at the zoo
 ## Compare all Saturdays

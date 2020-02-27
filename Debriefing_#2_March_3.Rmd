@@ -5,7 +5,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
 ```{r Loading Libraries}
@@ -29,6 +29,102 @@ library(ggbeeswarm)
 source("cleaning.R")
 source("columns_addition.R")
 ```
+
+\
+
+#### **Goals**
+
+\
+
+\
+
+\
+
+#### **Meeting with the Client**
+
+\
+
+\
+
+\
+
+
+#### **Data**
+
+\
+
+\
+
+\
+
+#### **Goal 1**
+
+\
+
+\
+
+\
+
+#### **Goal 2**
+
+\
+
+\
+
+\
+
+
+#### **Goal 3**
+
+\
+
+\
+
+\
+
+
+#### **Goal 4**
+
+
+\
+
+\
+
+\
+
+
+#### **Progress Reflection**
+
+\
+
+\
+
+\
+
+#### **Goal Reflection**
+
+\
+
+\
+
+\
+
+
+#### **Next Steps**
+
+\
+
+\
+
+\
+
+
+
+
+
+
+
+
 
 
 
