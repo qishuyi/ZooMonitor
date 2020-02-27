@@ -42,11 +42,32 @@ source("columns_addition.R")
 
 #### **Meeting with the Client**
 
-\
 
 \
 
+* **Questions**  
+  + Level of technology and whether they want to use R (data cleaning procedure report)
+  + Format of the instruction document (Google Docs or R markdown)  
+  + Expectation for the program (Visuals etc. )  
+  + How many/which animals in the program?  
+  + Data structure consistency  
+  + Data storage    
+
 \
+
+* **Answers**  
+  + They're fairly unfamiliar with the data analysis tools/technologies beyond Excel, but willing to adopt R as a way to clean data in the future  
+  + R markdown with both codes and an instruction  
+  + Three plots that we created:  
+    $\rightarrow$ Active vs. Inactive proportion throughout the week  
+    $\rightarrow$ Behavior frequencies throughout the day  
+    $\rightarrow$ Proportion of the inactive behaviors  
+  + Ideally all animals, 45 species in total 
+  + The data structure is fundamentally the same but there could be more columns depending on the animal's activeness
+  + ZooMonitor (not too troublesome to transfer the data to Google Drive)
+
+\
+
 
 
 #### **Data**
