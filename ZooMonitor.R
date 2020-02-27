@@ -285,24 +285,60 @@ formattable(Weather_Type_Reference)
   
 ################## Association B/W Events and Dog Behavior
 ## Compare dogs' behavior between zoo boo and brew at the zoo
-## Compare all Saturdays
+## Compare dogs' behavior on the day of the event with the same day of week during the same season
+## Brew at the zoo (4/27)
+spring_sat_2019_data <- dogs_data %>% filter (Season == "Spring", Year == 2019, Day_of_Week == "Sat", Hour == 10)
+compare_data_spring <- spring_sat_2019_data %>% filter(is.na(Notes))
+target_data_spring <- spring_sat_2019_data %>% filter(!is.na(Notes))
 
-# No data on Friday and Saturday between 2018-03-01 and 2019-03-01
-test_data <- dogs_data %>% filter(Six_Month_Interval != "2019-03-01~2019-09-01" & Six_Month_Interval != "2019-09-01~2020-01-11")
-test_data_1 <- dogs_data %>% filter(Six_Month_Interval == "2019-03-01~2019-09-01")
-test_data_2 <- dogs_data %>% filter(Six_Month_Interval == "2019-09-01~2020-01-11")
-table(test_data_2$Day_of_Week)
-table(test_data_1$Day_of_Week)
-table(test_data$Day_of_Week)
+# Filter data for each dog
+spring_Hunter_compare <- compare_data_spring %>% filter(Name == "Hunter")
+spring_Hunter_target <- target_data_spring %>% filter(Name == "Hunter")
+spring_Amara_compare <- compare_data_spring %>% filter(Name == "Amara")
+spring_Amara_target <- target_data_spring %>% filter(Name == "Amara")
+spring_Akilah_compare <- compare_data_spring %>% filter(Name == "Akilah")
+spring_Akilah_target <- target_data_spring %>% filter(Name == "Akilah")
+spring_JT_compare <- compare_data_spring %>% filter(Name == "JT")
+spring_JT_compare <- target_data_spring %>% filter(Name == "JT")
 
-third_interval_viz <- ggplot(data = test_data_1) + 
-  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
-  labs(title = "Number of Observations (Per month from 2019-03-01 to 2019-09-01)", x = "Day of Week", y = "Frequency") +
-  facet_grid(. ~ Month)
-fourth_interval_viz <- ggplot(data = test_data_2) + 
-  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
-  labs(title = "Number of Observations (Per month from 2019-09-01 to 2020-01-11)", x = "Day of Week", y = "Frequency") +
-  facet_grid(. ~ Month)
-grid.arrange(third_interval_viz, fourth_interval_viz, nrow = 2)
+normal_days_percentage <- compare_data_spring %>% 
+  group_by(Hour, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100) %>%
+  filter(Activity == "Resting" | Activity == "Alert")
+
+event_day_percentage <- target_data_spring %>% 
+  group_by(Hour, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100) %>%
+  filter(Activity == "Resting" | Activity == "Alert")
+
+#  Create graph for dogs' behaviors on the day of Brew at the zoo based on hour of day
+normal_days <- ggplot(data=normal_days_percentage) + 
+  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = "identity") + 
+  labs(title = "Frequency of alert and resting behaviors on normal days in spring 2019 at 10am", x = "Dogs' behavior", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 60))
+
+brew_at_zoo <- ggplot(data=event_day_percentage) + 
+  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = "identity") + 
+  labs(title = "Frequency of behaviors on the Brew at the zoo event", x = "Dogs' behavior", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 60))
+
+grid.arrange(normal_days, brew_at_zoo, nrow = 1)
+
+## Zoo Boo (10/26)
+fall_sat_2019_data <- dogs_data %>% filter (Season == "Fall", Year == 2019, Day_of_Week == "Sat")
+compare_data_fall <- fall_sat_2019_data %>% filter(is.na(Notes))
+target_data_fall <- fall_sat_2019_data %>% filter(!is.na(Notes))
+
+#  Filter data for each dog
+fall_Hunter_compare <- compare_data_fall %>% filter(Name == "Hunter")
+fall_Hunter_target <- target_data_fall %>% filter(Name == "Hunter")
+fall_Akilah_compare <- compare_data_fall %>% filter(Name == "Akilah")
+fall_Akilah_target <- target_data_fall %>% filter(Name == "Akilah")
+fall_JT_compare <- compare_data_fall %>% filter(Name == "JT")
+fall_JT_compare <- target_data_fall %>% filter(Name == "JT")
+
+#  Create graph for dogs' behaviors on the day of Zoo Boo based on hour of day
 
 
