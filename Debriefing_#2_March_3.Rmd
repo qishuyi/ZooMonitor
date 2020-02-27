@@ -117,6 +117,7 @@ Data obtained from *NOAA*
     + A good portion of observed days had missing entries in  those weather types, and some days had multiple weather types simultaneously  
     + Temperature of the recorded time didn't make sense    
 
+\
 
 #### **Goal 1**
 ##### **Visual for Weather**
