@@ -95,10 +95,10 @@ grid.arrange(active_frequency, active_percentage, inactive_frequency, inactive_p
 
 ```
 
-* The plot **a** and plot **b** illustrate the frequency and percentage of different types of **active** behaviors recorded in six-month intervals.
+* Plot **1a** and plot **1b** illustrate the frequency and percentage of different types of **active** behaviors recorded in six-month intervals.
 * 'Running' is the most common active behavior, especially between 2018-09-01 and 2019-03-01. 'Walking' is the second most common active behavior, especially between 2019-09-01 and 2020-01-11.
 
-* The plot **c** and plot **d** illustrate the frequency and percentage of different types of **inactive** behaviors recorded in six-month intervals.
+* Plot **1c** and plot **1d** illustrate the frequency and percentage of different types of **inactive** behaviors recorded in six-month intervals.
 * The total number of observations for inactivity between 2019-03-01 and 2020-01-11 is significantly higher and the majority of these observations are 'Resting'.
 
 * We notice that the total number of observations is not evenly distributed across the four six-month intervals. Specifically, there are more observations for both activity and inactivity between 2019-03-01 and 2019-09-01. 
