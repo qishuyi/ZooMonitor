@@ -85,28 +85,25 @@ Cleaned through the shared cleaning script (Only the basic cleaning procedure)
 
 ![](Initial_dd.png)
 
-**Column Additions**  
+\
+
+##### **Column Additions**  
 
 Column additions script (six column additions at once)  
 
-<<<<<<< HEAD
 **Data Dictionary as of now** 
 
 ![](Column_addition_dd.png)
+
 \
-=======
 
-
-
-
-**Food**
+##### **Food**
 
 * Created a food column for the data set
 * A relabeling of the day of week column
 * Used to create visuals associated with Goal 1
 
-
->>>>>>> 46524de9c06cef7430ee9fd4bbad58f9b87f7ea4
+\
 
 ##### **Weather/Temperature Data**
 Data obtained from *NOAA*
@@ -118,10 +115,9 @@ Data obtained from *NOAA*
   + Limits  
     + Absence of the normal weathers such as sunny and rainy 
     + A good portion of observed days had missing entries in  those weather types, and some days had multiple weather types simultaneously  
-    + Temperature of the recorded time didn't make sense  
+    + Temperature of the recorded time didn't make sense    
 
 
-test
 #### **Goal 1**
 
 \
