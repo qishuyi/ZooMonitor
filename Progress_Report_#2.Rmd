@@ -38,7 +38,7 @@ source("columns_addition.R")
 Hello Anna! We have created some visualizations that you requested during the first meeting and in the follow-up email.  
 The figures include:  
 
-+ **Figure 1**: Barplots displaying the frequency and percentage of dogs' inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' different types of inactiveness throughout the observational period.  
++ **Figure 1**: Barplots displaying the frequency and percentage of dogs' active and inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in dogs' different types of activeness and inactiveness throughout the observational period.  
 + **Figure 2**: Barplots displaying the percentage of observations per day of week, and time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations have been recorded.
 
 We hope that the visualizations we created in this progress report is helpful for you! 
@@ -48,47 +48,60 @@ We hope that the visualizations we created in this progress report is helpful fo
 
 #### **Figure 1.**
 
-```{r Inactivity Plot in 6 Month Intervals, fig.height = 8, fig.width = 10}
-## Other's Percentage (in six-month intervals)
-# Create barplots for the frequencies
-inactive_obs2 <- dogs_data %>% filter(Activeness == "Inactive")
-six_month_frequency <- ggplot(data=inactive_obs2) + 
-  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
-  labs(title = "Frequency of recorded inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
-  facet_grid((. ~Six_Month_Interval)) +
-  theme(plot.title = element_text(face = "bold"), axis.text.x = element_text(angle = 30, hjust = 1))
+```{r Inactivity Plot in 6 Month Intervals, fig.height = 15, fig.width = 12}
+## Frequency and percentage of active and inactive behaviors (in six-month intervals)
+## Calculate percentage for each behavior within each six-month interval
+active_obs <- dogs_data %>% 
+  filter(Activeness == 'Active') %>% 
+  group_by(Six_Month_Interval, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
 
+## Calculate percentage for each inactive behavior within each six-month interval
 inactive_obs <- dogs_data %>% 
   filter(Activeness == 'Inactive') %>% 
   group_by(Six_Month_Interval, Activity) %>%
   summarize(n = n()) %>%
   mutate(Percentage = n/sum(n)*100)
 
-six_month_percentage <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
+active_percentage <- ggplot(active_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   geom_col(position = "stack", width = 0.4) +
-  labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
+  labs(title = "b. Percentage of active behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") + 
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan")) + 
+  theme(plot.title = element_text(face = "bold"))
+
+inactive_percentage <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
+  geom_col(position = "stack", width = 0.4) +
+  labs(title = "d. Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
   scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan")) +
   theme(plot.title = element_text(face = "bold"))
 
-grid.arrange(six_month_frequency, six_month_percentage,  nrow = 2)
+## Create barplots for the frequencies
+active_obs2 <- dogs_data %>% filter(Activeness == 'Active')
+inactive_obs2 <- dogs_data %>% filter(Activeness == "Inactive")
+active_frequency <- ggplot(data=active_obs2) + 
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "a. Frequency of active behaviors (in 6-month intervals)", x = "Dogs' behavior when active", y = "Frequency") +
+  facet_grid(. ~Six_Month_Interval) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1), plot.title = element_text(face = "bold"))
+
+inactive_frequency <- ggplot(data=inactive_obs2) + 
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "c. Frequency of inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
+  facet_grid((. ~Six_Month_Interval)) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1), plot.title = element_text(face = "bold"))
+
+grid.arrange(active_frequency, active_percentage, inactive_frequency, inactive_percentage, nrow = 4)
+
 ```
 
-**1a.**
+* The plot **a** and plot **b** illustrate the frequency and percentage of different types of **active** behaviors recorded in six-month intervals.
+* 'Running' is the most common active behavior, especially between 2018-09-01 and 2019-03-01. 'Walking' is the second most common active behavior, especially between 2019-09-01 and 2020-01-11.
 
-* The **upper** plot illustrates the **frequency** with which different types of inactive behaviors were recorded in six-month intervals. 
-* The plot shows that the number of observations in which the observer selected 'Other' is relatively similar (fewer than 125) across all four six-month intervals.
-* We also notice that there are fewer observations that recorded inactive behaviors during the first two intervals.
-* The number of observations for inactivity between 2019-03-01 and 2020-01-11 is significantly higher.
-* Resting is the most common inactive behavior, especially between 2019-03-01 and 2019-09-01.
+* The plot **c** and plot **d** illustrate the frequency and percentage of different types of **inactive** behaviors recorded in six-month intervals.
+* The total number of observations for inactivity between 2019-03-01 and 2020-01-11 is significantly higher and the majority of these observations are 'Resting'.
 
-
-**1b.**
-
-* The **bottom** plot displays the **percentage** of observations where 'Other' was selected among all types of inactive behaviors in six-month intervals. 
-* The color scale on the right demonstrates the correspondance between colors and different types of inactive behaviors.
-* All percentages should add up to 100%
-* Over 25% of the observations between 2018-09-01 and 2019-03-01 recorded dogs' inactive behavior as 'Other'. Around 12.5% of the inactive observations between 2018-03-01 and 2018-09-01 were 'Other'. However, the high percentage could be due to the low number of total observations in the first two intervals.
-* Less than 10% of the inactive observations recorded in the last two intervals were classified as 'Other'.
+* We notice that the total number of observations is not evenly distributed across the four six-month intervals. Specifically, there are more observations for both activity and inactivity between 2019-03-01 and 2019-09-01. 
 
 \
 
