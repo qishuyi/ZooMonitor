@@ -39,9 +39,9 @@ Hello Anna! We have created some visualizations that you requested during the fi
 The figures include:  
 
 + **Figure 1**: Barplots displaying the frequency and percentage of dogs' active and inactive behaviors based on the six-month intervals. This plot helps you discover the shifts in the dogs' behaviors throughout the observational period.  
-+ **Figure 2**: Barplots displaying the percentage of observations per day of week, and time of day. This plot is useful in identifying certian days of the week or times of the day where few/many observations have been recorded.
++ **Figure 2**: Barplots displaying the percentage of observations per day of week, and time of day. This plot is useful in identifying certain days of the week or times of the day where few/many observations were recorded.
 
-We hope that the visualizations we created in this progress report is helpful for you! 
+We hope that the visualizations we created in this progress report are helpful for you! 
 
 
 <br>
@@ -101,7 +101,7 @@ grid.arrange(active_frequency, active_percentage, inactive_frequency, inactive_p
 * Plot **1c** and plot **1d** illustrate the frequency and percentage of different types of **inactive** behaviors recorded in six-month intervals.
 * The total number of observations for inactivity between 2019-03-01 and 2020-01-11 is significantly higher and the majority of these observations are 'Resting'.
 
-* We notice that the total number of observations is not evenly distributed across the four six-month intervals. Specifically, there are more observations for both activity and inactivity between 2019-03-01 and 2019-09-01. 
+* We noticed that the total number of observations is not evenly distributed across the four six-month intervals. Specifically, there are more observations for both activity and inactivity between 2019-03-01 and 2019-09-01. 
 
 \
 
@@ -139,7 +139,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 * The plot on the **left** illustrates the percentage of observations recorded on each day of the week. 
 * If observations were recorded equally throughout the days of the week, then the height of the bars should match the purple dashed line.
-  + That is, each day would consist of 14.28% of the total number of observations if there was equal representation for the days of the week.
+    + That is, each day would consist of 14.28% of the total number of observations if there was equal representation for the days of the week.
 * The plot suggests that over 50% of all observations in the data are recorded on Saturdays.
 * Friday is the day of the week where the least number of observations were recorded. 
 
@@ -148,7 +148,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 * The plot on the **right** displays the percentage of observations recorded on each hour of the day.
 * If equal numbers of observations were recorded on each hour of the day, the height of the bars should match up with the purple dashed line. 
-  + In otherwords, each hour of the day would consist of 12.5% of the total number of observations if there was equal representation for the times of the day.
+    + In otherwords, each hour of the day would consist of 12.5% of the total number of observations if there was equal representation for the times of the day.
 * The plot suggests that 9AM, 10AM, and 2PM (14), are the times in which most observations are recorded.
 * It appears as though not a lot of observations are recorded at 12PM and 4PM (16).
 

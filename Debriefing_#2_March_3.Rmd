@@ -1,7 +1,11 @@
 ---
 title: "Pueblo Zoo Monitor Debriefing #2"
-date: "3/3/2020"
-output: html_document
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +36,7 @@ source("columns_addition.R")
 
 \
 
-#### **Goals**
+### **Goals**
 
 1. **Explore potential associations between the dogs’ behavior and external factors such as weather, temperature, events and food**
     + Measured by the creation of multiple visualizations
@@ -45,12 +49,12 @@ source("columns_addition.R")
 
 \
 
-#### **Meeting with the Client**
+### **Meeting with the Client**
 
 
 \
 
-* **Questions**  
+#### **Questions**  
   + Level of technology and whether they want to use R (data cleaning procedure report)
   + Format of the instruction document (Google Docs or R markdown)  
   + Expectation for the program (Visuals etc. )  
@@ -60,48 +64,232 @@ source("columns_addition.R")
 
 \
 
-* **Answers**  
-  + They're fairly unfamiliar with the data analysis tools/technologies beyond Excel, but willing to adopt R as a way to clean data in the future  
+#### **Answers**  
+  + Unfamiliar with the data analysis tools/technologies beyond Excel  
+    + Willing to adopt R as a way to clean data in the future  
   + R markdown with both codes and an instruction  
   + Three plots that we created:  
-    $\rightarrow$ Active vs. Inactive proportion throughout the week  
-    $\rightarrow$ Behavior frequencies throughout the day  
-    $\rightarrow$ Proportion of the inactive behaviors  
-  + Ideally all animals, 45 species in total 
-  + The data structure is fundamentally the same but there could be more columns depending on the animal's activeness
+    + Active vs. Inactive proportion throughout the week  
+    + Behavior frequencies throughout the day  
+    + Proportion of the inactive behaviors  
+  + Ideally all animals (45 species)  
+  + The data structure is fundamentally the same
+    + There could be more columns depending on the animal's activeness
   + ZooMonitor (not too troublesome to transfer the data to Google Drive)
 
 \
 
 
 
-#### **Data**
+### **Data**
 
 \
 
+#### **Cleaning** 
+
+Cleaned through the shared cleaning script (Only the basic cleaning procedure)
+
+**Data Dictionary as of two weeks ago** 
+
+![](Initial_dd.png)
+
 \
 
+#### **Column Additions**  
 
+Column additions script (six column additions at once)  
 
+**Added columns** 
 
+![](Column_addition_dd.png)
 
-**Food**
+\
+
+#### **Weather/Temperature Data**
+Data obtained from *NOAA*
+
+  + Recorded at the Pueblo Airport, which is 15 min away from the zoo
+  
+  + Main variables: date, average/max/min temperature, and (abnormal) weather types
+  
+  + Limits  
+    + Absence of the normal weathers such as sunny and rainy 
+    + A good portion of observed days had missing entries in  those weather types, and some days had multiple weather types simultaneously  
+    + Temperature of the recorded time didn't make sense  
+
+\
+
+#### **Food**
 
 * Created a food column for the data set
 * A relabeling of the day of week column
 * Used to create visuals associated with Goal 1
 
-
-
-#### **Goal 1**
-
 \
 
 
+### **Goal 1**
+
 \
 
+#### **Visual for Weather**
 
-##### **Visual for Food**
+* Merging Data
+  + Reduced weather types from 11 to 4 due to the absence of cases
+    + Fog  
+    + Thunder  
+    + Hail  
+    + Smoke or haze  
+  + 2/3 of the observations had no record of any of these abnormal weather types 
+  + Reclassified and created a column of weather types so that they include all existing combinations (Weather Type Reference)
+
+```{r Visual for Weather}
+#################### Association Between Dogs' Behavior with Weather
+dogs_data_grouped3 <- group_by(dogs_data, Weather_Type, Activeness)
+summary3 <- as.data.frame(summarise(dogs_data_grouped3, n()))
+names(summary3)[names(summary3) == "n()"] <- "counts"
+summary3 <- summary3 %>% group_by(Weather_Type) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary3$percent <- round(summary3$percent, digits = 1)
+summary3 <- summary3 %>% mutate(percent_sub = paste(percent, "%"))
+##Activity by Weather Type Plot
+ggplot(summary3, aes(x="", y=counts, fill=Activeness)) +
+  geom_bar(stat="identity", position = "dodge") +
+  facet_grid(.~Weather_Type) +
+  geom_text(aes(label = percent_sub), position = position_dodge(width = 0.9), size = 2.7) +
+  labs(title = "Activeness by Weather Type", x = "Activeness", y="Counts") 
+```
+
+\
+
+```{r Visual for Weather Type Reference}
+##Weather Type Reference
+Weather_Type_Reference <- as.data.frame(0:7)
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "0:7"] <- "Weather_Type"
+Weather_Type_Reference <- cbind(Weather_Type_Reference, Weather_Description = Weather_Type_Reference$Weather_Type)
+for (a in c("0", "1", "2", "3", "4", "5", "6", "7"))
+  if(a == "0"){
+    Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "0"] <- "No Special Weather Type"
+    } else if(a == "1"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "1"] <- "Fog"
+    } else if(a == "2"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "2"] <- "Thunder"
+    } else if(a == "3"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "3"] <- "Smoke or haze"
+    } else if(a == "4"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "4"] <- "Fog and Thunder"
+    } else if(a == "5"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "5"] <- "Fog and Smoke or haze"
+    } else if(a == "6"){
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "6"] <- "Thunder and Hail"
+    } else{
+     Weather_Type_Reference$Weather_Description[Weather_Type_Reference$Weather_Description == "7"] <- "Fog and Thunder and Smoke or Haze"
+    }
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Type"] <- "Weather Type"
+names(Weather_Type_Reference)[names(Weather_Type_Reference) == "Weather_Description"] <- "Weather Description" 
+formattable(Weather_Type_Reference, align = c("l", "r"))
+```
+
+\
+
+#### **Visuals for Temperature**
+Using the **average of the average temp. and maximum temp.**
+
+\
+
+ **1. Categorical Temperature Level**
+
+```{r Visual for Temperature Level, fig.width = 13, fig.height = 8}
+dogs_data_grouped2 <- group_by(dogs_data, Activity,Temp_Level)
+summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Activity) %>%
+  mutate(sum = sum(counts)) %>% 
+  mutate(percent = counts/sum*100)
+summary2$percent <- round(summary2$percent, digits = 1)
+summary2 <- summary2 %>% mutate(percent_sub = paste(percent, "%"))
+
+##Activity by Temperature Level Plot (TAVG_TMAX_avg)
+ggplot(data = summary2, aes(x = Temp_Level, y = counts, fill = Temp_Level), show.legend = FALSE) + 
+  geom_bar(stat = "identity", position=position_dodge()) + 
+  facet_grid(.~ Activity) +
+  labs(title = "Activity Based on Temperature Level", subtitle = "with Temperature Grouped into 10 Levels", x = "Temperature", y="Counts", fill = "Temperature Level") 
+
+```
+
+\
+
+```{r Visual for Temperature Level Reference}
+#Temperature Level Reference Table (TAVG_TMAX_avg)
+Temp_Level_Reference <- as.data.frame(quantile(dogs_data$TAVG_TMAX_avg, 0:10/10))
+names(Temp_Level_Reference)[names(Temp_Level_Reference) == "quantile(dogs_data$TAVG_TMAX_avg, 0:10/10)"] <- "Temperature (Fº)"
+Temp_Level_Reference$`Temperature (Fº)` <- round(Temp_Level_Reference$`Temperature (Fº)`)
+Temp_Level_Reference[1, 1] = "34 ~ 40"
+Temp_Level_Reference[2, 1] = "41 ~ 45"
+Temp_Level_Reference[3, 1] = "46 ~ 53"
+Temp_Level_Reference[4, 1] = "54 ~ 59"
+Temp_Level_Reference[5, 1] = "60 ~ 65"
+Temp_Level_Reference[6, 1] = "66 ~ 69"
+Temp_Level_Reference[7, 1] = "70 ~ 77"
+Temp_Level_Reference[8, 1] = "78 ~ 81"
+Temp_Level_Reference[9, 1] = "82 ~ 85"
+Temp_Level_Reference[10, 1] = "86 ~ 94"
+Temp_Level_Reference <- slice(Temp_Level_Reference, 1:10)
+Temp_Level_Reference <- mutate(Temp_Level_Reference, Percent = rownames(Temp_Level_Reference))
+Temp_Level_Reference <- mutate(Temp_Level_Reference, Level = rownames(Temp_Level_Reference))
+Temp_Level_Reference <- Temp_Level_Reference %>% select(-Percent) 
+Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
+formattable(Temp_Level_Reference, align = c("l", "r"))
+```
+
+
+* Out of view → extreme temperatures
+* Running → low temperatures
+* Sleeping → high temperatures
+  
+\
+
+ **2. Continuous Temperature (Violin)**
+ 
+```{r Visual for Continuous temperature (violin)}
+dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
+
+##Activity by Numeric Temperature Plot(Violin)
+ggplot(dogs_data_sub, aes(x = Activity, y = TAVG_TMAX_avg)) +
+  geom_violin() +
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Activity", y = "Temperature (F°)")
+```
+ 
+
+
+* Removed "Eating," "Interaction with Objects," and "Interaction with dogs"
+* Width showing the rough density
+* Running → low temperatures
+* Sleeping → high temperatures
+
+\
+
+ **3. Continuous Temperature (beeswarm)**
+ 
+```{r Visual for continuous temperature (beeswarm)}
+ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity, color = Activity)) +
+  geom_quasirandom(groupOnX=FALSE) +
+  labs(title = "Activity Based on Temperature", subtitle = "with Continuous Temperature", x = "Temperature (F°)", y = "Activity")
+
+```
+ 
+
+* Shows the actual counts
+* Lets us confirm the tendencies in sleeping/running
+
+\
+
+#### **Visuals for Food**
+
+\
+
+**With Saturday**
 
 ```{r Visual for Food (Including Saturday), fig.width = 15, fig.height = 11}
 ################## Association B/W Food and Dog Behavior (Including Saturday)
@@ -140,6 +328,8 @@ grid.arrange(ground_meat, bones, nrow = 2)
 ```
 
 \
+
+**Without Saturday**
 
 ```{r Visual for Food (Not Including Saturday), fig.width = 15, fig.height = 11}
 ################### Association B/W Food and Dog Behavior (NOT Including Saturday)
@@ -190,19 +380,19 @@ grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 \
 
-#### **Goal 2**
+### **Goal 2**
 
-Data Cleaning Report for Pueblo Zoo
-
-\
-
-#### **Goal 3**
+Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
 
 \
 
+### **Goal 3**
+
 \
 
-##### **Figure 2.**
+\
+
+#### **Figure 2.**
 
 ```{r Percentage of Observations based on Day of Week/Time of Day, fig.height = 6, fig.width = 10}
 time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) + 
@@ -240,7 +430,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 \
 
 
-#### **Goal 4**
+### **Goal 4**
 
 
 \
@@ -249,27 +439,39 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 \
 
+### **Reflection and Discussion**
+
+\
 
 #### **Progress Reflection**
 
-\
+**1. Things that went well**
 
-\
+* Effective work distribution (using Trello)
+* Creation of visuals
+* Creation of the document
+* Meeting with our client 
+
+**2. Things that were difficult**
+
+* Github issue (as editing simultaneously)
+* A  difficulty explaining technical topics to our client
+* Finding a usable weather/temperature dataset
 
 \
 
 #### **Goal Reflection**
 
-1. Explore associations between dogs’ behavior and external factors $\rightarrow$ Complete
+1. Explore associations between dogs’ behavior and external factors $\rightarrow$ **Complete**
     + We created visualizations for four different external factors
-2. Inform the client about the data cleaning procedure $\rightarrow$ Complete
+2. Inform the client about the data cleaning procedure $\rightarrow$ **Complete**
     + We created and sent a comprehensive document to the client
-3. Fulfill the client’s request to create/modify new or existing visualizations $\rightarrow$ Complete
+3. Fulfill the client’s request to create/modify new or existing visualizations $\rightarrow$ **Complete**
     + Created two plots illustrating:
         + The frequency of inactive behaviors in 6 month intervals
         + The percentage of observations per day of week, and time of day
     + We sent the client a progress report which includes these visuals
-4. Investigate the possibility of creating the requested program  $\rightarrow$ Complete
+4. Investigate the possibility of creating the requested program  $\rightarrow$ **Complete**
     + We researched the pros and cons of potential tools and presented the findings 
 
 

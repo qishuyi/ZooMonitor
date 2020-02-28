@@ -143,13 +143,13 @@ This is what R Studio looks like when first opening a new RScript. It mainly con
 Here are some steps to begin working with an RScript:   
 
  1. **Set the "Working Directory"** (where you store your RScript)  
-CLick "Session" in R Studio menu bar $\rightarrow$ "Set Working Directory" $\rightarrow$ "Choose Working Directory" $\rightarrow$ Select a file you want to store your RScript in.
+Click "Session" in R Studio menu bar $\rightarrow$ "Set Working Directory" $\rightarrow$ "Choose Working Directory" $\rightarrow$ Select a file you want to store your RScript in.
  
  2. **Create a new RScript**  
- CLick "File" in R Studio menu bar $\rightarrow$ "New File" $\rightarrow$ "RScript"
+ Click "File" in R Studio menu bar $\rightarrow$ "New File" $\rightarrow$ "RScript"
  
  3. **Save your RScript**  
- CLick "File" in R Studio menu bar $\rightarrow$ "Save" or "Save As..."
+ Click "File" in R Studio menu bar $\rightarrow$ "Save" or "Save As..."
  
  4. **Open an existing RScript**  
  Click "File" in R Studio menu bar $\rightarrow$ "Open File" $\rightarrow$ Select a file you want to open. You can have as many RScripts open simultaneously as you want!
