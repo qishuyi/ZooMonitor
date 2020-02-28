@@ -283,7 +283,59 @@ formattable(Weather_Type_Reference, align = c("l", "r"))
 ## Compare dogs' behavior between zoo boo and brew at the zoo
 ## Compare dogs' behavior on the day of the event with the same day of week during the same season
 ## Brew at the zoo (4/27)
-spring_sat_2019_data <- dogs_data %>% filter (Season == "Spring", Year == 2019, Day_of_Week == "Sat", Hour == 10)
+spring_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Spring", Year == 2019, Day_of_Week == "Sat", Hour == 10) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
+
+spring_percentage <- spring_sat_2019_data %>% 
+  group_by(Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=spring_percentage, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors Saturdays in spring 2019 at 10am", x = "Events", y = "Percentage") +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+spring_percentage_dog <- spring_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=spring_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors Saturdays in spring 2019 at 10am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name) + 
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+## Fall comparison with Zoo boo
+
+fall_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Fall", Year == 2019, Day_of_Week == "Sat", Hour == 9) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
+
+fall_percentage <- fall_sat_2019_data %>% 
+  group_by(Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=fall_percentage, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors Saturdays in fall 2019 at 9am", x = "Events", y = "Percentage") +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
+
+fall_percentage_dog <- fall_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+## TODO: CHange colors
+ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors Saturdays in fall 2019 at 9am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name)
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
+
 compare_data_spring <- spring_sat_2019_data %>% filter(is.na(Notes))
 target_data_spring <- spring_sat_2019_data %>% filter(!is.na(Notes))
 
@@ -300,25 +352,25 @@ spring_JT_compare <- target_data_spring %>% filter(Name == "JT")
 normal_days_percentage <- compare_data_spring %>% 
   group_by(Hour, Activity) %>%
   summarize(n = n()) %>%
-  mutate(Percentage = n/sum(n)*100) %>%
-  filter(Activity == "Resting" | Activity == "Alert")
+  mutate(Percentage = n/sum(n)*100)
 
 event_day_percentage <- target_data_spring %>% 
   group_by(Hour, Activity) %>%
   summarize(n = n()) %>%
-  mutate(Percentage = n/sum(n)*100) %>%
-  filter(Activity == "Resting" | Activity == "Alert")
+  mutate(Percentage = n/sum(n)*100)
 
 #  Create graph for dogs' behaviors on the day of Brew at the zoo based on hour of day
-normal_days <- ggplot(data=normal_days_percentage) + 
-  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = "identity") + 
-  labs(title = "Frequency of alert and resting behaviors on normal days in spring 2019 at 10am", x = "Dogs' behavior", y = "Frequency") +
-  theme(axis.text.x = element_text(angle = 60))
+normal_days <- ggplot(data=normal_days_percentage, aes(x=Activity, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors on normal Saturdays in spring 2019 at 10am", x = "Dogs' behavior", y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 60)) +
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
 
-brew_at_zoo <- ggplot(data=event_day_percentage) + 
-  geom_bar(aes(x=Activity, y=Percentage), fill = "coral", alpha = 0.7, stat = "identity") + 
-  labs(title = "Frequency of behaviors on the Brew at the zoo event", x = "Dogs' behavior", y = "Frequency") +
-  theme(axis.text.x = element_text(angle = 60))
+brew_at_zoo <- ggplot(data=event_day_percentage, aes(x=Activity, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) +
+  labs(title = "Percentage of behaviors on the Brew at the zoo event", x = "Dogs' behavior", y = "Percentage") +
+  theme(axis.text.x = element_text(angle = 60)) +
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
 
 grid.arrange(normal_days, brew_at_zoo, nrow = 1)
 
