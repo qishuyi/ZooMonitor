@@ -1,7 +1,11 @@
 ---
 title: "Pueblo Zoo Monitor Debriefing #2"
-date: "3/3/2020"
-output: html_document
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +36,7 @@ source("columns_addition.R")
 
 \
 
-#### **Goals**
+### **Goals**
 
 1. **Explore potential associations between the dogs’ behavior and external factors such as weather, temperature, events and food**
     + Measured by the creation of multiple visualizations
@@ -45,12 +49,12 @@ source("columns_addition.R")
 
 \
 
-#### **Meeting with the Client**
+### **Meeting with the Client**
 
 
 \
 
-##### **Questions**  
+#### **Questions**  
   + Level of technology and whether they want to use R (data cleaning procedure report)
   + Format of the instruction document (Google Docs or R markdown)  
   + Expectation for the program (Visuals etc. )  
@@ -60,7 +64,7 @@ source("columns_addition.R")
 
 \
 
-##### **Answers**  
+#### **Answers**  
   + Unfamiliar with the data analysis tools/technologies beyond Excel  
     + Willing to adopt R as a way to clean data in the future  
   + R markdown with both codes and an instruction  
@@ -77,8 +81,12 @@ source("columns_addition.R")
 
 
 
-#### **Data**
-##### **Cleaning** (recap)  
+### **Data**
+
+\
+
+#### **Cleaning** 
+
 Cleaned through the shared cleaning script (Only the basic cleaning procedure)
 
 **Data Dictionary as of two weeks ago** 
@@ -87,7 +95,7 @@ Cleaned through the shared cleaning script (Only the basic cleaning procedure)
 
 \
 
-##### **Column Additions**  
+#### **Column Additions**  
 
 Column additions script (six column additions at once)  
 
@@ -97,15 +105,7 @@ Column additions script (six column additions at once)
 
 \
 
-##### **Food**
-
-* Created a food column for the data set
-* A relabeling of the day of week column
-* Used to create visuals associated with Goal 1
-
-\
-
-##### **Weather/Temperature Data**
+#### **Weather/Temperature Data**
 Data obtained from *NOAA*
 
   + Recorded at the Pueblo Airport, which is 15 min away from the zoo
@@ -115,12 +115,24 @@ Data obtained from *NOAA*
   + Limits  
     + Absence of the normal weathers such as sunny and rainy 
     + A good portion of observed days had missing entries in  those weather types, and some days had multiple weather types simultaneously  
-    + Temperature of the recorded time didn't make sense    
+    + Temperature of the recorded time didn't make sense  
 
 \
 
-#### **Goal 1**
-##### **Visual for Weather**
+#### **Food**
+
+* Created a food column for the data set
+* A relabeling of the day of week column
+* Used to create visuals associated with Goal 1
+
+\
+
+
+### **Goal 1**
+
+\
+
+#### **Visual for Weather**
 
 * Merging Data
   + Reduced weather types from 11 to 4 due to the absence of cases
@@ -181,12 +193,14 @@ formattable(Weather_Type_Reference, align = c("l", "r"))
 
 \
 
-##### **Visual for Temperature**
+#### **Visuals for Temperature**
 Using the **average of the average temp. and maximum temp.**
+
+\
 
  **1. Categorical Temperature Level**
 
-```{r Visual for Temperature Level}
+```{r Visual for Temperature Level, fig.width = 13, fig.height = 8}
 dogs_data_grouped2 <- group_by(dogs_data, Activity,Temp_Level)
 summary2 <- as.data.frame(summarise(dogs_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
@@ -236,7 +250,7 @@ formattable(Temp_Level_Reference, align = c("l", "r"))
   
 \
 
- **2. Continuous Temperature (Violin)***
+ **2. Continuous Temperature (Violin)**
  
 ```{r Visual for Continuous temperature (violin)}
 dogs_data_sub <- dogs_data %>% filter(!(Activity == "Eating" | Activity == "Dog Int" | Activity == "Object Int"))
@@ -266,12 +280,16 @@ ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity, color = Activity)) +
 ```
  
 
-* Showing the actual counts
-* Let us confirm the tendencies in sleeping/running
+* Shows the actual counts
+* Lets us confirm the tendencies in sleeping/running
 
 \
 
-##### **Visual for Food**
+#### **Visuals for Food**
+
+\
+
+**With Saturday**
 
 ```{r Visual for Food (Including Saturday), fig.width = 15, fig.height = 11}
 ################## Association B/W Food and Dog Behavior (Including Saturday)
@@ -310,6 +328,8 @@ grid.arrange(ground_meat, bones, nrow = 2)
 ```
 
 \
+
+**Without Saturday**
 
 ```{r Visual for Food (Not Including Saturday), fig.width = 15, fig.height = 11}
 ################### Association B/W Food and Dog Behavior (NOT Including Saturday)
@@ -360,19 +380,19 @@ grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 \
 
-#### **Goal 2**
+### **Goal 2**
 
 Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
 
 \
 
-#### **Goal 3**
+### **Goal 3**
 
 \
 
 \
 
-##### **Figure 2.**
+#### **Figure 2.**
 
 ```{r Percentage of Observations based on Day of Week/Time of Day, fig.height = 6, fig.width = 10}
 time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) + 
@@ -410,7 +430,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 \
 
 
-#### **Goal 4**
+### **Goal 4**
 
 
 \
@@ -419,6 +439,9 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 \
 
+### **Reflection and Discussion**
+
+\
 
 #### **Progress Reflection**
 
@@ -433,22 +456,22 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 * Github issue (as editing simultaneously)
 * A  difficulty explaining technical topics to our client
-* Finding a useful weather/temperature dataset
+* Finding a usable weather/temperature dataset
 
 \
 
 #### **Goal Reflection**
 
-1. Explore associations between dogs’ behavior and external factors $\rightarrow$ Complete
+1. Explore associations between dogs’ behavior and external factors $\rightarrow$ **Complete**
     + We created visualizations for four different external factors
-2. Inform the client about the data cleaning procedure $\rightarrow$ Complete
+2. Inform the client about the data cleaning procedure $\rightarrow$ **Complete**
     + We created and sent a comprehensive document to the client
-3. Fulfill the client’s request to create/modify new or existing visualizations $\rightarrow$ Complete
+3. Fulfill the client’s request to create/modify new or existing visualizations $\rightarrow$ **Complete**
     + Created two plots illustrating:
         + The frequency of inactive behaviors in 6 month intervals
         + The percentage of observations per day of week, and time of day
     + We sent the client a progress report which includes these visuals
-4. Investigate the possibility of creating the requested program  $\rightarrow$ Complete
+4. Investigate the possibility of creating the requested program  $\rightarrow$ **Complete**
     + We researched the pros and cons of potential tools and presented the findings 
 
 
