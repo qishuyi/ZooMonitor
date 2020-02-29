@@ -55,19 +55,16 @@ source("columns_addition.R")
 \
 
 #### **Questions**  
-  + Level of technology and whether they want to use R (data cleaning procedure report)
-  + Format of the instruction document (Google Docs or R markdown)  
+  + About the Data Cleaning Procedure Report
   + Expectation for the program (Visuals etc. )  
-  + How many/which animals in the program?  
-  + Data structure consistency  
-  + Data storage    
+  + Data structure and storage   
 
 \
 
 #### **Answers**  
   + Unfamiliar with the data analysis tools/technologies beyond Excel  
     + Willing to adopt R as a way to clean data in the future  
-  + R markdown with both codes and an instruction  
+  + R markdown with both code and an instruction  
   + Three plots that we created:  
     + Active vs. Inactive proportion throughout the week  
     + Behavior frequencies throughout the day  
