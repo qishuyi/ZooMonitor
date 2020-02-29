@@ -281,24 +281,36 @@ formattable(Weather_Type_Reference, align = c("l", "r"))
   
 ################## Association B/W Events and Dog Behavior
 ## Compare dogs' behavior between zoo boo and brew at the zoo
-## Compare all Saturdays
+## Compare dogs' behavior on the day of the event with the same day of week during the same season
+## Brew at the zoo (4/27)
+spring_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Spring", Year == 2019, Day_of_Week == "Sat", Hour == 10) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
 
-# No data on Friday and Saturday between 2018-03-01 and 2019-03-01
-test_data <- dogs_data %>% filter(Six_Month_Interval != "2019-03-01~2019-09-01" & Six_Month_Interval != "2019-09-01~2020-01-11")
-test_data_1 <- dogs_data %>% filter(Six_Month_Interval == "2019-03-01~2019-09-01")
-test_data_2 <- dogs_data %>% filter(Six_Month_Interval == "2019-09-01~2020-01-11")
-table(test_data_2$Day_of_Week)
-table(test_data_1$Day_of_Week)
-table(test_data$Day_of_Week)
+spring_percentage_dog <- spring_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
 
-third_interval_viz <- ggplot(data = test_data_1) + 
-  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
-  labs(title = "Number of Observations (Per month from 2019-03-01 to 2019-09-01)", x = "Day of Week", y = "Frequency") +
-  facet_grid(. ~ Month)
-fourth_interval_viz <- ggplot(data = test_data_2) + 
-  geom_bar(aes(x = Day_of_Week), fill = "coral", alpha = 0.7) + 
-  labs(title = "Number of Observations (Per month from 2019-09-01 to 2020-01-11)", x = "Day of Week", y = "Frequency") +
-  facet_grid(. ~ Month)
-grid.arrange(third_interval_viz, fourth_interval_viz, nrow = 2)
+## Zoo Boo (10/26)
+fall_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Fall", Year == 2019, Day_of_Week == "Sat", Hour == 9) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
 
+fall_percentage_dog <- fall_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=spring_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors on Saturdays in spring 2019 at 10am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name) +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors on Saturdays in fall 2019 at 9am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name) +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
 
