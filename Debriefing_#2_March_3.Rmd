@@ -62,16 +62,13 @@ source("columns_addition.R")
 \
 
 #### **Answers**  
-  + Unfamiliar with the data analysis tools/technologies beyond Excel  
-    + Willing to adopt R as a way to clean data in the future  
-  + R markdown with both code and an instruction  
+  + Agreed on using R 
   + Three plots that we created:  
     + Active vs. Inactive proportion throughout the week  
     + Behavior frequencies throughout the day  
     + Proportion of the inactive behaviors  
   + Ideally all animals (45 species)  
-  + The data structure is fundamentally the same
-    + There could be more columns depending on the animal's activeness
+  + The data structure is fundamentally the same (some animals have more columns)
   + ZooMonitor (not too troublesome to transfer the data to Google Drive)
 
 \
