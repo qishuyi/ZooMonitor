@@ -62,14 +62,14 @@ source("columns_addition.R")
 \
 
 #### **Answers**  
-  + Agreed on using R 
-  + Three plots that we created:  
+  + Agreed on using R for future data clenaning
+  + Three plots that we created in the program:  
     + Active vs. Inactive proportion throughout the week  
     + Behavior frequencies throughout the day  
     + Proportion of the inactive behaviors  
-  + Ideally all animals (45 species)  
+  + Ideally all animals in the program (45 species)  
   + The data structure is fundamentally the same (some animals have more columns)
-  + ZooMonitor (not too troublesome to transfer the data to Google Drive)
+  + Store data in ZooMonitor (not too troublesome to transfer the data to Google Drive)
 
 \
 
