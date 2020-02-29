@@ -237,11 +237,6 @@ Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
 formattable(Temp_Level_Reference, align = c("l", "r"))
 ```
 
-
-* Out of view → extreme temperatures
-* Running → low temperatures
-* Sleeping → high temperatures
-  
 \
 
  **2. Continuous Temperature (Violin)**
