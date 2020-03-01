@@ -621,12 +621,8 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 
 * Understand and clean the cattle dataset
-    + More categories for active behaviors (i.e., agonistic, locomotion, social, stereotypic)
+    + More categories for active behaviors (i.e., agonistic, locomotion, social, stereotypic, etc.)
 * Answer client’s questions about cattle behavior
-    + How often are they showing Agonistic behaviors?
-    + How often are Stereotypic behaviors occurring?
-    + Are they spending more of their day active or inactive?
-    + Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?
 * Continue with the planning/investigation stages of the program
 
 
