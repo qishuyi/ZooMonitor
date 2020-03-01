@@ -122,5 +122,7 @@ dogs_data$Weather_Type[dogs_data$Weather_Type == "0BC0"] <- 6
 dogs_data$Weather_Type[dogs_data$Weather_Type == "AB0D"] <- 7
 dogs_data$Weather_Type <- as.character(dogs_data$Weather_Type)
 
+dogs_data <- dogs_data %>% select(-c(WT01, WT03, WT05, WT08))
+
 
 

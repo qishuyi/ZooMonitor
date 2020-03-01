@@ -56,27 +56,21 @@ source("columns_addition.R")
 \
 
 #### **Questions**  
-  + Level of technology and whether they want to use R (data cleaning procedure report)
-  + Format of the instruction document (Google Docs or R markdown)  
+  + About the Data Cleaning Procedure Report
   + Expectation for the program (Visuals etc. )  
-  + How many/which animals in the program?  
-  + Data structure consistency  
-  + Data storage    
+  + Data structure and storage   
 
 \
 
 #### **Answers**  
-  + Unfamiliar with the data analysis tools/technologies beyond Excel  
-    + Willing to adopt R as a way to clean data in the future  
-  + R markdown with both codes and an instruction  
-  + Three plots that we created:  
+  + Agreed on using R for future data clenaning
+  + Three plots that we created in the program:  
     + Active vs. Inactive proportion throughout the week  
     + Behavior frequencies throughout the day  
     + Proportion of the inactive behaviors  
-  + Ideally all animals (45 species)  
-  + The data structure is fundamentally the same
-    + There could be more columns depending on the animal's activeness
-  + ZooMonitor (not too troublesome to transfer the data to Google Drive)
+  + Ideally all animals in the program (45 species)  
+  + The data structure is fundamentally the same (some animals have more columns)
+  + Store data in ZooMonitor (not too troublesome to transfer the data to Google Drive)
 
 \
 
@@ -247,11 +241,6 @@ Temp_Level_Reference <- Temp_Level_Reference[, c(2, 1)]
 formattable(Temp_Level_Reference, align = c("l", "r"))
 ```
 
-
-* Out of view → extreme temperatures
-* Running → low temperatures
-* Sleeping → high temperatures
-  
 \
 
  **2. Continuous Temperature (Violin)**
