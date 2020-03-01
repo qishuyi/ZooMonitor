@@ -275,7 +275,6 @@ ggplot(dogs_data, aes(x = TAVG_TMAX_avg, y = Activity, color = Activity)) +
  
 
 * Shows the actual counts
-* Lets us confirm the tendencies in sleeping/running
 
 \
 
@@ -592,7 +591,7 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 **2. Things that were difficult**
 
 * Github issue (as editing simultaneously)
-* A  difficulty explaining technical topics to our client
+* A  difficulty talking about technical topics with our client
 * Finding a usable weather/temperature dataset
 
 \
