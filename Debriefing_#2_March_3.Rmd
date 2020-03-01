@@ -74,7 +74,7 @@ source("columns_addition.R")
 
 \
 
-#### **Post meeting**  
+#### **Post Meeting**  
 
 * Received data on cattles
 * Figured out that the format of the datasets differed between cattle and P.A.D.
@@ -375,12 +375,7 @@ grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 \
 
-#### **Visuals for events**
-
-\
-
-
-
+#### **Visuals for Events**
 
 
 * Two type of events: Brew at the Zoo, Zoo boo
