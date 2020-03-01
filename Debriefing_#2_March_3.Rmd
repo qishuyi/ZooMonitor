@@ -50,7 +50,8 @@ source("columns_addition.R")
 \
 
 ### **Meeting with the Client**
-
+* Had our 2nd meeting with Anna on 2/19/2020 (Wednesday)
+* To interview our client and set goals based on her needs
 
 \
 
@@ -79,7 +80,10 @@ source("columns_addition.R")
 
 \
 
+#### **Post meeting**  
+-> Received data on cattles -> figured out that the format of the datasets differed between cattle and P.A.D.
 
+\
 
 ### **Data**
 
@@ -380,6 +384,86 @@ grid.arrange(ground_meat_nosat, bones_nosat, nrow = 2)
 
 \
 
+#### **Visuals for events**
+
+\
+
+
+
+
+
+* Two type of events: Brew at the Zoo, Zoo boo
+    + Brew at the Zoo: beer event (2019/04/27)  
+    + Zoo boo: Halloween event (2019/10/26)  
+* Bring a high volume of visitors
+* Investigate whether dogs' behave differently on the days of events
+* Controlled for year, season, day of week, time of day
+    + Compare days w/ and w/o events in similar contexts
+    + Eliminate the effect of the relatively small number of observations between 2018/03/01 and 2019/03/01 (will discuss in Goal 3)
+    + Eliminate the effect of seasonal differences
+    + Eliminate the effect of the large number of observations on Saturdays (will discuss in Goal 3)
+    + Observations on the days of events only recorded between 10:00~10:59am for Brew at the Zoo, between 9:00am~9:59am for Zoo boo
+
+
+
+
+\
+
+**Brew at the Zoo**
+
+```{r Visual for Events (Brew at the Zoo), fig.width = 10, fig.height=4}
+################## Association B/W Events and Dog Behavior
+## Brew at the zoo (2019/4/27)
+spring_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Spring", Year == 2019, Day_of_Week == "Sat", Hour == 10) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
+
+spring_percentage_dog <- spring_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=spring_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors on Saturdays in spring 2019 between 10:00~10:59am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name) +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+```
+
+\
+
+**Zoo boo**
+
+```{r Visual for Events (Zoo boo), fig.width = 10, fig.height=4}
+################## Association B/W Events and Dog Behavior
+## Zoo boo (2019/10/26)
+fall_sat_2019_data <- dogs_data %>% 
+  filter (Season == "Fall", Year == 2019, Day_of_Week == "Sat", Hour == 9) %>%
+  mutate(Events = ifelse(is.na(Notes), "No event", Notes))
+
+fall_percentage_dog <- fall_sat_2019_data %>% 
+  group_by(Name, Events, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
+  geom_col(position = "stack", width = 0.4) + 
+  labs(title = "Percentage of behaviors on Saturdays in fall 2019 between 9:00~9:59am", x = "Events", y = "Percentage") +
+  facet_grid(. ~ Name) +
+  scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
+```
+
+\
+
+
+* Most dogs are resting or alert when there is an event, while on the days without events they have more varied behaviors
+* Akilah showed a stereotypically negative behavior on the day of Zoo boo
+    + Walking -> pacing (usually a sign of anxiety)
+* JT, the puppy, was always alert on the days of events
+
+
+\
+
 ### **Goal 2**
 
 Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
@@ -389,6 +473,42 @@ Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
 ### **Goal 3**
 
 \
+
+#### **Figure 1**
+
+```{r Visual for active/inactive behaviors in six-month intervals}
+## Calculate percentage for each inactive behavior within each six-month interval
+inactive_obs <- dogs_data %>% 
+  filter(Activeness == 'Inactive') %>% 
+  group_by(Six_Month_Interval, Activity) %>%
+  summarize(n = n()) %>%
+  mutate(Percentage = n/sum(n)*100)
+
+inactive_obs2 <- dogs_data %>% filter(Activeness == "Inactive")
+
+## Inactive + stacked barplot + frequency
+inactive_frequency <- ggplot(data=inactive_obs2) + 
+  geom_bar(aes(x=Activity), fill = "coral", alpha = 0.7) + 
+  labs(title = "Frequency of recorded inactive behaviors (in 6-month intervals)", x = "Dogs' behavior when inactive", y = "Frequency") +
+  facet_grid((. ~Six_Month_Interval))
+
+## Inactive + stacked barplot + percentage
+inactive_percentage <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
+  geom_col(position = "stack", width = 0.4) +
+  labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+
+grid.arrange(inactive_frequency, inactive_percentage, nrow = 2)
+```
+
+\
+
+
+* First debriefing: plot for frequencies of different types of inactive behaviors
+* Plot for inactiveness in six-month intervals
+* The total number of observations between 2019-03-01 and 2020-01-11 is significantly higher with the majority of observations being ‘Resting’
+* Uneven distribution of observations across intervals
+
 
 \
 
@@ -434,6 +554,26 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 
 \
+
+
+* RShiny (deployed to shinyapps.io):
+    + End user can upload data to the app (32MB max)
+    + Googledrive package to pull data from a Google Drive
+* Tableau (dashboard app/data visualization platform)
+    + Faster rendering of visualizations
+    + Slow data wrangling with limited packages
+    + Drag-and-drop functionality
+        + Unable to redo data cleaning process or recreate visualizations from scripts
+    + Expensive ($70/user/month)
+* Shiny
+    + Faster and easier data wrangling (considerably more packages than Tableau)
+    + Good for a large number of visualizations
+    + Dynamic rendering of visualization
+* Excel add-in for data cleaning (not sufficient for the higher-level cleaning we want to do)
+* Python
+    + Lots of learning -> lower quality of the product
+    + Deployment issues
+
 
 \
 
@@ -485,7 +625,15 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 \
 
-\
+* Understand and clean the cattle dataset
+    + More categories for active behaviors (i.e., agonistic, locomotion, social, stereotypic)
+* Answer client’s questions about cattle behavior
+    + How often are they showing Agonistic behaviors?
+    + How often are Stereotypic behaviors occurring?
+    + Are they spending more of their day active or inactive?
+    + Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?
+* Continue with the planning/investigation stages of the program
+
 
 \
 

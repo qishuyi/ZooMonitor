@@ -304,13 +304,12 @@ fall_percentage_dog <- fall_sat_2019_data %>%
 
 ggplot(data=spring_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
   geom_col(position = "stack", width = 0.4) + 
-  labs(title = "Percentage of behaviors on Saturdays in spring 2019 at 10am", x = "Events", y = "Percentage") +
+  labs(title = "Percentage of behaviors on Saturdays in spring 2019 between 10:00~10:59am", x = "Events", y = "Percentage") +
   facet_grid(. ~ Name) +
   scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
 
 ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) + 
   geom_col(position = "stack", width = 0.4) + 
-  labs(title = "Percentage of behaviors on Saturdays in fall 2019 at 9am", x = "Events", y = "Percentage") +
+  labs(title = "Percentage of behaviors on Saturdays in fall 2019 between 9:00~9:59am", x = "Events", y = "Percentage") +
   facet_grid(. ~ Name) +
   scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
-
