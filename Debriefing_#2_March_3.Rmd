@@ -75,7 +75,9 @@ source("columns_addition.R")
 \
 
 #### **Post meeting**  
--> Received data on cattles -> figured out that the format of the datasets differed between cattle and P.A.D.
+
+* Received data on cattles
+* Figured out that the format of the datasets differed between cattle and P.A.D.
 
 \
 
@@ -300,7 +302,7 @@ ground_meat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat"), aes(x 
   geom_bar(aes(y = ..count..), fill = "steelblue") +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Ground Meat"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring), plot.title = element_text(size = 17), plot.subtitle = element_text(size = 14)) +
   scale_x_discrete(limits = behavior_order) 
  
 
@@ -309,7 +311,7 @@ bones <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Activity))
   geom_bar(aes(y = ..count..), fill = "steelblue2", width = .55) +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring), plot.title = element_text(size = 17), plot.subtitle = element_text(size = 14)) +
   scale_y_continuous(limits = c(0,500)) +
   scale_x_discrete(limits = behavior_order) 
 
@@ -334,7 +336,7 @@ ground_meat_nosat <- ggplot(data = dogs_data %>% filter(Food == "Ground Meat", D
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)" 
        , subtitle  = "Food: Ground Meat (Excluding Saturdays)"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring), plot.title = element_text(size = 17), plot.subtitle = element_text(size = 14)) +
   scale_y_continuous(limits = c(0,200)) + 
   scale_x_discrete(limits = behavior_order) 
  
@@ -344,7 +346,7 @@ bones_nosat <- ggplot(data = dogs_data %>% filter(Food == "Bones"), aes(x = Acti
   geom_bar(aes(y = ..count..), fill = "steelblue2", width = .65) +
   labs(title = "Bar Plot of Dog Behavior (Per Hour of Day)", subtitle  = "Food: Bones"
        , y = "Frequency") + facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring)) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring), plot.title = element_text(size = 17), plot.subtitle = element_text(size = 14)) +
   scale_y_continuous(limits = c(0,200)) +
   scale_x_discrete(limits = behavior_order) 
 
@@ -455,7 +457,7 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 
 ### **Goal 2**
 
-Data Cleaning Report for Pueblo Zoo [link](Data_Cleaning_Report.html)
+[Data Cleaning Report for Pueblo Zoo](Data_Cleaning_Report.html)
 
 \
 
@@ -485,10 +487,22 @@ inactive_frequency <- ggplot(data=inactive_obs2) +
 inactive_percentage <- ggplot(inactive_obs, aes(x=Six_Month_Interval, y=Percentage, fill=Activity)) +
   geom_col(position = "stack", width = 0.4) +
   labs(title = "Percentage of inactive behaviors (in 6-month intervals)", x = "Six Month Intervals", y = "Percentage of observations (%)") +
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan")) +
+  theme(plot.title = element_text(size = 12))
 
-grid.arrange(inactive_frequency, inactive_percentage, nrow = 2)
+#grid.arrange(inactive_frequency, inactive_percentage, nrow = 2)
 ```
+
+```{r Inactive Frequency Plot, fig.width = 14, fig.height = 4.5}
+inactive_frequency
+```
+
+```{r Inactive Percentage Plot, fig.width = 8, fig.height = 4}
+inactive_percentage
+```
+
+
+
 
 \
 
@@ -511,7 +525,7 @@ time_of_day_viz <- ggplot(data = dogs_data, aes(x = Hour)) +
   geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +
   labs(title = "b. Percentage of Observations (Per Time of Day)", x = "Time of Day", y = "Percentage (%)") +
   annotate("text", x= 16.6, y = 13.5 , label = "12.5%", color = "darkmagenta", size = 3.25) +
-  theme(plot.title = element_text(size = 11))
+  theme(plot.title = element_text(size = 11, face = "bold"))
 
 day_of_week_viz <- ggplot(data = dogs_data, aes(x = Day_of_Week)) +
   geom_bar(aes(y = ..count../nrow(dogs_data)*100), fill = "steelblue2", width = .75) +
@@ -519,7 +533,7 @@ day_of_week_viz <- ggplot(data = dogs_data, aes(x = Day_of_Week)) +
   scale_y_continuous(limits = c(0,60)) +
   labs(title = "a. Percentage of Observations (Per Day of Week)", x = "Day of Week", y = "Percentage (%)") +
   geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") +   annotate("text", x= 1.5, y = 16.5 , label = "14.28%", color = "darkmagenta", size = 3.25) +
-  theme(plot.title = element_text(size = 11))
+  theme(plot.title = element_text(size = 11, face = "bold"))
   
 
 grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
@@ -545,22 +559,22 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 \
 
 
-* RShiny (deployed to shinyapps.io):
+* **RShiny** (deployed to shinyapps.io):
     + End user can upload data to the app (32MB max)
     + Googledrive package to pull data from a Google Drive
-* Tableau (dashboard app/data visualization platform)
+* **Tableau** (dashboard app/data visualization platform)
     + Faster rendering of visualizations
     + Slow data wrangling with limited packages
     + Drag-and-drop functionality
         + Unable to redo data cleaning process or recreate visualizations from scripts
     + Expensive ($70/user/month)
-* Shiny
+* **RShiny**
     + Faster and easier data wrangling (considerably more packages than Tableau)
     + Good for a large number of visualizations
     + Dynamic rendering of visualization
-* Excel add-in for data cleaning (not sufficient for the higher-level cleaning we want to do)
-* Python
-    + Lots of learning -> lower quality of the product
+* **Excel** add-in for data cleaning (not sufficient for the higher-level cleaning we want to do)
+* **Python**
+    + Lots of learning $\rightarrow$ lower quality of the product
     + Deployment issues
 
 
@@ -612,7 +626,6 @@ grid.arrange(day_of_week_viz, time_of_day_viz,  nrow = 1)
 
 #### **Next Steps**
 
-\
 
 * Understand and clean the cattle dataset
     + More categories for active behaviors (i.e., agonistic, locomotion, social, stereotypic)
