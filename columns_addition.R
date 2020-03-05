@@ -1,19 +1,3 @@
-##Activeness Column
-dogs_data <- dogs_data %>% unite("Activeness", c(IC1_Name, IC2_Name), remove = T)
-dogs_data <- dogs_data %>% mutate(Activeness = gsub("NA_", "", Activeness))
-dogs_data <- dogs_data %>% mutate(Activeness = gsub("_NA", "", Activeness))       
-
-##Activity Column and Changing Long Column Names
-dogs_data <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T)
-dogs_data <- dogs_data %>% mutate(Activity = gsub("NA_", "", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("_NA", "", Activity))                                  
-
-##Changing Name of Behavior in Activity Column
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Dog interaction", "Dog Int", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Interacting with object", "Object Int", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Walking Around", "Walking", Activity))
-dogs_data <- dogs_data %>% mutate(Activity = gsub("Out of view", "Out of View", Activity))
-
 ##Day_of_Week Column
 dogs_data <- mutate(dogs_data, Day_of_Week = wday(Date, label = TRUE))
 
