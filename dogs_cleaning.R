@@ -31,7 +31,7 @@ dogs_data <- dogs_data %>% unite("Activity", c(IC1_Value, IC2_Value), remove = T
 
 
 #Filtering out rows without behavioral observations
-dogs_data <-  dogs_data %>% filter(!(Activeness == "NA_NA")) 
+dogs_data <- dogs_data %>% filter(!(Activeness == "NA_NA")) 
 
 
 #Fixing NA Labels for Activeness Column
