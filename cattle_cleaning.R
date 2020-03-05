@@ -9,7 +9,7 @@ cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/ma
 #Removing Unnecessary Columns
 cattle_data <- cattle_data %>% select(-`Configuration Name`, -Observer,-DeviceID,
                                   -DateTime, -`Grid Size`, -`Image Size`,-`Channel Type`,
-                                  -`Project Animals`, -Duration, `All Occurrence Value`)
+                                  -`Project Animals`, -Duration, -`All Occurrence Value`)
   
 #Renaming Columns
 cattle_data <- cattle_data %>% rename(Session_Start_Time = `Session Start Time`,
