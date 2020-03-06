@@ -31,7 +31,7 @@ sq_monkey_data$Occurence_Duplicate[sq_monkey_data$Occurence_Duplicate == "Interv
 sq_monkey_data <- sq_monkey_data %>% unite("Category", c(IC1_Name, IC2_Name,
                                                          Occurence_Duplicate), remove = T)
 
-#Uniting all IC Value columns to a single column named Activity   
+#Uniting all IC Value + Occurence Value columns to a single column named Activity   
 sq_monkey_data <- sq_monkey_data %>% unite("Activity", c(IC1_Value, IC2_Value, AOV), remove = T)                                                                 
 
 
