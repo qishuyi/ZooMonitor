@@ -5,17 +5,13 @@ library(tidyr)
 #Importing Cattle Data
 cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1582236321.csv", col_types = cols(Notes = col_character()))
 
-
-#Removing Unnecessary Columns
-cattle_data <- cattle_data %>% select(-`Configuration Name`, -Observer,-DeviceID,
-                                  -DateTime, -`Grid Size`, -`Image Size`,-`Channel Type`,
-                                  -`Project Animals`, -Duration, -`All Occurrence Value`)
   
 #Renaming Columns
 cattle_data <- cattle_data %>% rename(Session_Start_Time = `Session Start Time`,
                                   Session_End_Time = `Session End Time`, 
                                   Name = `Focal Name`,
                                   Frame_Number = `Frame Number`,
+                                  Channel_Type = `Channel Type`,
                                   IC1_Name = `Interval Channel 1 Name`,
                                   IC1_Value = `Interval Channel 1 Value`,
                                   IC2_Name = `Interval Channel 2 Name`,
@@ -66,7 +62,10 @@ cattle_data <- cattle_data %>% mutate(Activity= gsub("NA_", "", Activity)) %>%
 cattle_data <- separate_rows(cattle_data, Category, Activity, sep  = "_")
 
                    
-                                  
+#Removing Unnecessary Columns
+cattle_data <- cattle_data %>% select(-`Configuration Name`, -Observer,-DeviceID,
+                                      -DateTime, -`Grid Size`, -`Image Size`,
+                                      -`Project Animals`, -Duration, -Channel_Type)                               
                                 
                                   
                                   
