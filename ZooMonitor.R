@@ -97,12 +97,12 @@ summary <- as.data.frame(summarise(dogs_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
 summary <- summary %>% group_by(Name, Day_of_Week) %>%
   mutate(sum = sum(counts))
-dogs_data_DW <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
-dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
-dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
-dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
+dogs_data_HR <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
+dogs_data_HR <- mutate(dogs_data_HR, percent = dogs_data_HR$counts/dogs_data_HR$sum*100)
+dogs_data_HR$percent <- round(dogs_data_HR$percent, digits = 1)
+dogs_data_HR$percent <- paste(dogs_data_HR$percent, "%")
 ##Plots of activeness by dogs by day
-ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
+ggplot(dogs_data_HR, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
   geom_bar(stat="identity", position=position_dodge()) +
   labs(x = "Day of Week", y="Counts") +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
@@ -354,57 +354,39 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
 ################## (CATTLE) Positive Behavior Visual
 
-
-
-
-
-
-################## Death/Birth Exploration
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################## Active vs. Inactive plot (cattle)
-
-cattle_data_grouped <- group_by(cattle_data, Hour, Category)
+################## (CATTLE) Active/Inactive Visual
+cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
 summary <- as.data.frame(summarise(cattle_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
 summary <- summary %>% group_by(Name, Hour) %>%
   mutate(sum = sum(counts))
-cattle_data_hour <- left_join(cattle_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
-dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
-dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
-dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
-##Plots of activeness by dogs by day
-ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
-  geom_bar(stat="identity", position=position_dodge()) +
-  labs(x = "Day of Week", y="Counts") +
-  geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
-  facet_grid(Name ~.) 
+cattle_data_HR <- left_join(cattle_data, summary, by = c("Name", "Hour", "Category"))
+cattle_data_HR <- mutate(cattle_data_HR, percent = cattle_data_HR$counts/cattle_data_HR$sum*100)
+cattle_data_HR$percent <- round(cattle_data_HR$percent, digits = 1)
+cattle_data_HR$percent <- paste(cattle_data_HR$percent, "%")
+##Plots of category by cattle by hour by name
+#similar distribution
+ggplot(cattle_data_HR, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Time of Day", y="Counts") +
+  facet_grid(Name ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90))
+
+##Plots of category by cattle by hour
+cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
+summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR2 <- left_join(cattle_data, summary, by = c("Hour", "Category"))
+cattle_data_HR2 <- mutate(cattle_data_HR2, percent = cattle_data_HR2$counts/cattle_data_HR2$sum*100)
+cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
+cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
+ggplot(cattle_data_HR2, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Time of Day", y="Counts") +
+  facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90))
 
 
 
@@ -414,11 +396,10 @@ ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) +
 
 
 
-################## Death/Birth Exploration (sq_monkey)
 
-#2018-02-05 --> 2018-02-22 (on the day he died) --> 2018-03-04 (Damian)
-#2018-11-11 --> no ob. on 2018-12-03 (on the day she died) --> 2019-01-03 (Pistachio)
-#2019-03-17 --> no ob. on 2019-06-13 (on the day he came) --> 2019-06-18
+
+
+
 
 
 
