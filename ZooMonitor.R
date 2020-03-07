@@ -26,6 +26,8 @@ source("sq_monkey_columns_addition.R")
 
 
 
+
+
 ################# For 2/18/2020
 
 ################## Plot of Activity of Dogs in each Hour (V_R)
@@ -325,14 +327,75 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 ################## For 3/31/2020
 
 
+################## (MONKEY) Head Spins per Monkey Visual
 
-################## Headspin per Monkey Visual
+obs_per_monkey <- c(638,234,594,620,256,178)
 
-#Count Version
+
+#Barplot of Headspins (Percentage + Count)
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name), fill = "springgreen3") +
-  labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
-  
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
+  labs(title = "Barplot of Head Spins per Monkey", 
+       subtitle = "Percentages based on each monkey's total number of observations",
+       x = "Monkey", y = "Percentage") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic")) +
+  geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
+            stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
+      
+
+
+
+
+
+################## (CATTLE) Positive Behavior Visual
+
+################## (CATTLE) Active/Inactive Visual
+cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
+summary <- as.data.frame(summarise(cattle_data_grouped, n()))
+names(summary)[names(summary) == "n()"] <- "counts"
+summary <- summary %>% group_by(Name, Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR <- left_join(cattle_data, summary, by = c("Name", "Hour", "Category"))
+cattle_data_HR <- mutate(cattle_data_HR, percent = cattle_data_HR$counts/cattle_data_HR$sum*100)
+cattle_data_HR$percent <- round(cattle_data_HR$percent, digits = 1)
+cattle_data_HR$percent <- paste(cattle_data_HR$percent, "%")
+##Plots of category by cattle by hour by name
+#similar distribution
+ggplot(cattle_data_HR, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Time of Day", y="Counts") +
+  facet_grid(Name ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90))
+
+##Plots of category by cattle by hour
+cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
+summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR2 <- left_join(cattle_data, summary, by = c("Hour", "Category"))
+cattle_data_HR2 <- mutate(cattle_data_HR2, percent = cattle_data_HR2$counts/cattle_data_HR2$sum*100)
+cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
+cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
+ggplot(cattle_data_HR2, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Time of Day", y="Counts") +
+  facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
