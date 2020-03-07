@@ -352,15 +352,13 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 #change % label decimals for y axis
       
  
-
+################## (CATTLE) Positive Behavior Visual
 
 
   
 
 ################## Death/Birth Exploration
 
-
-################## (CATTLE) Positive Behavior Visual
 
 #2018-02-05 --> 2018-02-22 (on the day he died) --> 2018-03-04 (Damian)
 #2018-11-11 --> no ob. on 2018-12-03 (on the day she died) --> 2019-01-03 (Pistachio)
