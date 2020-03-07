@@ -3,9 +3,8 @@ library(dplyr)
 library(tidyr)
 
 #Importing Cattle Data
-cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1582236321.csv", col_types = cols(Notes = col_character()))
+cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1582236321.csv", col_types = cols(.default = col_character()))
 
-  
 #Renaming Columns
 cattle_data <- cattle_data %>% rename(Session_Start_Time = `Session Start Time`,
                                   Session_End_Time = `Session End Time`, 
