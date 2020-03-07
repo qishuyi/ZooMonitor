@@ -26,6 +26,8 @@ source("sq_monkey_columns_addition.R")
 
 
 
+
+
 ################# For 2/18/2020
 
 ################## Plot of Activity of Dogs in each Hour (V_R)
@@ -355,8 +357,15 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
   
 
+################## Death/Birth Exploration
+
 
 ################## (CATTLE) Positive Behavior Visual
+
+#2018-02-05 --> 2018-02-22 (on the day he died) --> 2018-03-04 (Damian)
+#2018-11-11 --> no ob. on 2018-12-03 (on the day she died) --> 2019-01-03 (Pistachio)
+#2019-03-17 --> no ob. on 2019-06-13 (on the day he came) --> 2019-06-18
+
 
 
 
