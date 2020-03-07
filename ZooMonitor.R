@@ -13,11 +13,18 @@ library(zoo)
 library(tibble)
 library(ggbeeswarm)
 
-#Run Data cleaning script
-source("cleaning.R")
+#Run Data cleaning script for each animal
+source("dogs_cleaning.R")
+source("cattle_cleaning.R")
+source("sq_monkey_cleaning.R")
 
 #Run column addition script
-source("columns_addition.R")
+source("dogs_columns_addition.R")
+source("cattle_columns_addition.R")
+source("sq_monkey_columns_addition.R")
+
+
+
 
 ################# For 2/18/2020
 
@@ -313,3 +320,25 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
   labs(title = "Percentage of behaviors on Saturdays in fall 2019 between 9:00~9:59am", x = "Events", y = "Percentage") +
   facet_grid(. ~ Name) +
   scale_fill_manual(values = c("khaki", "coral","cornflowerblue", "darkolivegreen3", "darkorchid1", "darkcyan", "aquamarine", "mediumvioletred"))
+
+
+################## For 3/31/2020
+
+
+
+################## Headspin per Monkey Visual
+
+#Count Version
+ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
+  geom_bar(aes(x = Name), fill =
+
+
+
+
+
+
+
+
+
+
+
