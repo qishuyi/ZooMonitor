@@ -326,15 +326,20 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 
 
 
-################## Headspin per Monkey Visual
+################## (MONKEY) Head Spin per Monkey Visual
 
 #Count Version
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   geom_bar(aes(x = Name), fill = "springgreen3") +
   labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
+
   
+ggplot(data = sq_monkey_data) +
+  geom_bar(aes(x = Name), fill = "turquoise3" )
 
 
+
+################## (CATTLE) Positive Behavior Visual
 
 
 
