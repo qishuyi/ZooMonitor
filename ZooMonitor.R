@@ -97,12 +97,12 @@ summary <- as.data.frame(summarise(dogs_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
 summary <- summary %>% group_by(Name, Day_of_Week) %>%
   mutate(sum = sum(counts))
-dogs_data_HR <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
-dogs_data_HR <- mutate(dogs_data_HR, percent = dogs_data_HR$counts/dogs_data_HR$sum*100)
-dogs_data_HR$percent <- round(dogs_data_HR$percent, digits = 1)
-dogs_data_HR$percent <- paste(dogs_data_HR$percent, "%")
+dogs_data_DW <- left_join(dogs_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
+dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
+dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
+dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
 ##Plots of activeness by dogs by day
-ggplot(dogs_data_HR, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
+ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
   geom_bar(stat="identity", position=position_dodge()) +
   labs(x = "Day of Week", y="Counts") +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
