@@ -332,7 +332,7 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 obs_per_monkey <- c(638,234,594,620,256,178)
 
 
-#Percentage (of each monkey) Version
+#Barplot of Headspins (Percentage + Count)
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
   labs(title = "Barplot of Head Spins per Monkey", 
