@@ -328,15 +328,32 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 
 ################## (MONKEY) Head Spin per Monkey Visual
 
-#Count Version
+obs_per_monkey <- c(638,234,594,620,256,178)
+
+#Raw Frequency Version
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   geom_bar(aes(x = Name), fill = "springgreen3") +
   labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
 
-  
-ggplot(data = sq_monkey_data) +
-  geom_bar(aes(x = Name), fill = "turquoise3" )
 
+#Percentage (of each monkey) Version
+ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3") +
+  labs(title = "Percentage of Head Spin per Monkey", 
+       subtitle = "Percentage based on each monkey's total number of observations",
+       x = "Monkey", y = "Percentage") +
+  scale_y_continuous(labels = scales::percent) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"))
+
+#change x and y axis laberling
+#change % label decimals for y axis
+      
+ 
+
+
+
+  
 
 
 ################## (CATTLE) Positive Behavior Visual
