@@ -336,8 +336,26 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
 
 
+#Percentage (of each monkey) Version
+ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3") +
+  labs(title = "Percentage of Head Spin per Monkey", 
+       subtitle = "Percentage based on each monkey's total number of observations",
+       x = "Monkey", y = "Percentage") +
+  scale_y_continuous(labels = scales::percent) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"))
+
+#change x and y axis laberling
+#change % label decimals for y axis
 
 
+################## (CATTLE) Positive Behavior Visual
+
+
+
+
+################## Death/Birth Exploration
 
 
 
