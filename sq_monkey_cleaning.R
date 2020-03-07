@@ -4,8 +4,7 @@ library(dplyr)
 library(stringr)
 library(janitor)
 
-sq_monkey_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1583445158.csv", col_types = cols(Notes = col_character()))
-
+sq_monkey_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1583445158.csv", col_types = cols(.default = col_character()))
 
 #Renaming Columns
 sq_monkey_data <- sq_monkey_data %>% rename(Session_Start_Time = `Session Start Time`,
