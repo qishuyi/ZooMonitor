@@ -393,14 +393,14 @@ summary <- as.data.frame(summarise(cattle_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
 summary <- summary %>% group_by(Name, Hour) %>%
   mutate(sum = sum(counts))
-cattle_data_hour <- left_join(cattle_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
-dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
-dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
-dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
+cattle_data_hour <- left_join(cattle_data, summary, by = c("Name", "Hour", "Activeness"))
+cattle_data_hour <- mutate(cattle_data_hour, percent = cattle_data_hour$counts/cattle_data_hour$sum*100)
+cattle_data_hour$percent <- round(cattle_data_hour$percent, digits = 1)
+cattle_data_hour$percent <- paste(cattle_data_hour$percent, "%")
 ##Plots of activeness by dogs by day
-ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
+ggplot(cattle_data_hour, aes(x = Hourk, y = counts, fill = Activeness)) + 
   geom_bar(stat="identity", position=position_dodge()) +
-  labs(x = "Day of Week", y="Counts") +
+  labs(x = "Hour", y="Counts") +
   geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
   facet_grid(Name ~.) 
 
