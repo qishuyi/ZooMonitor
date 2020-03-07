@@ -327,29 +327,27 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 ################## For 3/31/2020
 
 
-################## (MONKEY) Head Spin per Monkey Visual
+################## (MONKEY) Head Spins per Monkey Visual
 
 obs_per_monkey <- c(638,234,594,620,256,178)
-
-#Raw Frequency Version
-ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name), fill = "springgreen3") +
-  labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
 
 
 #Percentage (of each monkey) Version
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3") +
-  labs(title = "Percentage of Head Spin per Monkey", 
-       subtitle = "Percentage based on each monkey's total number of observations",
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
+  labs(title = "Barplot of Head Spins per Monkey", 
+       subtitle = "Percentages based on each monkey's total number of observations",
        x = "Monkey", y = "Percentage") +
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
   theme(plot.title = element_text(size = 12, face = "bold"),
-        plot.subtitle = element_text(size = 9, face = "italic"))
+        plot.subtitle = element_text(size = 9, face = "italic")) +
+  geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
+            stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
+      
 
-#change x and y axis laberling
-#change % label decimals for y axis
-#Add count to top of bar
+
+
 
 
 ################## (CATTLE) Positive Behavior Visual
