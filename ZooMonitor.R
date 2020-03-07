@@ -330,7 +330,9 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 
 #Count Version
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name), fill =
+  geom_bar(aes(x = Name), fill = "springgreen3") +
+  labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
+  
 
 
 
