@@ -328,42 +328,75 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 
 
 
-################## (MONKEY) Head Spin per Monkey Visual
+################## Headspin per Monkey Visual
 
-obs_per_monkey <- c(638,234,594,620,256,178)
-
-#Raw Frequency Version
+#Count Version
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   geom_bar(aes(x = Name), fill = "springgreen3") +
   labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
 
 
-#Percentage (of each monkey) Version
-ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3") +
-  labs(title = "Percentage of Head Spin per Monkey", 
-       subtitle = "Percentage based on each monkey's total number of observations",
-       x = "Monkey", y = "Percentage") +
-  scale_y_continuous(labels = scales::percent) +
-  theme(plot.title = element_text(size = 12, face = "bold"),
-        plot.subtitle = element_text(size = 9, face = "italic"))
-
-#change x and y axis laberling
-#change % label decimals for y axis
-      
- 
-################## (CATTLE) Positive Behavior Visual
 
 
-  
 
-################## Death/Birth Exploration
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################## Active vs. Inactive plot (cattle)
+
+cattle_data_grouped <- group_by(cattle_data, Hour, Category)
+summary <- as.data.frame(summarise(cattle_data_grouped, n()))
+names(summary)[names(summary) == "n()"] <- "counts"
+summary <- summary %>% group_by(Name, Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_hour <- left_join(cattle_data, summary, by = c("Name", "Day_of_Week", "Activeness"))
+dogs_data_DW <- mutate(dogs_data_DW, percent = dogs_data_DW$counts/dogs_data_DW$sum*100)
+dogs_data_DW$percent <- round(dogs_data_DW$percent, digits = 1)
+dogs_data_DW$percent <- paste(dogs_data_DW$percent, "%")
+##Plots of activeness by dogs by day
+ggplot(dogs_data_DW, aes(x = Day_of_Week, y = counts, fill = Activeness)) + 
+  geom_bar(stat="identity", position=position_dodge()) +
+  labs(x = "Day of Week", y="Counts") +
+  geom_text(aes(label = percent), position = position_dodge(width = 0.9), size = 4) +
+  facet_grid(Name ~.) 
+
+
+
+
+
+
+
+
+
+################## Death/Birth Exploration (sq_monkey)
 
 #2018-02-05 --> 2018-02-22 (on the day he died) --> 2018-03-04 (Damian)
 #2018-11-11 --> no ob. on 2018-12-03 (on the day she died) --> 2019-01-03 (Pistachio)
 #2019-03-17 --> no ob. on 2019-06-13 (on the day he came) --> 2019-06-18
-
 
 
 
