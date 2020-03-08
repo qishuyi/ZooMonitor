@@ -8,7 +8,7 @@ library(ggplot2)
 library(lubridate)
 library(gridExtra)
 library(grid)
-library(formattable) #To make a nice table
+library(formattable) 
 library(zoo)
 library(tibble)
 library(ggbeeswarm)
@@ -346,11 +346,30 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
             stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
       
 
+################## (CATTLE) Stereotypic Behavior Table
+cattle_stereotypic <- cattle_data %>% filter(Category == "Stereotypic") %>%
+  select(Name, Activity, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1,5))
 
+cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d %Y")
+  
+
+formattable(cattle_stereotypic, align = c("l", rep("c",3)))
 
 
 
 ################## (CATTLE) Positive Behavior Visual
+
+
+
+
+
+
+
+
+
+
+
 
 ################## (CATTLE) Active/Inactive Visual
 cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
