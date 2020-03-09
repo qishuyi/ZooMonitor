@@ -366,7 +366,9 @@ ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive")) +
   geom_bar(aes(x = Name, y = ..count.. / obs_per_cattle, fill = Category), width = .4) +
   labs(title = "Barplot of Positive Behaviors per Cattle",
        subtitle = "Percentages based on each cattle's total number of observations",
-       x = "Cattle", y = "Percentage")
+       x = "Cattle", y = "Percentage") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.4))
 
 #Change title and subtitle
 #Change y axis to percentage label
