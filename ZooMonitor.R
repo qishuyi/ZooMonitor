@@ -378,11 +378,23 @@ ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive")) +
 
 #Testing to fix errors
 ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive"),　
-       aes(x = Name, y = ..count.. , fill = Category)) +
+       aes(x = Name, y = ..count.. /obs_per_cattle)) +
   geom_bar(position = "dodge", width = .4) +
   labs(title = "Barplot of Positive Behaviors per Cattle",
        subtitle = "Percentages based on each cattle's total number of observations",
        x = "Cattle", y = "Percentage") 
+
+#Creating Data Frame for Positive Behavior Visual
+cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
+  group_by(Name, Category) %>% 
+  summarize(Count = n()) 
+ 
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761,692), 4))
+
+ggplot(data = cattle_positive) +
+  geom_bar(aes(x = Name, y = count, fill = Category), stat = "identity")
+
+
 
 
 
