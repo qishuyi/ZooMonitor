@@ -338,10 +338,10 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   labs(title = "Barplot of Head Spins per Monkey", 
        subtitle = "Percentages based on each monkey's total number of observations",
        x = "Monkey", y = "Percentage") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                     limits = c(0,.125)) +
   theme(plot.title = element_text(size = 12, face = "bold"),
         plot.subtitle = element_text(size = 9, face = "italic")) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
   geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
             stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
       
@@ -351,7 +351,7 @@ cattle_stereotypic <- cattle_data %>% filter(Category == "Stereotypic") %>%
   select(Name, Activity, Date, Time) %>%
   mutate(Time = str_sub(Time, 1,5))
 
-cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d %Y")
+cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d, %Y")
   
 
 formattable(cattle_stereotypic, align = c("l", rep("c",3)))
@@ -367,18 +367,22 @@ ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive")) +
   labs(title = "Barplot of Positive Behaviors per Cattle",
        subtitle = "Percentages based on each cattle's total number of observations",
        x = "Cattle", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                     limits = c(0,.4))
+                     limits = c(0,.4)) +
+  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3"))
+ 
 
-#Change title and subtitle
-#Change y axis to percentage label
-#Change y axis limits
-#Change color of the bars
-
-
-
-
-
+#Testing to fix errors
+ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive"),　
+       aes(x = Name, y = ..count.. , fill = Category)) +
+  geom_bar(position = "dodge", width = .4) +
+  labs(title = "Barplot of Positive Behaviors per Cattle",
+       subtitle = "Percentages based on each cattle's total number of observations",
+       x = "Cattle", y = "Percentage") 
 
 
 
