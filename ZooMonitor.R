@@ -360,10 +360,16 @@ formattable(cattle_stereotypic, align = c("l", rep("c",3)))
 
 ################## (CATTLE) Positive Behavior Visual
 
-obs_per_cattle <- c(720, 761, 692)
+#Creating Data Frame for Positive Behavior Visual
+cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
+  group_by(Name, Category) %>% 
+  summarize(Count = n()) 
 
-ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive")) + 
-  geom_bar(aes(x = Name, y = ..count.. / obs_per_cattle, fill = Category), width = .4) +
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761,692), times = c(4,4,4)))
+
+#Positive Behavior Visual
+ggplot(data = cattle_positive) +
+  geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
   labs(title = "Barplot of Positive Behaviors per Cattle",
        subtitle = "Percentages based on each cattle's total number of observations",
        x = "Cattle", y = "Percentage") +
@@ -374,25 +380,6 @@ ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive")) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                      limits = c(0,.4)) +
   scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3"))
- 
-
-#Testing to fix errors
-ggplot(data = cattle_data %>% filter(Behavior_Type == "Positive"),　
-       aes(x = Name, y = ..count.. /obs_per_cattle)) +
-  geom_bar(position = "dodge", width = .4) +
-  labs(title = "Barplot of Positive Behaviors per Cattle",
-       subtitle = "Percentages based on each cattle's total number of observations",
-       x = "Cattle", y = "Percentage") 
-
-#Creating Data Frame for Positive Behavior Visual
-cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
-  group_by(Name, Category) %>% 
-  summarize(Count = n()) 
- 
-cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761,692), 4))
-
-ggplot(data = cattle_positive) +
-  geom_bar(aes(x = Name, y = count, fill = Category), stat = "identity")
 
 
 
