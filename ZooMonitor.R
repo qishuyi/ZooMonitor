@@ -8,7 +8,7 @@ library(ggplot2)
 library(lubridate)
 library(gridExtra)
 library(grid)
-library(formattable) #To make a nice table
+library(formattable) 
 library(zoo)
 library(tibble)
 library(ggbeeswarm)
@@ -327,41 +327,68 @@ ggplot(data=fall_percentage_dog, aes(x=Events, y=Percentage, fill=Activity)) +
 ################## For 3/31/2020
 
 
-################## (MONKEY) Head Spin per Monkey Visual
+################## (MONKEY) Head Spins per Monkey Visual
 
 obs_per_monkey <- c(638,234,594,620,256,178)
 
-#Raw Frequency Version
-ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name), fill = "springgreen3") +
-  labs(title = "Raw Frequency of Head Spin per Monkey", x = "Monkey", y = "Frequency") 
 
-
-#Percentage (of each monkey) Version
+#Barplot of Headspins (Percentage + Count)
 ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
-  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3") +
-  labs(title = "Percentage of Head Spin per Monkey", 
-       subtitle = "Percentage based on each monkey's total number of observations",
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
+  labs(title = "Barplot of Head Spins per Monkey", 
+       subtitle = "Percentages based on each monkey's total number of observations",
        x = "Monkey", y = "Percentage") +
-  scale_y_continuous(labels = scales::percent) +
   theme(plot.title = element_text(size = 12, face = "bold"),
-        plot.subtitle = element_text(size = 9, face = "italic"))
+        plot.subtitle = element_text(size = 9, face = "italic")) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
+  geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
+            stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
+      
 
-#change x and y axis laberling
-#change % label decimals for y axis
-#Add count to top of bar
+################## (CATTLE) Stereotypic Behavior Table
+cattle_stereotypic <- cattle_data %>% filter(Category == "Stereotypic") %>%
+  select(Name, Activity, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1,5))
+
+cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d, %Y")
+  
+
+formattable(cattle_stereotypic, align = c("l", rep("c",3)))
+
 
 
 ################## (CATTLE) Positive Behavior Visual
 
+#Creating Data Frame for Positive Behavior Visual
+cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
+  group_by(Name, Category) %>% 
+  summarize(Count = n()) 
+
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761,692), times = c(4,4,4)))
+
+#Positive Behavior Visual
+ggplot(data = cattle_positive) +
+  geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
+  labs(title = "Barplot of Positive Behaviors per Cattle",
+       subtitle = "Percentages based on each cattle's total number of observations",
+       x = "Cattle", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.4)) +
+  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3"))
+
+
+
 ################## (CATTLE) Active/Inactive Visual (each cattle)
 cattle_data$Hour <- as.numeric(cattle_data$Hour)
 cattle_data$Category <- factor(cattle_data$Category, levels = c("Agonistic","Enrichment-based","Exploratory & Feeding", 
-                    "Locomotion", "Maintenance", "Social", "Stereotypic", 
-                    "Inactive", "Other"))
+                                                                "Locomotion", "Maintenance", "Social", "Stereotypic", 
+                                                                "Inactive", "Other"))
 label_coloring <- rep(c("forestgreen","maroon"), times = c(7,2))
-
-#Ground Meat (Including Saturday)
 cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
 summary <- as.data.frame(summarise(cattle_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"

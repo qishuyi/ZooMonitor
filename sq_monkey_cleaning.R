@@ -4,8 +4,19 @@ library(dplyr)
 library(stringr)
 library(janitor)
 
-sq_monkey_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1583445158.csv", col_types = cols(.default = col_character()))
-
+sq_monkey_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1583445158.csv", 
+                           col_types = cols(.default = col_character(),
+                                            SessionID = col_double(), 
+                                            `Session Start Time` = col_datetime(format = ""),
+                                            `Session End Time` = col_datetime(format = ""),
+                                            DateTime = col_datetime(format = ""),
+                                            Date = col_date(format = ""),
+                                            Time = col_time(format = ""),
+                                            Year = col_double(),
+                                            Month = col_double(),
+                                            Hour = col_double(),
+                                            Duration = col_double(),
+                                            `Frame Number` = col_double()))
 #Renaming Columns
 sq_monkey_data <- sq_monkey_data %>% rename(Session_Start_Time = `Session Start Time`,
                                       Session_End_Time = `Session End Time`, 
