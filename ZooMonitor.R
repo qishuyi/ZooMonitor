@@ -365,7 +365,7 @@ cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
   group_by(Name, Category) %>% 
   summarize(Count = n()) 
 
-cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761,692), times = c(4,4,4)))
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761, 692), times = c(4,4,4)))
 
 #Positive Behavior Visual
 ggplot(data = cattle_positive) +
@@ -379,8 +379,8 @@ ggplot(data = cattle_positive) +
         legend.text = element_text(size = 8)) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                      limits = c(0,.4)) +
-  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3"))
-
+  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3")) 
+  
 
 
 ################## (CATTLE) Active/Inactive Visual (each cattle)
