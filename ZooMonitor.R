@@ -354,7 +354,14 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
 ################## (CATTLE) Positive Behavior Visual
 
-################## (CATTLE) Active/Inactive Visual
+################## (CATTLE) Active/Inactive Visual (each cattle)
+cattle_data$Hour <- as.numeric(cattle_data$Hour)
+cattle_data$Category <- factor(cattle_data$Category, levels = c("Agonistic","Enrichment-based","Exploratory & Feeding", 
+                    "Locomotion", "Maintenance", "Social", "Stereotypic", 
+                    "Inactive", "Other"))
+label_coloring <- rep(c("forestgreen","maroon"), times = c(7,2))
+
+#Ground Meat (Including Saturday)
 cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
 summary <- as.data.frame(summarise(cattle_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
@@ -368,11 +375,11 @@ cattle_data_HR$percent <- paste(cattle_data_HR$percent, "%")
 #similar distribution
 ggplot(cattle_data_HR, aes(x = Category, y = counts)) + 
   geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
-  labs(x = "Time of Day", y="Counts") +
+  labs(x = "Bar Plot of Cattle's Behavior Category", subtitle = "Individuals", y="Counts") +
   facet_grid(Name ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
 
-##Plots of category by cattle by hour
+##(CATTLE) Active/Inactive Visual (all cattles)
 cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
 summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
@@ -384,10 +391,9 @@ cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
 cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
 ggplot(cattle_data_HR2, aes(x = Category, y = counts)) + 
   geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
-  labs(x = "Time of Day", y="Counts") +
+  labs(x = "Bar Plot of Cattle's Behavior Category", subtitle = "General", y="Counts") +
   facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90))
-
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
 
 
 
