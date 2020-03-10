@@ -406,7 +406,7 @@ ggplot(cattle_data_HR, aes(x = Category, y = counts)) +
   facet_grid(Name ~ Hour) +
   theme(axis.text.x = element_text(angle = 90, color = label_coloring))
 
-##(CATTLE) Active/Inactive Visual (all cattles)
+################## (CATTLE) Active/Inactive Visual (all cattles)
 cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
 summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
@@ -422,6 +422,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
   facet_grid(. ~ Hour) +
   theme(axis.text.x = element_text(angle = 90, color = label_coloring))
 
+################## (SQ_MONKEY) Death/Birth Impact Plots
 
 
 
