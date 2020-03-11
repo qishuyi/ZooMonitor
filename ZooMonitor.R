@@ -12,6 +12,7 @@ library(formattable)
 library(zoo)
 library(tibble)
 library(ggbeeswarm)
+library(forcats)
 
 #Run Data cleaning script for each animal
 source("dogs_cleaning.R")
@@ -22,9 +23,6 @@ source("sq_monkey_cleaning.R")
 source("dogs_columns_addition.R")
 source("cattle_columns_addition.R")
 source("sq_monkey_columns_addition.R")
-
-
-
 
 
 
@@ -427,48 +425,48 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 #Damian passed away on Feb 22, 2018,
 #Pistachio passed away on Dec 3, 2018
 #Squirt came to our zoo from another zoo on June 13, 2019
-sq_monkey_data_Damian <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21")
-sq_monkey_data_Damian <- sq_monkey_data_Damian %>% group_by(Activity)
-summary_Damian <- as.data.frame(summarise(sq_monkey_data_Damian, n()))
-names(summary_Damian)[names(summary_Damian) == "n()"] <- "counts"
-summary_Damian <- summary_Damian %>%
-  mutate(percent = round(counts/159*100, 1))
-summary_Damian$Activity <- factor(summary_Damian$Activity, levels = rev(as.character(summary_Damian$Activity)))
 
-sq_monkey_data_Damian_rest <- subset(sq_monkey_data, !(Date >= "2018-02-23" & Date <= "2018-03-21"))
-sq_monkey_data_Damian_rest <- sq_monkey_data_Damian_rest %>% group_by(Activity)
-summary_Damian_rest <- as.data.frame(summarise(sq_monkey_data_Damian_rest, n()))
-names(summary_Damian_rest)[names(summary_Damian_rest) == "n()"] <- "counts"
-summary_Damian_rest <- summary_Damian_rest %>%
-  mutate(percent = round(counts/2361*100, 1))
-summary_Damian_rest$Activity <- factor(summary_Damian_rest$Activity, levels = rev(as.character(summary_Damian_rest$Activity)) )
+Damian_before <- subset(sq_monkey_data, Date < "2018-02-23")
+Damian_before <- Damian_before %>% group_by(Activity)
+summary_Damian_before <- as.data.frame(summarise(Damian_before, n()))
+names(summary_Damian_before)[names(summary_Damian_before) == "n()"] <- "counts"
+summary_Damian_before <- summary_Damian_before %>%
+  mutate(percent = round(counts/399*100, 1)) %>%
+  mutate(Period = "Before")
+summary_Damian_before$Activity <- factor(summary_Damian_before$Activity, levels = rev(as.character(summary_Damian_before$Activity)))
 
-dd <- union(summary_Damian$Activity, summary_Damian_rest$Activity)
-dd.col <- rainbow(length(dd))
-names(dd.col)  <- dd
+Damian_amonth <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21")
+Damian_amonth <- Damian_amonth %>% group_by(Activity)
+summary_Damian_amonth <- as.data.frame(summarise(Damian_amonth, n()))
+names(summary_Damian_amonth)[names(summary_Damian_amonth) == "n()"] <- "counts"
+summary_Damian_amonth <- summary_Damian_amonth %>%
+  mutate(percent = round(counts/159*100, 1)) %>%
+  mutate(Period = "One month after")
+summary_Damian_amonth$Activity <- factor(summary_Damian_amonth$Activity, levels = rev(as.character(summary_Damian_amonth$Activity)))
 
+Damian_after <- subset(sq_monkey_data, Date > "2018-03-21")
+Damian_after <- Damian_after %>% group_by(Activity)
+summary_Damian_after <- as.data.frame(summarise(Damian_after, n()))
+names(summary_Damian_after)[names(summary_Damian_after) == "n()"] <- "counts"
+summary_Damian_after <- summary_Damian_after %>%
+  mutate(percent = round(counts/1962*100, 1)) %>%
+  mutate(Period = "After")
+summary_Damian_after$Activity <- factor(summary_Damian_after$Activity, levels = rev(as.character(summary_Damian_after$Activity)))
+sum(summary_Damian_before$counts)
 
-pie_Damian = ggplot(summary_Damian, aes(x="", y=counts, fill=Activity)) + geom_bar(stat="identity", width=1) +
+summary_Damian <- rbind(summary_Damian_before, summary_Damian_amonth, summary_Damian_after)
+summary_Damian <- group_by(summary_Damian, Period)
+
+ggplot(summary_Damian, aes(x="", y=percent, fill=reorder(Activity, percent))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Around Damian's Death") +
-  guides(fill = guide_legend(reverse = TRUE)) +
-  theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual("Legend", values = dd.col)
-
-pie_Damian_rest = ggplot(summary_Damian_rest, aes(x="", y=counts, fill=Activity)) + geom_bar(stat="identity", width=1) +
-  coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Other times") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Death and Activity") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
                           plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual("Legend", values = dd.col)
-
-grid.arrange(pie_Damian, pie_Damian_rest, ncol = 2)
+  scale_fill_manual(values = rainbow(16))
 
 
 
