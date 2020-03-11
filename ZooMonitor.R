@@ -13,7 +13,7 @@ library(zoo)
 library(tibble)
 library(ggbeeswarm)
 library(forcats)
-
+library(viridis)
 #Run Data cleaning script for each animal
 source("dogs_cleaning.R")
 source("cattle_cleaning.R")
@@ -457,12 +457,13 @@ summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One
 ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity", subtitle = "Raw Counts: Before = 399, One month after = 159, After = 1962") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(16)[sample(1:16)])
 
@@ -489,12 +490,13 @@ summary_Pistachio$Period <- factor(summary_Pistachio$Period, levels = c("Before"
 ggplot(summary_Pistachio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Passing and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Passing and Activity", subtitle = "Raw Counts: Before = 760, After = 1760") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 
@@ -521,12 +523,13 @@ summary_Squirt$Period <- factor(summary_Squirt$Period, levels = c("Before", "Aft
 ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Arrival and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Arrival and Activity", subtitle = "Raw Counts: Before = 1296, After = 1224") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 
@@ -561,12 +564,13 @@ summary_JT$Period <- factor(summary_JT$Period, levels = c("Before", "After"))
 ggplot(summary_JT, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "JT's Birth and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "JT's Birth and Activity", subtitle = "Raw Counts: Before = 268, After = 2996") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(10)[sample(1:10)])
 
@@ -594,12 +598,13 @@ summary_Minzi$Period <- factor(summary_Minzi$Period, levels = c("Before", "After
 ggplot(summary_Minzi, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Minzi's Passing and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Minzi's Passing and Activity", subtitle = "Raw Counts: Before = 450, After = 2814") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(10)[sample(1:10)])
 
@@ -626,12 +631,13 @@ summary_Amara$Period <- factor(summary_Amara$Period, levels = c("Before", "After
 ggplot(summary_Amara, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Amara's Passing and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Amara's Passing and Activity", subtitle = "Raw Counts: Before = 2464, After = 800") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
                           axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
                           legend.position="bottom") +
   scale_fill_manual(values = rainbow(10)[sample(1:10)])
 
