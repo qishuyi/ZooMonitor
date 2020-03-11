@@ -426,7 +426,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 #Pistachio passed away on Dec 3, 2018
 #Squirt came to our zoo from another zoo on June 13, 2019
 
-#Damian's death
+##Damian's death
 Damian_before <- subset(sq_monkey_data, Date < "2018-02-23")
 Damian_before <- Damian_before %>% group_by(Activity)
 summary_Damian_before <- as.data.frame(summarise(Damian_before, n()))
@@ -465,7 +465,7 @@ ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
                           plot.title = element_text(hjust = 0.5)) +
   scale_fill_manual(values = rainbow(16))
 
-#Pistachio's death
+##Pistachio's death
 Pistachio_before <- subset(sq_monkey_data, Date < "2018-12-03")
 Pistachio_before <- Pistachio_before %>% group_by(Activity)
 summary_Pistachio_before <- as.data.frame(summarise(Pistachio_before, n()))
@@ -496,7 +496,7 @@ ggplot(summary_Pistachio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(p
                           plot.title = element_text(hjust = 0.5)) +
   scale_fill_manual(values = rainbow(27))
 
-#Squirt's arrival
+##Squirt's arrival
 Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
 Squirt_before <- Squirt_before %>% group_by(Activity)
 summary_Squirt_before <- as.data.frame(summarise(Squirt_before, n()))
