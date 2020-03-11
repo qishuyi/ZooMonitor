@@ -452,11 +452,12 @@ summary_Damian_after <- summary_Damian_after %>%
   mutate(Period = "After")
 
 summary_Damian <- rbind(summary_Damian_before, summary_Damian_amonth, summary_Damian_after)
-
+summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
+  
 ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Death and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
@@ -482,11 +483,12 @@ summary_Pistachio_after <- summary_Pistachio_after %>%
   mutate(Period = "After")
 
 summary_Pistachio <- rbind(summary_Pistachio_before, summary_Pistachio_after)
+summary_Pistachio$Period <- factor(summary_Pistachio$Period, levels = c("Before", "After"))
 
 ggplot(summary_Pistachio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Death and Activity") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Passing and Activity") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
@@ -512,6 +514,7 @@ summary_Squirt_after <- summary_Squirt_after %>%
   mutate(Period = "After")
 
 summary_Squirt <- rbind(summary_Squirt_before, summary_Squirt_after)
+summary_Squirt$Period <- factor(summary_Squirt$Period, levels = c("Before", "After"))
 
 ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
