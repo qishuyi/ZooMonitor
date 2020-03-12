@@ -57,8 +57,9 @@ weather_temp <- read_csv("Weather_Temperature.csv",
                                           WT08 = col_double(),
                                           WT09 = col_double(),
                                           WT11 = col_double()))
-                         
+
 weather_temp$DATE <- as.Date(weather_temp$DATE, format = "%m/%d/%y")
+names(weather_temp)[names(weather_temp) == "DATE"] <- "Date"
 weather_temp <- weather_temp %>% select(-c(STATION, NAME, TOBS))
 weather_temp <- weather_temp %>%
   mutate(TAVG_C = round((TAVG-32)*5/9)) %>%
@@ -67,8 +68,7 @@ weather_temp <- weather_temp %>%
 weather_temp <- weather_temp %>% slice(1:717)
 
 #Merge/Further Cleaning
-dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
-
+dogs_data <- left_join(dogs_data, weather_temp, by = "Date")
 ##Average of Average-max Temperature column and its temperature level
 dogs_data <- mutate(dogs_data, TAVG_TMAX_avg = (dogs_data$TMAX + dogs_data$TAVG)/2)
 dogs_data <- within(dogs_data, Temp_Level <- as.integer(cut(TAVG_TMAX_avg, quantile(TAVG_TMAX_avg, probs=0:10/10), include.lowest=TRUE)))
@@ -101,15 +101,13 @@ get_interval <- Vectorize(get_interval)
 dogs_data <- mutate(dogs_data, Six_Month_Interval = get_interval(Date))
 
 ##Add Column for weather type
-dogs_data$WT01[is.na(dogs_data$WT01)] <- 0
-dogs_data$WT03[is.na(dogs_data$WT03)] <- 0
-dogs_data$WT05[is.na(dogs_data$WT05)] <- 0
-dogs_data$WT08[is.na(dogs_data$WT08)] <- 0
-dogs_data$WT01 <- ifelse(dogs_data$WT01 == "1", "A", "0")
-dogs_data$WT03 <- ifelse(dogs_data$WT03 == "1", "B", "0")
-dogs_data$WT05 <- ifelse(dogs_data$WT05 == "1", "C", "0")
-dogs_data$WT08 <- ifelse(dogs_data$WT08 == "1", "D", "0")
-dogs_data$Weather_Type <- paste0(dogs_data$WT01, dogs_data$WT03, dogs_data$WT05, dogs_data$WT08)
+dogs_data <- select(dogs_data, c(-WT02, -WT06, -WT07, -WT09, -WT11))
+dogs_data$WT01 <- ifelse(is.na(dogs_data$WT01), "0", "A")
+dogs_data$WT03 <- ifelse(is.na(dogs_data$WT03), "0", "B")
+dogs_data$WT05 <- ifelse(is.na(dogs_data$WT05), "0", "C")
+dogs_data$WT08 <- ifelse(is.na(dogs_data$WT08), "0", "D")
+dogs_data$Weather_Type <- paste0(dogs_data$WT01, dogs_data$WT03, 
+                                 dogs_data$WT05, dogs_data$WT08)
 dogs_data$Weather_Type[dogs_data$Weather_Type == "0000"] <- 0
 dogs_data$Weather_Type[dogs_data$Weather_Type == "A000"] <- 1
 dogs_data$Weather_Type[dogs_data$Weather_Type == "0B00"] <- 2
