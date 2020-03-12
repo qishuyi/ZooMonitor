@@ -42,7 +42,22 @@ for(month in c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")){
 
 ##Temperature/Weather Columns
 #Cleaning weather_temp dataset
-weather_temp <- read_csv("Weather_Temperature.csv")
+weather_temp <- read_csv("Weather_Temperature.csv",
+                         col_types = cols(.default = col_character(),
+                                          TAVG = col_double(),
+                                          TMAX = col_double(),
+                                          TMIN = col_double(),
+                                          TOBS = col_double(),
+                                          WT01 = col_double(),
+                                          WT02 = col_double(),
+                                          WT03 = col_double(),
+                                          WT05 = col_double(),
+                                          WT06 = col_double(),
+                                          WT07 = col_double(),
+                                          WT08 = col_double(),
+                                          WT09 = col_double(),
+                                          WT11 = col_double()))
+                         
 weather_temp$DATE <- as.Date(weather_temp$DATE, format = "%m/%d/%y")
 weather_temp <- weather_temp %>% select(-c(STATION, NAME, TOBS))
 weather_temp <- weather_temp %>%
@@ -53,7 +68,6 @@ weather_temp <- weather_temp %>% slice(1:717)
 
 #Merge/Further Cleaning
 dogs_data <- left_join(dogs_data, weather_temp, by = c("Date" = "DATE"))
-dogs_data <- dogs_data %>% select(-c(WT02, WT06, WT07, WT09, WT11))
 
 ##Average of Average-max Temperature column and its temperature level
 dogs_data <- mutate(dogs_data, TAVG_TMAX_avg = (dogs_data$TMAX + dogs_data$TAVG)/2)
