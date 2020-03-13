@@ -32,7 +32,7 @@ sq_monkey_data <- sq_monkey_data %>% rename(Session_Start_Time = `Session Start 
                                       AOV_Social_Modifier = `All Occurrence Behavior Social Modifier`)
 
 
-#Creating a Duplicate Occurance Column
+#Creating a Duplicate Channel Type Column
 sq_monkey_data$Occurence_Duplicate <- sq_monkey_data$Channel_Type
 sq_monkey_data$Occurence_Duplicate[sq_monkey_data$Occurence_Duplicate == "Interval"] <- NA
 
