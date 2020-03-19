@@ -310,3 +310,23 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 * We see a larger proportion of "Sitting" after a certain event, but not clear what this explains.
 
+\
+
+### **Goal 3**
+
+***Comparison among animal datasets***
+
+
+### **Goal 4**
+
+***R Shiny app Prototype***
+
+##link to it
+
+
+
+
+
+
+
+
