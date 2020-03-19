@@ -81,7 +81,9 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 
 \
 
-### **Goal 1 (Visuals for Cattle)**
+### **Goal 1**
+
+***Visuals for Cattle***
 
 \
 
@@ -91,12 +93,65 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 \
 
 #### **Stereotypic Behaviors**
-*How often are stereotypic behaviors occurring?*
+*How often are they showing Stereoptypic behaviors?*
 
 \
 
 #### **Active vs. Inactive**
 *Are they spending more of their day active or inactive?*
+
+
+```{r Visual for Cattle Active vs. Inactive for individual cattles}
+##Common procedure
+cattle_data$Hour <- as.numeric(cattle_data$Hour)
+cattle_data$Category <- factor(cattle_data$Category, levels = c("Agonistic","Enrichment-based",
+                                                                "Exploratory & Feeding", 
+                                                                "Locomotion", "Maintenance", 
+                                                                "Social", "Stereotypic", 
+                                                                "Inactive", "Other"))
+label_coloring <- rep(c("forestgreen","maroon"), times = c(7,2))
+
+##plots ffor indivdual
+cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
+summary <- as.data.frame(summarise(cattle_data_grouped, n()))
+names(summary)[names(summary) == "n()"] <- "counts"
+summary <- summary %>% group_by(Name, Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR <- left_join(cattle_data, summary, by = c("Name", "Hour", "Category"))
+cattle_data_HR <- mutate(cattle_data_HR, percent = cattle_data_HR$counts/cattle_data_HR$sum*100)
+cattle_data_HR$percent <- round(cattle_data_HR$percent, digits = 1)
+cattle_data_HR$percent <- paste(cattle_data_HR$percent, "%")
+##Plots of category by cattle by hour by name
+#similar distribution
+ggplot(cattle_data_HR, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  theme(axis.title.x = element_blank()) + 
+  labs(title = "Bar Plot of Cattle's Behavior Category", subtitle = "Individuals", y="Counts") +
+  facet_grid(Name ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+```
+
+```{r Visual for Cattle Active vs. Inactive for all cattles}
+cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
+summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR2 <- left_join(cattle_data, summary2, by = c("Hour", "Category"))
+cattle_data_HR2 <- mutate(cattle_data_HR2, percent = cattle_data_HR2$counts/cattle_data_HR2$sum*100)
+cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
+cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
+ggplot(cattle_data_HR2, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Behavior Category", subtitle = "General", y="Counts") +
+  facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+```
+
+* Green = Active, Red = Inactive
+* Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
+* All individuals behave similarly throuout the day
+* Significantly few observations at 12pm and 4pm
 
 \
 
@@ -105,11 +160,30 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 
 \
 
+### **Goal 2**
 
+***Visuals for Squirrel Monkeys***
 
+\
 
+#### **Aggressive Behaviors**
+*How often are they showing Aggressive behaviors?*
+*Which one is showing this behavior the most?*
 
+\
 
+#### **Headspin**
+*How often are they showing Headspin?*
+*Is it one squirrel monkey being aggressive to all the others or is it one being picked on regularly?*
+
+\
+
+#### **Behaviors before/after an event**
+*Do the deaths/arrival of the animals have an impact on overall behaviors?*
+
+```{r}
+
+```
 
 
 
