@@ -185,6 +185,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 #### **Behaviors before/after an event**
 *Did the deaths of Damian and Pistachio have an impact on the monkeys' behaviors?*
+
 *Did the addition of Squirt have an impact on the monkeys' behaviors?*
 
 ```{r Visual for before and after the death of Damian}
