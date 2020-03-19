@@ -323,6 +323,19 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 ##link to it
 
+\
+
+### **Progress Reflection**
+
+\
+
+### **Goal Reflection**
+
+\
+
+### **Next Steps**
+
+
 
 
 
