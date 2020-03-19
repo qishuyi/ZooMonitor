@@ -3,9 +3,10 @@ library(readr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(lubridate)
 
 #Loading in Data
-animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1582236321.csv", 
+animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1579790635.csv", 
                            col_types = cols(.default = col_character(),
                                             SessionID = col_double(), 
                                             `Session Start Time` = col_datetime(format = ""),
@@ -87,7 +88,7 @@ for(k in names(animal_data)){
 
 
 if(length(Social_Modifier_Vector) == 1){
-  animal_data <- animal_data %>% rename(Social_Modifer = Social_Modifier_Vector[1])
+  animal_data <- animal_data %>% rename(Social_Modifier = Social_Modifier_Vector[1])
 
   } else if(length(Social_Modifier_Vector) > 1){
   animal_data <- animal_data %>% unite("Social_Modifier", Social_Modifier_Vector, remove = TRUE)

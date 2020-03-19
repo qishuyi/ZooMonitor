@@ -645,7 +645,7 @@ ggplot(summary_Amara, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perce
 ##JT's Death
 ###Impossible to investigate due to the absence of observations after his death (no data after 2020-02-01)
 
-################## (CATTLE) Agonistic Behavior Table
+################## (CATTLE) Agonistic Behavior Table + Visual
 cattle_agonistic <- cattle_data %>% filter(Category == "Agonistic") %>%
   select(Name, IC4_Social_Modifier, Activity, Date, Time) %>%
   mutate(Time = str_sub(Time, 1,5))
@@ -662,7 +662,7 @@ cattle_agonistic$Date <- format(cattle_agonistic$Date, format = "%B %d, %Y")
 
 formattable(cattle_agonistic, align = c("l", rep("c",3)))
 
-################## (MONKEY) Aggression/Attack Table
+################## (MONKEY) Aggression/Attack Table + Visual
 monkey_aggression <- sq_monkey_data %>% filter(Activity == "Aggression") %>%
   select(Name, AOV_Social_Modifier, Date, Time) %>%
   mutate(Time = str_sub(Time, 1, 5))
