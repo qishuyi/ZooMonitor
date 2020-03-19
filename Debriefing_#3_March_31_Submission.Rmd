@@ -330,12 +330,14 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 **1. Things that went well**
 
 * Effective work distribution (using Trello)
-* Effective use of R documents; we created an individual, but shared, R script to avoid the merge conflicts on Github
+* Effective use of R documents; we created an individual, but shared, R scripts to avoid the merge conflicts on Github
 * Creation of visuals
   + 25 new visuals were sent to our client
   + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
 * Creation of the generalized cleaning script
-  + Created a script that cleans any animal data in the same way, taking the differences among the datasets into account 
+  + Created a script that is compatible with any animal data set
+  + Takes the differences among the datasets into account and cleans any animal data in the same way 
+  
 * Meeting with our client 
   + She told us her more specific preference on the plots that would possibly be included in the program than the last meeting
   + We were able to envision the program soon after the meeting
