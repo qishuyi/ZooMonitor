@@ -25,6 +25,7 @@ library(grid)
 library(formattable)
 library(zoo)
 library(tibble)
+library(forcats)
 ```
 
 
@@ -149,6 +150,9 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 ```
 
 * Green = Active, Red = Inactive
+
+\
+
 * Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
 * All individuals behave similarly throuout the day
 * Significantly few observations at 12pm and 4pm
@@ -179,15 +183,130 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 \
 
 #### **Behaviors before/after an event**
-*Do the deaths/arrival of the animals have an impact on overall behaviors?*
+*Do the deaths/joining of the animals have an impact on overall behaviors?*
 
-```{r}
+```{r Visual for before and after the death of Damian}
+##Damian's death
+Damian_before <- subset(sq_monkey_data, Date < "2018-02-23")
+Damian_before <- Damian_before %>% group_by(Activity)
+summary_Damian_before <- as.data.frame(summarise(Damian_before, n()))
+names(summary_Damian_before)[names(summary_Damian_before) == "n()"] <- "counts"
+summary_Damian_before <- summary_Damian_before %>%
+  mutate(percent = round(counts/399*100, 1)) %>%
+  mutate(Period = "Before")
 
+Damian_amonth <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21")
+Damian_amonth <- Damian_amonth %>% group_by(Activity)
+summary_Damian_amonth <- as.data.frame(summarise(Damian_amonth, n()))
+names(summary_Damian_amonth)[names(summary_Damian_amonth) == "n()"] <- "counts"
+summary_Damian_amonth <- summary_Damian_amonth %>%
+  mutate(percent = round(counts/159*100, 1)) %>%
+  mutate(Period = "One month after")
+
+Damian_after <- subset(sq_monkey_data, Date > "2018-03-21")
+Damian_after <- Damian_after %>% group_by(Activity)
+summary_Damian_after <- as.data.frame(summarise(Damian_after, n()))
+names(summary_Damian_after)[names(summary_Damian_after) == "n()"] <- "counts"
+summary_Damian_after <- summary_Damian_after %>%
+  mutate(percent = round(counts/1962*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Damian <- rbind(summary_Damian_before, summary_Damian_amonth, summary_Damian_after)
+summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
+  
+ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity", subtitle = "Raw Counts: Before = 399, One month after = 159, After = 1962") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(16)[sample(1:16)])
 ```
 
+```{r Visual for before and after the death of Pistachio}
+##Pistachio's death
+Pistachio_before <- subset(sq_monkey_data, Date < "2018-12-03")
+Pistachio_before <- Pistachio_before %>% group_by(Activity)
+summary_Pistachio_before <- as.data.frame(summarise(Pistachio_before, n()))
+names(summary_Pistachio_before)[names(summary_Pistachio_before) == "n()"] <- "counts"
+summary_Pistachio_before <- summary_Pistachio_before %>%
+  mutate(percent = round(counts/760*100, 1)) %>%
+  mutate(Period = "Before")
 
+Pistachio_after <- subset(sq_monkey_data, Date >= "2018-12-03")
+Pistachio_after <- Pistachio_after %>% group_by(Activity)
+summary_Pistachio_after <- as.data.frame(summarise(Pistachio_after, n()))
+names(summary_Pistachio_after)[names(summary_Pistachio_after) == "n()"] <- "counts"
+summary_Pistachio_after <- summary_Pistachio_after %>%
+  mutate(percent = round(counts/1760*100, 1)) %>%
+  mutate(Period = "After")
 
+summary_Pistachio <- rbind(summary_Pistachio_before, summary_Pistachio_after)
+summary_Pistachio$Period <- factor(summary_Pistachio$Period, levels = c("Before", "After"))
 
+ggplot(summary_Pistachio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Passing and Activity", subtitle = "Raw Counts: Before = 760, After = 1760") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(27)[sample(1:27)])
+```
 
+```{r Visual for before and after the joining of Squirt}
+##Squirt's joining
+Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
+Squirt_before <- Squirt_before %>% group_by(Activity)
+summary_Squirt_before <- as.data.frame(summarise(Squirt_before, n()))
+names(summary_Squirt_before)[names(summary_Squirt_before) == "n()"] <- "counts"
+summary_Squirt_before <- summary_Squirt_before %>%
+  mutate(percent = round(counts/1296*100, 1)) %>%
+  mutate(Period = "Before")
 
+Squirt_after <- subset(sq_monkey_data, Date >= "2019-06-13")
+Squirt_after <- Squirt_after %>% group_by(Activity)
+summary_Squirt_after <- as.data.frame(summarise(Squirt_after, n()))
+names(summary_Squirt_after)[names(summary_Squirt_after) == "n()"] <- "counts"
+summary_Squirt_after <- summary_Squirt_after %>%
+  mutate(percent = round(counts/1224*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Squirt <- rbind(summary_Squirt_before, summary_Squirt_after)
+summary_Squirt$Period <- factor(summary_Squirt$Period, levels = c("Before", "After"))
+
+ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Joining and Activity", subtitle = "Raw Counts: Before = 1296, After = 1224") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(27)[sample(1:27)])
+```
+
+* Deaths/Joining information
+  + Damian passed away on Feb 22, 2018,
+  + Pistachio passed away on Dec 3, 2018
+  + Squirt came to the zoo on June 13, 2019
+* Included the raw counts of observations since they normally differ between before/after
+* Only Damian has the period "One month after" since only he had observations soon after his death.
+* Created the same plots for Painted African Dogs' death/birth since it was one of our client's initial interests. 
+
+\
+
+* We see a larger proportion of "Sitting" after a certain event, but not clear what this explains.
 
