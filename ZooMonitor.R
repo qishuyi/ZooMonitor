@@ -383,11 +383,15 @@ ggplot(data = cattle_positive) +
 
 
 ################## (CATTLE) Active/Inactive Visual (each cattle)
+
+##Common procedure
 cattle_data$Hour <- as.numeric(cattle_data$Hour)
 cattle_data$Category <- factor(cattle_data$Category, levels = c("Agonistic","Enrichment-based","Exploratory & Feeding", 
                                                                 "Locomotion", "Maintenance", "Social", "Stereotypic", 
                                                                 "Inactive", "Other"))
 label_coloring <- rep(c("forestgreen","maroon"), times = c(7,2))
+
+##plots ffor indivdual
 cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
 summary <- as.data.frame(summarise(cattle_data_grouped, n()))
 names(summary)[names(summary) == "n()"] <- "counts"
@@ -411,7 +415,7 @@ summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
 names(summary2)[names(summary2) == "n()"] <- "counts"
 summary2 <- summary2 %>% group_by(Hour) %>%
   mutate(sum = sum(counts))
-cattle_data_HR2 <- left_join(cattle_data, summary, by = c("Hour", "Category"))
+cattle_data_HR2 <- left_join(cattle_data, summary2, by = c("Hour", "Category"))
 cattle_data_HR2 <- mutate(cattle_data_HR2, percent = cattle_data_HR2$counts/cattle_data_HR2$sum*100)
 cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
 cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
