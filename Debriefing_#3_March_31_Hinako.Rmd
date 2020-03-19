@@ -1,30 +1,362 @@
 ---
-title: "Debriefing_#3_March_31_Hinako"
-author: "Riu Sakaguchi"
-date: "3/12/2020"
-output: html_document
+title: "Pueblo Zoo Monitor Debriefing #3"
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r Loading Libraries}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(formattable)
+library(zoo)
+library(tibble)
+library(forcats)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r Source}
+source("dogs_cleaning.R")
+source("cattle_cleaning.R")
+source("sq_monkey_cleaning.R")
+source("dogs_columns_addition.R")
+source("cattle_columns_addition.R")
+source("sq_monkey_columns_addition.R")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+\
+
+### **Goals**
+
+1. **Work with the Cattle data and answer the client's questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+2. **Work with another animal's data and answer the client’s questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+3. **Explore the differences in the structure of the animal datasets that we currently have.**
+    + Measured by the ability to articulate the differences during the next debriefing
+4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and the other animal** 
+    + Measured by a live demonstration during the next debriefing
+
+\
+
+### **Meeting with the Client**
+We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals and to interview her about the program.
+
+#### **Plots** 
+* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. This part of the meeting was mainly about the clarification of the plots.
+ 
+#### **Program** 
+* We then asked her her expectations for the program. Even though we had asked the same question before, since we had had a wider variety of plots than the last time, we were curious if her mind had changed.
+
+* Last time, she said she wanted the three plots that we sent her at the first meeting in the program:
+  + Behaviors throught the day
+  + Activeness throught the week
+  + Proportion of the behavior "Others" within the inactive behaviors
+
+* We suggested that we create an input bar in the program so that the user can choose the factor by which they facet the data, e.g., day of week, time of day, etc.
+* Agreeing on our suggestion, she requested that we put some more dedtailed plots into the program, such as:
+  + Distribution of observations (throughout the day of week/time of day)
+  + Percentage of each Behavior Category/Behavior for each individual
+  + Frequency of each Behavior (throughout the day of week/time of day/particular individual(s))
+  + Percentage of Behavior before/after a certain event
+
+*The detail about the program will be mentioned shortly.* 
+
+#### **Post Meeting**  
+
+* Finalized the plots and choice of inputs we put in the prototype program
+
+\
+
+### **Goal 1**
+
+***Visuals for Cattle***
+
+\
+
+#### **Agonistic Behaviors**
+*How often are they showing Agonistic behaviors?*
+
+\
+
+#### **Stereotypic Behaviors**
+*How often are they showing Stereoptypic behaviors?*
+
+\
+
+#### **Active vs. Inactive**
+*Are they spending more of their day active or inactive?*
+
+
+```{r Visual for Cattle Active vs. Inactive for individual cattles}
+##Common procedure
+cattle_data$Hour <- as.numeric(cattle_data$Hour)
+cattle_data$Category <- factor(cattle_data$Category, levels = c("Agonistic","Enrichment-based",
+                                                                "Exploratory & Feeding", 
+                                                                "Locomotion", "Maintenance", 
+                                                                "Social", "Stereotypic", 
+                                                                "Inactive", "Other"))
+label_coloring <- rep(c("forestgreen","maroon"), times = c(7,2))
+
+##plots ffor indivdual
+cattle_data_grouped <- group_by(cattle_data, Name, Hour, Category)
+summary <- as.data.frame(summarise(cattle_data_grouped, n()))
+names(summary)[names(summary) == "n()"] <- "counts"
+summary <- summary %>% group_by(Name, Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR <- left_join(cattle_data, summary, by = c("Name", "Hour", "Category"))
+cattle_data_HR <- mutate(cattle_data_HR, percent = cattle_data_HR$counts/cattle_data_HR$sum*100)
+cattle_data_HR$percent <- round(cattle_data_HR$percent, digits = 1)
+cattle_data_HR$percent <- paste(cattle_data_HR$percent, "%")
+##Plots of category by cattle by hour by name
+#similar distribution
+ggplot(cattle_data_HR, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  theme(axis.title.x = element_blank()) + 
+  labs(title = "Bar Plot of Cattle's Behavior Category", subtitle = "Individuals", y="Counts") +
+  facet_grid(Name ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+```
+
+```{r Visual for Cattle Active vs. Inactive for all cattles}
+cattle_data_grouped2 <- group_by(cattle_data, Hour, Category)
+summary2 <- as.data.frame(summarise(cattle_data_grouped2, n()))
+names(summary2)[names(summary2) == "n()"] <- "counts"
+summary2 <- summary2 %>% group_by(Hour) %>%
+  mutate(sum = sum(counts))
+cattle_data_HR2 <- left_join(cattle_data, summary2, by = c("Hour", "Category"))
+cattle_data_HR2 <- mutate(cattle_data_HR2, percent = cattle_data_HR2$counts/cattle_data_HR2$sum*100)
+cattle_data_HR2$percent <- round(cattle_data_HR2$percent, digits = 1)
+cattle_data_HR2$percent <- paste(cattle_data_HR2$percent, "%")
+ggplot(cattle_data_HR2, aes(x = Category, y = counts)) + 
+  geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
+  labs(x = "Behavior Category", subtitle = "General", y="Counts") +
+  facet_grid(. ~ Hour) +
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+```
+
+* Green = Active, Red = Inactive
+
+\
+
+* Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
+* All individuals behave similarly throuout the day
+* Significantly few observations at 12pm and 4pm
+
+\
+
+#### **Positive Behaviors**
+*Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?*
+
+\
+
+### **Goal 2**
+
+***Visuals for Squirrel Monkeys***
+
+\
+
+#### **Aggressive Behaviors**
+*How often are they showing Aggressive behaviors?*
+*Which one is showing this behavior the most?*
+
+\
+
+#### **Headspin**
+*How often are they showing Headspin?*
+*Is it one squirrel monkey being aggressive to all the others or is it one being picked on regularly?*
+
+\
+
+#### **Behaviors before/after an event**
+*Do the deaths/joining of the animals have an impact on overall behaviors?*
+
+```{r Visual for before and after the death of Damian}
+##Damian's death
+Damian_before <- subset(sq_monkey_data, Date < "2018-02-23")
+Damian_before <- Damian_before %>% group_by(Activity)
+summary_Damian_before <- as.data.frame(summarise(Damian_before, n()))
+names(summary_Damian_before)[names(summary_Damian_before) == "n()"] <- "counts"
+summary_Damian_before <- summary_Damian_before %>%
+  mutate(percent = round(counts/399*100, 1)) %>%
+  mutate(Period = "Before")
+
+Damian_amonth <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21")
+Damian_amonth <- Damian_amonth %>% group_by(Activity)
+summary_Damian_amonth <- as.data.frame(summarise(Damian_amonth, n()))
+names(summary_Damian_amonth)[names(summary_Damian_amonth) == "n()"] <- "counts"
+summary_Damian_amonth <- summary_Damian_amonth %>%
+  mutate(percent = round(counts/159*100, 1)) %>%
+  mutate(Period = "One month after")
+
+Damian_after <- subset(sq_monkey_data, Date > "2018-03-21")
+Damian_after <- Damian_after %>% group_by(Activity)
+summary_Damian_after <- as.data.frame(summarise(Damian_after, n()))
+names(summary_Damian_after)[names(summary_Damian_after) == "n()"] <- "counts"
+summary_Damian_after <- summary_Damian_after %>%
+  mutate(percent = round(counts/1962*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Damian <- rbind(summary_Damian_before, summary_Damian_amonth, summary_Damian_after)
+summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
+  
+ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity", subtitle = "Raw Counts: Before = 399, One month after = 159, After = 1962") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(16)[sample(1:16)])
+```
+
+```{r Visual for before and after the death of Pistachio}
+##Pistachio's death
+Pistachio_before <- subset(sq_monkey_data, Date < "2018-12-03")
+Pistachio_before <- Pistachio_before %>% group_by(Activity)
+summary_Pistachio_before <- as.data.frame(summarise(Pistachio_before, n()))
+names(summary_Pistachio_before)[names(summary_Pistachio_before) == "n()"] <- "counts"
+summary_Pistachio_before <- summary_Pistachio_before %>%
+  mutate(percent = round(counts/760*100, 1)) %>%
+  mutate(Period = "Before")
+
+Pistachio_after <- subset(sq_monkey_data, Date >= "2018-12-03")
+Pistachio_after <- Pistachio_after %>% group_by(Activity)
+summary_Pistachio_after <- as.data.frame(summarise(Pistachio_after, n()))
+names(summary_Pistachio_after)[names(summary_Pistachio_after) == "n()"] <- "counts"
+summary_Pistachio_after <- summary_Pistachio_after %>%
+  mutate(percent = round(counts/1760*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Pistachio <- rbind(summary_Pistachio_before, summary_Pistachio_after)
+summary_Pistachio$Period <- factor(summary_Pistachio$Period, levels = c("Before", "After"))
+
+ggplot(summary_Pistachio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistachio's Passing and Activity", subtitle = "Raw Counts: Before = 760, After = 1760") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(27)[sample(1:27)])
+```
+
+```{r Visual for before and after the joining of Squirt}
+##Squirt's joining
+Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
+Squirt_before <- Squirt_before %>% group_by(Activity)
+summary_Squirt_before <- as.data.frame(summarise(Squirt_before, n()))
+names(summary_Squirt_before)[names(summary_Squirt_before) == "n()"] <- "counts"
+summary_Squirt_before <- summary_Squirt_before %>%
+  mutate(percent = round(counts/1296*100, 1)) %>%
+  mutate(Period = "Before")
+
+Squirt_after <- subset(sq_monkey_data, Date >= "2019-06-13")
+Squirt_after <- Squirt_after %>% group_by(Activity)
+summary_Squirt_after <- as.data.frame(summarise(Squirt_after, n()))
+names(summary_Squirt_after)[names(summary_Squirt_after) == "n()"] <- "counts"
+summary_Squirt_after <- summary_Squirt_after %>%
+  mutate(percent = round(counts/1224*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Squirt <- rbind(summary_Squirt_before, summary_Squirt_after)
+summary_Squirt$Period <- factor(summary_Squirt$Period, levels = c("Before", "After"))
+
+ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Joining and Activity", subtitle = "Raw Counts: Before = 1296, After = 1224") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(27)[sample(1:27)])
+```
+
+* Deaths/Joining information
+  + Damian passed away on Feb 22, 2018,
+  + Pistachio passed away on Dec 3, 2018
+  + Squirt came to the zoo on June 13, 2019
+* Included the raw counts of observations since they normally differ between before/after
+* Only Damian has the period "One month after" since only he had observations soon after his death.
+* Created the same plots for Painted African Dogs' death/birth since it was one of our client's initial interests. 
+
+\
+
+* We see a larger proportion of "Sitting" after a certain event, but not clear what this explains.
+
+\
+
+### **Goal 3**
+
+***Comparison among animal datasets***
+
+
+### **Goal 4**
+
+***R Shiny app Prototype***
+
+##link to it
+
+\
+
+### **Progress Reflection**
+
+**1. Things that went well**
+
+* Effective work distribution (using Trello)
+* Effective use of R documents; we created an individual, but shared, R script to avoid the merge conflicts on Github
+* Creation of visuals
+  + 25 new visuals were sent to our client
+  + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
+* Creation of the generalized cleaning script
+  + Created a script that cleans any animal data in the same way, taking the differences among the datasets into account 
+* Meeting with our client 
+  + She told us her more specific preference on the plots that would possibly be included in the program than the last meeting
+  + We were able to envision the program soon after the meeting
+
+**2. Things that were difficult**
+
+* Plot creations
+  + It took time to figure out how to deal with the cases with extremely few observations
+  + Ended up creating a table for those ones
+* Pie chart aesthetics
+  + We had to choose between making the colors of the slice distinct to each other and sorting the slices by size (proportion)
+  + Ended up making the colors of the slice distinct to each other and putting the largest slice at the beginning
+  
+\
+
+### **Goal Reflection**
+
+\
+
+### **Next Steps**
+
+
+
+
