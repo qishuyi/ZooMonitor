@@ -1,30 +1,118 @@
 ---
-title: "Debriefing_#3_March_31_Hinako"
-author: "Riu Sakaguchi"
-date: "3/12/2020"
-output: html_document
+title: "Pueblo Zoo Monitor Debriefing #3"
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r Loading Libraries}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(formattable)
+library(zoo)
+library(tibble)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r Source}
+source("dogs_cleaning.R")
+source("cattle_cleaning.R")
+source("sq_monkey_cleaning.R")
+source("dogs_columns_addition.R")
+source("cattle_columns_addition.R")
+source("sq_monkey_columns_addition.R")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+\
+
+### **Goals**
+
+1. **Work with the Cattle data and answer the client's questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+2. **Work with another animal's data and answer the client’s questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+3. **Explore the differences in the structure of the animal datasets that we currently have.**
+    + Measured by the ability to articulate the differences during the next debriefing
+4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and the other animal** 
+    + Measured by a live demonstration during the next debriefing
+
+\
+
+### **Meeting with the Client**
+We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals and to interview her about the program.
+
+#### **Plots** 
+* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. This part of the meeting was mainly about the clarification of the plots.
+ 
+#### **Program** 
+* We then asked her her expectations for the program. Even though we had asked the same question before, since we had had a wider variety of plots than the last time, we were curious if her mind had changed.
+
+* Last time, she said she wanted the three plots that we sent her at the first meeting in the program:
+  + Behaviors throught the day
+  + Activeness throught the week
+  + Proportion of the behavior "Others" within the inactive behaviors
+
+* We suggested that we create an input bar in the program so that the user can choose the factor by which they facet the data, e.g., day of week, time of day, etc.
+* Agreeing on our suggestion, she requested that we put some more dedtailed plots into the program, such as:
+  + Distribution of observations (throughout the day of week/time of day)
+  + Percentage of each Behavior Category/Behavior for each individual
+  + Frequency of each Behavior (throughout the day of week/time of day/particular individual(s))
+  + Percentage of Behavior before/after a certain event
+
+*The detail about the program will be mentioned shortly.* 
+
+#### **Post Meeting**  
+
+* Finalized the plots and choice of inputs we put in the prototype program
+
+\
+
+### **Goal 1 (Visuals for Cattle)**
+
+\
+
+#### **Agonistic Behaviors**
+*How often are they showing Agonistic behaviors?*
+
+\
+
+#### **Stereotypic Behaviors**
+*How often are stereotypic behaviors occurring?*
+
+\
+
+#### **Active vs. Inactive**
+*Are they spending more of their day active or inactive?*
+
+\
+
+#### **Positive Behaviors**
+*Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?*
+
+\
+
+
+
+
+
+
+
+
+
+
+
+
