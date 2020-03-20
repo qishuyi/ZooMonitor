@@ -6,6 +6,7 @@ library(stringr)
 library(lubridate)
 library(shiny)
 library(ggplot2)
+library(forcats)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -298,14 +299,47 @@ server <- function(input, output) {
   })
   
   ############################### Pie Charts ###############################
-  
-
-  
-  
-  
-  
-  
-  }
+  output$event_pie_plot <- renderPlot({
+    #Creates a before dataset
+    before <- subset(animal_data, Date < input$date)
+    before <- before %>% group_by(Behavior)
+    summary_before <- as.data.frame(summarise(before, n()))
+    names(summary_before)[names(summary_before) == "n()"] <- "counts"
+    a_before <- nrow
+    summary_before <- summary_before %>%
+      mutate(Percent = round(counts/a_before*100, 1)) %>%
+      mutate(Period = "Before")
+    
+   #Creates an after dataset 
+    after <- subset(animal_data, Date > input$date)
+    after <- after %>% group_by(Behavior)
+    summary_after <- as.data.frame(summarise(after, n()))
+    names(summary_after)[names(summary_after) == "n()"] <- "counts"
+    a_after <- 
+    summary_after <- summary_after %>%
+      mutate(Percent = round(counts/a_after*100, 1)) %>%
+      mutate(Period = "After")
+    
+    #Combines two summaries
+    summary <- rbind(summary_before, summary_after)
+    summary$Period <- factor(summary$Period, levels = c("Before", "After"))
+    
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + geom_bar(stat="identity", width=1) +
+      facet_grid(.~ Period) +
+      coord_polar("y", start=0) + 
+      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors") +
+      guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+      theme_classic() + theme(axis.line = element_blank(),
+                              axis.text = element_blank(),
+                              axis.ticks = element_blank(),
+                              plot.title = element_text(hjust = 0.5, face = "bold"),
+                              plot.subtitle = element_text(face = "italic"),
+                              legend.position="bottom") +
+      scale_fill_manual(values = rainbow(10)[sample(1:10)])
+    
+    
+  })
+}
 
 # Run the application 
 shinyApp(ui = ui, server = server)
