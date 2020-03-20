@@ -261,24 +261,26 @@ server <- function(input, output) {
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue", width = .75) + 
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(limits = c(0,100)) +
-        labs(title = "Percentage of Observations (Per Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
+        labs(title = "Percentage of Observations (Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
         geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash")
-    } # Day of Week Plot 
+    } 
+    # Day of Week Plot 
     else if(input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue2", width = .75) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(limits = c(0,100)) +
-        labs(title = "Percentage of Observations (Per Day of Week)", x = "Day of Week", y = "Percentage (%)") +
+        labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
         geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
-    } #Animal Plot
+    } 
+    #Animal Plot
     else {
       a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
         scale_x_discrete(animal_data$Name) +
         scale_y_continuous(limits = c(0,100)) +
-        labs(title = "Percentage of Observations (Per Animal)", x = "Animal Name", y = "Percentage (%)") +
+        labs(title = "Percentage of Observations (Animal)", x = "Animal Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
     
