@@ -42,8 +42,8 @@ ui <- navbarPage("ZooMonitor",
                               # Add filters to take user inputs
                               sidebarPanel(
                                 # Allow users to choose the x-axis
-                                radioButtons("select_general", "Choose an input",
-                                             choices = list("Time of Day", "Day of Week", "Animal")
+                                radioButtons("select_general", "Choose an Input",
+                                             choices = list("Time of Day", "Day of Week", "Animal's Name")
                                              )
                               ),
                           mainPanel(
@@ -280,7 +280,7 @@ server <- function(input, output) {
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
         scale_x_discrete(animal_data$Name) +
         scale_y_continuous(limits = c(0,100)) +
-        labs(title = "Percentage of Observations (Animal)", x = "Animal Name", y = "Percentage (%)") +
+        labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
     
@@ -299,7 +299,13 @@ server <- function(input, output) {
   
   ############################### Pie Charts ###############################
   
-}
+
+  
+  
+  
+  
+  
+  }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
