@@ -6,6 +6,7 @@ library(stringr)
 library(lubridate)
 library(shiny)
 library(ggplot2)
+library(forcats)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -42,8 +43,8 @@ ui <- navbarPage("ZooMonitor",
                               # Add filters to take user inputs
                               sidebarPanel(
                                 # Allow users to choose the x-axis
-                                radioButtons("select_general", "Choose a period",
-                                             choices = list("Time of Day", "Day of Week")
+                                radioButtons("select_general", "Choose an Input",
+                                             choices = list("Time of Day", "Day of Week", "Animal's Name")
                                              )
                               ),
                           mainPanel(
@@ -254,20 +255,35 @@ server <- function(input, output) {
   
   ############################### General Observations ###############################
   ##Bar plot of observation distribution
-  output$selected_general <- renderText({input$select_general
-    
-  })
   output$general_plot <- renderPlot({
-    animal_data <- animal_data %>% group_by(Hour)
-    summary <- as.data.frame(summarise(animal_data, n()))
-    names(summary)[names(summary) == "n()"] <- "counts"
-    animal_data <- left_join(animal_data, summary, by = "Hour")
-    animal_data <- animal_data %>% mutate(Percentage = counts/nrow(animal_data)*100)
-    animal_data$Percentage <- round(animal_data$Percentage, digits = 1)
-    
-    ggplot(data = animal_data) + 
-    geom_bar(aes(x = input$select_general, y = ..count../nrow(animal_data)*100), fill = "steelblue", width = .75) +
-    labs(title = "Percentage of Observations", y = "Percentage (%)") 
+    #Time of Day plot
+    if(input$select_general == "Time of Day"){
+      ggplot(data = animal_data, aes(x = Hour)) + 
+        geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue", width = .75) + 
+        scale_x_discrete(limits = 9:16) +
+        scale_y_continuous(limits = c(0,100)) +
+        labs(title = "Percentage of Observations (Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
+        geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash")
+    } 
+    # Day of Week Plot 
+    else if(input$select_general == "Day of Week"){
+      ggplot(data = animal_data, aes(x = Day_of_Week)) +
+        geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue2", width = .75) +
+        scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
+        scale_y_continuous(limits = c(0,100)) +
+        labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
+        geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+    } 
+    #Animal Plot
+    else {
+      a <- length(unique(animal_data$Name))
+      ggplot(data = animal_data, aes(x = Name)) +
+        geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
+        scale_x_discrete(animal_data$Name) +
+        scale_y_continuous(limits = c(0,100)) +
+        labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
+        geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+    }
     
   })
   ############################### Category ###############################
@@ -283,7 +299,46 @@ server <- function(input, output) {
   })
   
   ############################### Pie Charts ###############################
-  
+  output$event_pie_plot <- renderPlot({
+    #Creates a before dataset
+    before <- subset(animal_data, Date < input$date)
+    before <- before %>% group_by(Behavior)
+    summary_before <- as.data.frame(summarise(before, n()))
+    names(summary_before)[names(summary_before) == "n()"] <- "counts"
+    a_before <- nrow
+    summary_before <- summary_before %>%
+      mutate(Percent = round(counts/a_before*100, 1)) %>%
+      mutate(Period = "Before")
+    
+   #Creates an after dataset 
+    after <- subset(animal_data, Date > input$date)
+    after <- after %>% group_by(Behavior)
+    summary_after <- as.data.frame(summarise(after, n()))
+    names(summary_after)[names(summary_after) == "n()"] <- "counts"
+    a_after <- 
+    summary_after <- summary_after %>%
+      mutate(Percent = round(counts/a_after*100, 1)) %>%
+      mutate(Period = "After")
+    
+    #Combines two summaries
+    summary <- rbind(summary_before, summary_after)
+    summary$Period <- factor(summary$Period, levels = c("Before", "After"))
+    
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + geom_bar(stat="identity", width=1) +
+      facet_grid(.~ Period) +
+      coord_polar("y", start=0) + 
+      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors") +
+      guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+      theme_classic() + theme(axis.line = element_blank(),
+                              axis.text = element_blank(),
+                              axis.ticks = element_blank(),
+                              plot.title = element_text(hjust = 0.5, face = "bold"),
+                              plot.subtitle = element_text(face = "italic"),
+                              legend.position="bottom") +
+      scale_fill_manual(values = rainbow(10)[sample(1:10)])
+    
+    
+  })
 }
 
 # Run the application 
