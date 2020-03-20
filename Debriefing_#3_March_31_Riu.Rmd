@@ -57,7 +57,7 @@ source("sq_monkey_columns_addition.R")
     + Measured by the posting of a link for people to test out the prototype R Shiny Program, alongside a set of bullet point comments describing the program  
 
 
-* These are the four goals our team worked on for Debriefing #3
+* We worked on the four goals listed above for Debriefing #3
 * For Goal 3 and Goal 4, we made slight modifications on how our progress can be measured, as debriefings are now deilivered in a written format
 
 
