@@ -1,7 +1,157 @@
 ---
 title: "Debriefing_#3_March_31_Riu"
-author: "Riu Sakaguchi"
-date: "3/12/2020"
-output: html_document
+output: 
+  html_document:
+    theme: yeti
+    toc: TRUE
+    toc_depth: 5
+    toc_float: TRUE
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+```{r Loading Libraries}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(magrittr)
+library(ggplot2)
+library(lubridate)
+library(gridExtra)
+library(grid)
+library(formattable)
+library(zoo)
+library(tibble)
+library(forcats)
+```
+
+
+```{r Source}
+source("dogs_cleaning.R")
+source("cattle_cleaning.R")
+source("sq_monkey_cleaning.R")
+source("dogs_columns_addition.R")
+source("cattle_columns_addition.R")
+source("sq_monkey_columns_addition.R")
+```
+
+\
+
+### **Goals**
+
+1. **Work with the Cattle data and answer the client's questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+    
+2. **Work with Squirrel Monkey data and answer the client’s questions regarding the animal**
+    + Measured by the creation of visualizations to send to the client
+    
+3. **Explore the differences in the structure of the animal datasets that we currently have.**
+    + ~~Measured by the ability to articulate the differences during the next debriefing~~
+    + Measured by the creation of a table accompanied by bullet point comments, both detailing the various differences 
+    
+4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys** 
+    + ~~Measured by a live demonstration during the next debriefing~~
+    + Measured by the posting of a link for people to test out the prototype R Shiny Program, alongside a set of bullet point comments describing the program  
+
+
+* These are the four goals our team worked on for Debriefing #3
+* For Goal 3 and Goal 4, we made slight modifications on how our progress can be measured, as debriefings are now deilivered in a written format
+
+
+\
+
+#### **Stereotypic Behaviors**
+*How often are they showing Stereoptypic behaviors?*
+
+```{r Table for Stereotypic Behaviors}
+
+cattle_stereotypic <- cattle_data %>% filter(Category == "Stereotypic") %>%
+  select(Name, Activity, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1,5))
+
+cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d, %Y")
+  
+
+formattable(cattle_stereotypic, align = c("l", rep("c",3)))
+
+```
+
+
+* Since there were only 5 observations in the data set where a cattle showed stereotypic behaviors, we decided to create a table instead of a visualization
+* The table depicts the name of the cattle showing the stereotypic behavior, the type of stereotypic behavior, as well as the date and time of when the behavior occured 
+* With only five cases, it appears as though cattles showing stereotypic behaviors is very rare 
+* Also, of the three cattles at the zoo, only two of them were ever observed showing stereotypic behaviors
+
+
+\
+
+#### **Positive Behaviors**
+*Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?*
+
+
+```{r (CATTLE) Positive Behavior Visual}
+
+#Creating Data Frame for Positive Behavior Visual
+cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
+  group_by(Name, Category) %>% 
+  summarize(Count = n()) 
+
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761, 692), times = c(4,4,4)))
+
+#Positive Behavior Visual
+ggplot(data = cattle_positive) +
+  geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
+  labs(title = "Barplot of Positive Behaviors per Cattle",
+       subtitle = "Percentages based on each cattle's total number of observations",
+       x = "Cattle", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.4)) +
+  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3")) 
+  
+
+```
+
+* The visualization illustrates the percentage of times for which each cattle was observed doing a positive behavior
+  + The percentages for each cattle are based on the total number of observations for that specific cattle
+  + For example, considering **only** Batik's observations, roughly 36% is of those observations are of a positive behavior
+* The visualization suggests that Batik spends the most time doing positive behaviors, followed by Patty, and then Chilly Jane
+* The coloring indicates that the composition that makes up the total percentage differs for each cattle
+  + Chilly Jane spends a lot more time doing locomotion behaviors than maintanance behaviors
+  + Patty spends a lot more time doing maintanence behaviors than locomotion behaviors
+ 
+\
+
+
+#### **Headspin**
+*Which animal is doing headspins and how often?*
+
+
+```{r (MONKEY) Headspins Visual }
+
+#Vector of total number of observations for each monkey
+
+obs_per_monkey <- c(638,234,594,620,256,178)
+
+#Barplot of Headspins (Percentage + Count)
+ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
+  labs(title = "Barplot of Head Spins per Monkey", 
+       subtitle = "Percentages based on each monkey's total number of observations",
+       x = "Monkey", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic")) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
+  geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
+            stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
+```
+
+
 
