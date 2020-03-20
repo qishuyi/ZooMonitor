@@ -43,13 +43,13 @@ ui <- navbarPage("ZooMonitor",
                               sidebarPanel(
                                 # Allow users to choose the x-axis
                                 radioButtons("select_general", "Choose a period",
-                                             choices = c("Time of Day" = "Hour", "Day of Week" = "Day_of_Week")
+                                             choices = list("Time of Day", "Day of Week")
                                              )
                               ),
                           mainPanel(
                             # Show the plot of general obervations
                             plotOutput("general_plot"),
-                            textOutput("selected_select_general")
+                            textOutput("selected_general")
                           ))),
                  
                  ############################### Category ###############################
@@ -254,11 +254,20 @@ server <- function(input, output) {
   
   ############################### General Observations ###############################
   ##Bar plot of observation distribution
+  output$selected_general <- renderText({input$select_general
+    
+  })
   output$general_plot <- renderPlot({
+    animal_data <- animal_data %>% group_by(Hour)
+    summary <- as.data.frame(summarise(animal_data, n()))
+    names(summary)[names(summary) == "n()"] <- "counts"
+    animal_data <- left_join(animal_data, summary, by = "Hour")
+    animal_data <- animal_data %>% mutate(Percentage = counts/nrow(animal_data)*100)
+    animal_data$Percentage <- round(animal_data$Percentage, digits = 1)
     
     ggplot(data = animal_data) + 
     geom_bar(aes(x = input$select_general, y = ..count../nrow(animal_data)*100), fill = "steelblue", width = .75) +
-    labs(title = "Percentage of Observations", x = "Period", y = "Percentage (%)") 
+    labs(title = "Percentage of Observations", y = "Percentage (%)") 
     
   })
   ############################### Category ###############################
@@ -279,6 +288,5 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
 
 
