@@ -5,6 +5,7 @@ library(tidyr)
 library(stringr)
 library(lubridate)
 library(shiny)
+library(ggplot2)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -42,12 +43,13 @@ ui <- navbarPage("ZooMonitor",
                               sidebarPanel(
                                 # Allow users to choose the x-axis
                                 radioButtons("select_general", "Choose a period",
-                                             choices = list("Time of Day", "Day of Week"),
-                                             selected = "Time of Day")
+                                             choices = c("Time of Day" = "Hour", "Day of Week" = "Day_of_Week")
+                                             )
                               ),
                           mainPanel(
                             # Show the plot of general obervations
-                            plotOutput("general_plot")
+                            plotOutput("general_plot"),
+                            textOutput("selected_select_general")
                           ))),
                  
                  ############################### Category ###############################
@@ -251,7 +253,14 @@ server <- function(input, output) {
   })
   
   ############################### General Observations ###############################
-  
+  ##Bar plot of observation distribution
+  output$general_plot <- renderPlot({
+    
+    ggplot(data = animal_data) + 
+    geom_bar(aes(x = input$select_general, y = ..count../nrow(animal_data)*100), fill = "steelblue", width = .75) +
+    labs(title = "Percentage of Observations", x = "Period", y = "Percentage (%)") 
+    
+  })
   ############################### Category ###############################
   
   ############################### Behavior ###############################
@@ -270,3 +279,6 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+
+
