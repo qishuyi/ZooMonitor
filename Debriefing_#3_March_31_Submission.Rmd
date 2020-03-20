@@ -99,7 +99,7 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 
 \
 
-#### **Active vs. Inactive**
+#### **Active vs. Inactive Behaviors**
 *Are they spending more of their day active or inactive?*
 
 
@@ -183,7 +183,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 \
 
-#### **Behaviors before/after an event**
+#### **Impact of Events on Behaviors**
 *Did the deaths of Damian and Pistachio have an impact on the monkeys' behaviors?*
 
 *Did the addition of Squirt have an impact on the monkeys' behaviors?*
