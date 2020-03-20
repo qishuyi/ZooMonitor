@@ -185,7 +185,8 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
 \
 
-* All four goals were feasible, but some goals took more time than others
+* We were able to successfully complete all four of our goals
+* All goals were feasible, but some goals took more time than others
 * The first two goals were fairly straightforward, even though we were working with a completely new data set
 * Since we had to explore the new data sets to complete the first two goals, the third goal was not troublesome
 * The prototype R Shiny Program was the most complicated, and required a lot of preparation beforehand 
