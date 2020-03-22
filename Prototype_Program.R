@@ -103,7 +103,9 @@ ui <- navbarPage("ZooMonitor",
                                         value = min(animal_data$Date), 
                                         min = min(animal_data$Date), 
                                         max = max(animal_data$Date)
-                              )),
+                              ),
+                              helpText("You can only choose a date from the imported dataset.")
+                            ),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot")
