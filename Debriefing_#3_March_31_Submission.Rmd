@@ -63,15 +63,13 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 #### **Program** 
 * We then asked her about her expectations for our final product, a program that will address all animals. Even though we had asked the same thing before, when we only had shown her some general plots, since we had created a wider variety of plots than then, we were curious if she had different ideas in mind. 
 
-* Last time, she said she wanted in the program the three plots that we sent her at the first meeting (2/6):
+* Last time, she requested the three plots that we sent her at the first meeting (2/6) to be in the program:
   + Behaviors throught the day (Frequency & Proportion)
   + Activeness throught the week (Frequency)
   + Proportion of the behavior "Others" within all inactive behaviors
 
-* We suggested that we create input sections in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
+* We suggested that we create the input sections in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
 * She agreed on this suggestion and requested that we put some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
-
-*Specific details regarding the program will be provided under Goal 4.* 
 
 #### **Post Meeting**  
 
@@ -84,6 +82,8 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 *Behavior Category is a variable that groups some similar behaviors.
   
 \
+
+*Specific details regarding the program will be provided under Goal 4.* 
 
 ### **Goal 1**
 
@@ -158,7 +158,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 * Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
 * All individuals behave similarly throuout the day
-* Significantly few observations at 12pm and 4pm
+* Significantly few observations at 12pm and 4pm, as in the Painted African Dogs' case
 
 \
 
@@ -307,9 +307,9 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Damian passed away on Feb 22, 2018,
   + Pistachio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
-* Included the raw counts of observations since they normally differ between before/after
+* Included the raw counts of observations since they normally differ significantly between before/after
 * Only Damian has the period "One month after" since only he had observations soon after his death.
-* Created the same plots for Painted African Dogs' death/birth since it was one of our client's initial interests. 
+* We also created the same plots for Painted African Dogs' death/birth and sent them to our client since it was one of her initial interests. 
 
 \
 
@@ -339,17 +339,16 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 **1. Things that went well**
 
 * Effective work distribution (using Trello)
-* Effective use of R documents; we created an individual, but shared, R scripts to avoid the merge conflicts on Github
-* Creation of visuals
+* Effective use of R documents; we created an individual, but shared, R scripts to avoid the possible merge conflicts on Github
+* Creation of the visuals
   + 25 visuals (Including some created for Debriefing #2) were sent to our client
   + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
 * Creation of the generalized cleaning script
-  + Created a script that is compatible with any animal data set
-  + Takes the differences among the datasets into account and cleans any animal data in the same way 
-  
+  + Created a script that is compatible with any animal's dataset
+  + This script takes the differences among the datasets into account and cleans any dataset in the same way 
 * Meeting with our client 
-  + She told us her more specific preference on the plots that would possibly be included in the program than the last meeting
-  + We were able to envision the program soon after the meeting
+  + She told us her more specific preferences on the plots that would possibly be included in the program than the last meeting
+  + We were able to envision the program soon after the meeting and decide the plots and inputs for each plot 
 
 **2. Things that were difficult**
 
