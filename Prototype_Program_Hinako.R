@@ -199,11 +199,15 @@ ui <- navbarPage("ZooMonitor",
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               dateInput("date", "Date of the event:",
-                                        value = NULL #TODO:add min/max
-                              )),
+                                        value = min(animal_data$Date),
+                                        min = min(animal_data$Date),
+                                        max = max(animal_data$Date)
+                              ),
+                              helpText("The date can only be chosen from the dataset you uploaded.")),
                             mainPanel(
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot")
+                              plotOutput("event_pie_plot"),
+                              h6("The colors of slices will change every time you change the date.", align = "center")
                             ))))
 
 # Define server logic
@@ -337,9 +341,7 @@ server <- function(input, output) {
                                           -DateTime, -Grid_Size, -Image_Size,
                                           -Project_Animals, -Duration, -Channel_Type)
     
-
     ####################### Addition
-    
     #Adding Day of Week
     animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
     
