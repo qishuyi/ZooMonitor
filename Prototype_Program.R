@@ -43,7 +43,7 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              radioButtons("select_general", "Choose an Input",
+                              radioButtons("select_general", "Distribution by:",
                                            choices = list("Time of Day", "Day of Week", "Animal's Name")
                               )
                             ),
@@ -104,12 +104,12 @@ ui <- navbarPage("ZooMonitor",
                                         min = min(animal_data$Date), 
                                         max = max(animal_data$Date)
                               ),
-                              helpText("You can only choose a date from the imported dataset.")
+                              helpText("You can only choose a date from the imported dataset.", align = "center")
                             ),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
-                              helpText("The colors of slices will change each time you render the plot.")
+                              h6("The colors of slices will change every time you change the date.", align = "center")
                             ))))
 
 # Define server logic
@@ -321,7 +321,7 @@ server <- function(input, output) {
     summary_after <- as.data.frame(summarise(after, n()))
     names(summary_after)[names(summary_after) == "n()"] <- "counts"
     a_after <- sum(summary_after$counts)
-      summary_after <- summary_after %>%
+    summary_after <- summary_after %>%
       mutate(Percent = round(counts/a_after*100, 1)) %>%
       mutate(Period = "After")
     
@@ -350,5 +350,6 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
 
 

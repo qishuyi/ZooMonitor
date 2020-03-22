@@ -43,7 +43,7 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              radioButtons("select_general", "Choose an Input",
+                              radioButtons("select_general", "Distribution by:",
                                            choices = list("Time of Day", "Day of Week", "Animal's Name")
                               )
                             ),
