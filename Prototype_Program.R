@@ -198,9 +198,9 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              dateInput("date", "Date of the event:", value = NULL
+                              uiOutput("dateControls")
                               ),
-                              helpText("Choose a date from the dataset you uploaded. (Today's date by default)")),
+                              helpText("The date can only be chosen from the dataset you uploaded."),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
@@ -364,7 +364,14 @@ server <- function(input, output) {
     facetedBarplots(input, output, animal_data)
     
     ############################### Pie Charts ###############################
-    piechart(input, output, animal_data)
+   output$dateControls <- renderUI({
+     date <- animal_data$Date
+     dateInput("date", "Date of the event:",
+     value = min(animal_data$Date),
+     min = min(animal_data$Date),
+     max = max(animal_data$Date))
+     })
+   piechart(input, output, animal_data)
     
     return(animal_data)
     
@@ -393,6 +400,13 @@ server <- function(input, output) {
   })
   
   ############################### Pie Charts ###############################
+  output$dateControls <- renderUI({
+    date <- animal_data$Date
+    dateInput("date", "Date of the event:",
+              value = min(animal_data$Date),
+              min = min(animal_data$Date),
+              max = max(animal_data$Date))
+    })
   piechart(input, output, animal_data)
 }
 
