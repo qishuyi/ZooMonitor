@@ -57,30 +57,32 @@ source("sq_monkey_columns_addition.R")
 We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals and to interview her about the program.
 
 #### **Plots** 
-* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. 
+* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. (These plots include the ones we have already presented in our last debriefing)
 * This part of the meeting was mainly about the clarification of the plots.
  
 #### **Program** 
-* We then asked her her expectations for the program. Even though we had asked the same question before, since we had had a wider variety of plots than the last time, we were curious if her mind had changed.
+* We then asked her about her expectations for our final product, a program that will address all animals. Even though we had asked the same thing before, when we only had shown her some general plots, since we had created a wider variety of plots than then, we were curious if she had different ideas in mind. 
 
-* Last time, she said she wanted the three plots that we sent her at the first meeting in the program:
-  + Behaviors throught the day
-  + Activeness throught the week
-  + Proportion of the behavior "Others" within the inactive behaviors
+* Last time, she said she wanted in the program the three plots that we sent her at the first meeting (2/6):
+  + Behaviors throught the day (Frequency & Proportion)
+  + Activeness throught the week (Frequency)
+  + Proportion of the behavior "Others" within all inactive behaviors
 
-* We suggested that we create an input bar in the program so that the user can choose the factor by which they facet the data, e.g., day of week, time of day, etc.
-* Agreeing on our suggestion, she requested that we put some more detailed plots into the program, such as:
-  + Distribution of observations (throughout the day of week/time of day)
-  + Percentage of each Behavior Category/Behavior for each individual
-  + Frequency of each Behavior (throughout the day of week/time of day/particular individual(s))
-  + Percentage of Behavior before/after a certain event
+* We suggested that we create input sections in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
+* She agreed on this suggestion and requested that we put some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
 
-*Specific detail regarding the program will be mentioned under Goal 4.* 
+*Specific details regarding the program will be provided under Goal 4.* 
 
 #### **Post Meeting**  
 
-* Finalized the plots and choice of inputs we put in the prototype program
-
+* Based on our client's request, we finalized the plots and choices of inputs we put in the prototype program:
+  + Distribution of observations (by day of week/time of day/individual's name)
+  + Percentage of a Behavior/Behaviors of users' choice per each individual animal
+  + Percentage of a *Behavior Category/Behavior Categories of users' choice per each individual animal
+  + Percentage of Behaviors before/after a certain event, e.g., death of the baby JT (in the Painted African Dogs' case)
+  
+*Behavior Category is a variable that groups some similar behaviors.
+  
 \
 
 ### **Goal 1**
