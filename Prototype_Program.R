@@ -200,7 +200,7 @@ ui <- navbarPage("ZooMonitor",
                               # Allow users to choose the x-axis
                               dateInput("date", "Date of the event:", value = NULL
                               ),
-                              helpText("The date can only be chosen from the dataset you uploaded.")),
+                              helpText("Choose a date from the dataset you uploaded. (Today's date by default)")),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
