@@ -39,19 +39,19 @@ ui <- navbarPage("ZooMonitor",
                           
                           titlePanel("Distribution of Observations"),
                           
-                            sidebarLayout(
-                              # Add filters to take user inputs
-                              sidebarPanel(
-                                # Allow users to choose the x-axis
-                                radioButtons("select_general", "Choose an Input",
-                                             choices = list("Time of Day", "Day of Week", "Animal's Name")
-                                             )
-                              ),
-                          mainPanel(
-                            # Show the plot of general obervations
-                            plotOutput("general_plot"),
-                            textOutput("selected_general")
-                          ))),
+                          sidebarLayout(
+                            # Add filters to take user inputs
+                            sidebarPanel(
+                              # Allow users to choose the x-axis
+                              radioButtons("select_general", "Choose an Input",
+                                           choices = list("Time of Day", "Day of Week", "Animal's Name")
+                              )
+                            ),
+                            mainPanel(
+                              # Show the plot of general obervations
+                              plotOutput("general_plot"),
+                              textOutput("selected_general")
+                            ))),
                  
                  ############################### Category ###############################
                  tabPanel("Category",
@@ -103,12 +103,13 @@ ui <- navbarPage("ZooMonitor",
                                         value = min(animal_data$Date), 
                                         min = min(animal_data$Date), 
                                         max = max(animal_data$Date)
-                            ),
-                            helpText("You can only choose a date from the imported dataset.")
+                              ),
+                              helpText("You can only choose a date from the imported dataset.", align = "center")
                             ),
                             mainPanel(
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot")
+                              plotOutput("event_pie_plot"),
+                              h6("The colors of slices will change every time you change the date.", align = "center")
                             ))))
 
 # Define server logic
@@ -328,18 +329,20 @@ server <- function(input, output) {
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
-    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + geom_bar(stat="identity", width=1) +
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+      geom_bar(stat="identity", width=1) +
       facet_grid(.~ Period) +
       coord_polar("y", start=0) + 
-      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors") +
+      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
+           subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after)) +
       guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
       theme_classic() + theme(axis.line = element_blank(),
                               axis.text = element_blank(),
                               axis.ticks = element_blank(),
                               plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(face = "italic"),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                               legend.position="bottom") +
-      scale_fill_manual(values = rainbow(10)[sample(1:10)])
+      scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     
     
   })
@@ -347,5 +350,4 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-
 
