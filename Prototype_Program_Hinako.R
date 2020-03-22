@@ -305,17 +305,17 @@ server <- function(input, output) {
     before <- before %>% group_by(Behavior)
     summary_before <- as.data.frame(summarise(before, n()))
     names(summary_before)[names(summary_before) == "n()"] <- "counts"
-    a_before <- nrow
+    a_before <- sum(summary_before$counts)
     summary_before <- summary_before %>%
       mutate(Percent = round(counts/a_before*100, 1)) %>%
       mutate(Period = "Before")
     
-   #Creates an after dataset 
+    #Creates an after dataset 
     after <- subset(animal_data, Date > input$date)
     after <- after %>% group_by(Behavior)
     summary_after <- as.data.frame(summarise(after, n()))
     names(summary_after)[names(summary_after) == "n()"] <- "counts"
-    a_after <- 
+    a_after <- sum(summary_after$counts)
     summary_after <- summary_after %>%
       mutate(Percent = round(counts/a_after*100, 1)) %>%
       mutate(Period = "After")
