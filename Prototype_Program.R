@@ -271,14 +271,14 @@ server <- function(input, output) {
         geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash")
     } 
     # Day of Week Plot 
-    else if(input$select_general == "Day of Week"){
+    else if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue2", width = .75) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
         geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
-    } 
+    }
     #Animal Plot
     else {
       a <- length(unique(animal_data$Name))
@@ -289,7 +289,6 @@ server <- function(input, output) {
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
-    
   })
   ############################### Category ###############################
   
