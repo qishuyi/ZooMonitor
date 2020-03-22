@@ -13,6 +13,8 @@ library(forcats)
 ### which uses dogs' data (line 97). To use another dataset, either upload the data file or change the 
 ### filepath in generalized_cleaning.R.
 
+# Helper functions to create plots
+
 ############################### General Observations ###############################
 generalplot <- function(input, output, animal_data) {
   ##Bar plot of observation distribution
@@ -27,25 +29,23 @@ generalplot <- function(input, output, animal_data) {
         geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash")
     } 
     # Day of Week Plot 
-    else if(input$select_general == "Day of Week"){
+    else if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "steelblue2", width = .75) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
         geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
-    } 
+    }
     #Animal Plot
     else {
       a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
-        scale_x_discrete(animal_data$Name) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
-    
   })
 }
 
@@ -72,7 +72,7 @@ piechart <- function(input, output, animal_data) {
     before <- before %>% group_by(Behavior)
     summary_before <- as.data.frame(summarise(before, n()))
     names(summary_before)[names(summary_before) == "n()"] <- "counts"
-    a_before <- nrow
+    a_before <- sum(summary_before$counts)
     summary_before <- summary_before %>%
       mutate(Percent = round(counts/a_before*100, 1)) %>%
       mutate(Period = "Before")
@@ -82,8 +82,8 @@ piechart <- function(input, output, animal_data) {
     after <- after %>% group_by(Behavior)
     summary_after <- as.data.frame(summarise(after, n()))
     names(summary_after)[names(summary_after) == "n()"] <- "counts"
-    a_after <- 
-      summary_after <- summary_after %>%
+    a_after <- sum(summary_after$counts)
+    summary_after <- summary_after %>%
       mutate(Percent = round(counts/a_after*100, 1)) %>%
       mutate(Period = "After")
     
@@ -91,18 +91,20 @@ piechart <- function(input, output, animal_data) {
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
-    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + geom_bar(stat="identity", width=1) +
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+      geom_bar(stat="identity", width=1) +
       facet_grid(.~ Period) +
       coord_polar("y", start=0) + 
-      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors") +
+      labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
+           subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after)) +
       guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
       theme_classic() + theme(axis.line = element_blank(),
                               axis.text = element_blank(),
                               axis.ticks = element_blank(),
                               plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(face = "italic"),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                               legend.position="bottom") +
-      scale_fill_manual(values = rainbow(10)[sample(1:10)])
+      scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     
     
   })
@@ -319,8 +321,7 @@ server <- function(input, output) {
       mutate(Behavior = gsub("_NA", "", Behavior)) 
     
     #Fixing NA labels for Social Modifier Column
-    animal_data <- animal_data %>% 
-      mutate(Social_Modifier = gsub("NA_", "", Social_Modifier)) %>%
+    animal_data <- animal_data %>% mutate(Social_Modifier = gsub("NA_", "", Social_Modifier)) %>%
       mutate(Social_Modifier = gsub("_NA", "", Social_Modifier)) 
     
     if(length(Social_Modifier_Vector) > 1){
@@ -368,13 +369,18 @@ server <- function(input, output) {
     
   })
   
+  ## Note: Everything below that's within the server function might be deleted in the final version,
+  ##       depending on whether we want to provide a default data file for the users.
+  
   ############################### General Observations ###############################
   generalplot(input, output, animal_data)
-  
+
   ############################### Category ###############################
+  # TODO: Create the reactive filter options here
   category(input, output, animal_data)
   
   ############################### Behavior ###############################
+  # TODO: Create the reactive filter options here
   behavior(input, output, animal_data)
   
   ############################### Faceted Barplots ###############################
