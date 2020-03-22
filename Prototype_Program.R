@@ -284,7 +284,6 @@ server <- function(input, output) {
       a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name)) +
         geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
-        scale_x_discrete(animal_data$Name) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
