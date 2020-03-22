@@ -198,10 +198,7 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              dateInput("date", "Date of the event:",
-                                        value = min(animal_data$Date),
-                                        min = min(animal_data$Date),
-                                        max = max(animal_data$Date)
+                              dateInput("date", "Date of the event:", value = NULL
                               ),
                               helpText("The date can only be chosen from the dataset you uploaded.")),
                             mainPanel(
