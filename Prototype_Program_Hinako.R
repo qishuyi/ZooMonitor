@@ -100,7 +100,7 @@ ui <- navbarPage("ZooMonitor",
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               dateInput("date", "Date of the event:",
-                                        value = NULL #TODO:add min/max
+                                        value = min(animal_data$Date), min = min(animal_data$Date), max = max(animal_data$Date)
                             )),
                             mainPanel(
                               # Show the plot of general obervations
