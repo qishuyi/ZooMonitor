@@ -656,11 +656,11 @@ cattle_agonistic <- cattle_data %>% filter(Category == "Agonistic") %>%
 
 ggplot(cattle_agonistic, aes(x=Name, fill=IC4_Social_Modifier)) +
   geom_bar(position = "stack", width = 0.4) +
-  labs(title = "Cattle showing agonistic behaviors", x = "Animal Name", y = "Frequency of agonistic behaviors", fill = "Social Modifier") + 
+  labs(title = "Cattle showing agonistic behaviors", x = "Animal Name", y = "Frequency of agonistic behaviors", fill = "Towards") + 
   scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3"))
 
 colnames(cattle_agonistic)[1] <- 'Cattle showing agonistic behavior'
-colnames(cattle_agonistic)[2] <- 'Social modifier'
+colnames(cattle_agonistic)[2] <- 'Towards'
 
 cattle_agonistic$Date <- format(cattle_agonistic$Date, format = "%B %d, %Y")
 
@@ -673,11 +673,11 @@ monkey_aggression <- sq_monkey_data %>% filter(Activity == "Aggression") %>%
 
 ggplot(monkey_aggression, aes(x=Name, fill=AOV_Social_Modifier)) +
   geom_bar(position = "stack", width = 0.4) +
-  labs(title = "Monkeys showing aggressive behaviors", x = "Animal Name", y = "Frequency of aggressive behaviors", fill = "Social Modifier") + 
+  labs(title = "Monkeys showing aggressive behaviors", x = "Animal Name", y = "Frequency of aggressive behaviors", fill = "Towards") + 
   scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan"))
 
 colnames(monkey_aggression)[1] <- 'Monkey showing aggressive behavior'
-colnames(monkey_aggression)[2] <- 'Social modifier'
+colnames(monkey_aggression)[2] <- 'Towards'
 
 monkey_aggression$Date <- format(monkey_aggression$Date, format = "%B %d, %Y")
 
