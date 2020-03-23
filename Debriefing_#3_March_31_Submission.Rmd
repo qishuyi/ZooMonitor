@@ -358,7 +358,11 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 * Pie chart aesthetics
   + We had to choose between making the colors of the slice distinct to each other and sorting the slices by size (proportion)
   + Ended up making the colors of the slice distinct to each other and putting the largest slice at the beginning
-  
+* Pie chart's inclusion/exclusion of the subject animal
+  + We discussed whether we should include the subject individual, the one who caused the event, in the pie chart or not. 
+  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion significantly.
+  + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
+  + Ended up INCLUDING it for now and asking our client in the next meeting if she want the excluded version. 
 \
 
 #### **Goal Reflection**
