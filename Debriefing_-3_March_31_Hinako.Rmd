@@ -57,33 +57,30 @@ source("sq_monkey_columns_addition.R")
 We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals and to interview her about the program.
 
 #### **Plots** 
-* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. (These plots include the ones we have already presented in our last debriefing)
-* This part of the meeting was mainly about the clarification of the plots.
+* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. This part of the meeting was mainly about the clarification of the plots.
  
 #### **Program** 
-* We then asked her about her expectations for our final product, a program that will address all animals. Even though we had asked the same thing before, when we only had shown her some general plots, since we had created a wider variety of plots than then, we were curious if she had different ideas in mind. 
+* We then asked her her expectations for the program. Even though we had asked the same question before, since we had had a wider variety of plots than the last time, we were curious if her mind had changed.
 
-* Last time, she requested the three plots that we sent her at the first meeting (2/6) to be in the program:
-  + Behaviors throught the day (Frequency & Proportion)
-  + Activeness throught the week (Frequency)
-  + Proportion of the behavior "Others" within all inactive behaviors
+* Last time, she said she wanted the three plots that we sent her at the first meeting in the program:
+  + Behaviors throught the day
+  + Activeness throught the week
+  + Proportion of the behavior "Others" within the inactive behaviors
 
-* We suggested that we create the input sections in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
-* She agreed on this suggestion and requested that we put some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
+* We suggested that we create an input bar in the program so that the user can choose the factor by which they facet the data, e.g., day of week, time of day, etc.
+* Agreeing on our suggestion, she requested that we put some more dedtailed plots into the program, such as:
+  + Distribution of observations (throughout the day of week/time of day)
+  + Percentage of each Behavior Category/Behavior for each individual
+  + Frequency of each Behavior (throughout the day of week/time of day/particular individual(s))
+  + Percentage of Behavior before/after a certain event
+
+*The detail about the program will be mentioned shortly.* 
 
 #### **Post Meeting**  
 
-* Based on our client's request, we finalized the plots and choices of inputs we put in the prototype program:
-  + Distribution of observations (by day of week/time of day/individual's name)
-  + Percentage of a Behavior/Behaviors of users' choice per each individual animal
-  + Percentage of a *Behavior Category/Behavior Categories of users' choice per each individual animal
-  + Percentage of Behaviors before/after a certain event, e.g., death of the baby JT (in the Painted African Dogs' case)
-  
-*Behavior Category is a variable that groups some similar behaviors.
-  
-\
+* Finalized the plots and choice of inputs we put in the prototype program
 
-*Specific details regarding the program will be provided under Goal 4.* 
+\
 
 ### **Goal 1**
 
@@ -101,7 +98,7 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 
 \
 
-#### **Active vs. Inactive Behaviors**
+#### **Active vs. Inactive**
 *Are they spending more of their day active or inactive?*
 
 
@@ -158,7 +155,7 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 * Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
 * All individuals behave similarly throuout the day
-* Significantly few observations at 12pm and 4pm, as in the Painted African Dogs' case
+* Significantly few observations at 12pm and 4pm
 
 \
 
@@ -174,21 +171,19 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 \
 
 #### **Aggressive Behaviors**
-*Is it one squirrel monkey being aggressive to all the others or is it one being picked on regularly?*
-
+*How often are they showing Aggressive behaviors?*
+*Which one is showing this behavior the most?*
 
 \
 
 #### **Headspin**
-*Which animal is doing headspins and how often?*
-
+*How often are they showing Headspin?*
+*Is it one squirrel monkey being aggressive to all the others or is it one being picked on regularly?*
 
 \
 
-#### **Impact of Events on Behaviors**
-*Did the deaths of Damian and Pistachio have an impact on the monkeys' behaviors?*
-
-*Did the addition of Squirt have an impact on the monkeys' behaviors?*
+#### **Behaviors before/after an event**
+*Do the deaths/joining of the animals have an impact on overall behaviors?*
 
 ```{r Visual for before and after the death of Damian}
 ##Damian's death
@@ -307,9 +302,9 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Damian passed away on Feb 22, 2018,
   + Pistachio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
-* Included the raw counts of observations since they normally differ significantly between before/after
+* Included the raw counts of observations since they normally differ between before/after
 * Only Damian has the period "One month after" since only he had observations soon after his death.
-* We also created the same plots for Painted African Dogs' death/birth and sent them to our client since it was one of her initial interests. 
+* Created the same plots for Painted African Dogs' death/birth since it was one of our client's initial interests. 
 
 \
 
@@ -330,25 +325,20 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 \
 
-### **Reflection and Discussion**
-
-\
-
-#### **Progress Reflection**
+### **Progress Reflection**
 
 **1. Things that went well**
 
 * Effective work distribution (using Trello)
-* Effective use of R documents; we created an individual, but shared, R scripts to avoid the possible merge conflicts on Github
-* Creation of the visuals
-  + 25 visuals (Including some created for Debriefing #2) were sent to our client
+* Effective use of R documents; we created an individual, but shared, R script to avoid the merge conflicts on Github
+* Creation of visuals
+  + 25 new visuals were sent to our client
   + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
 * Creation of the generalized cleaning script
-  + Created a script that is compatible with any animal's dataset
-  + This script takes the differences among the datasets into account and cleans any dataset in the same way 
+  + Created a script that cleans any animal data in the same way, taking the differences among the datasets into account 
 * Meeting with our client 
-  + She told us her more specific preferences on the plots that would possibly be included in the program than the last meeting
-  + We were able to envision the program soon after the meeting and decide the plots and inputs for each plot 
+  + She told us her more specific preference on the plots that would possibly be included in the program than the last meeting
+  + We were able to envision the program soon after the meeting
 
 **2. Things that were difficult**
 
@@ -358,23 +348,14 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 * Pie chart aesthetics
   + We had to choose between making the colors of the slice distinct to each other and sorting the slices by size (proportion)
   + Ended up making the colors of the slice distinct to each other and putting the largest slice at the beginning
-* Pie chart's inclusion/exclusion of the subject animal
-  + We discussed whether we should include the subject individual, the one who caused the event, in the pie chart or not. 
-  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion significantly.
-  + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
-  + Ended up INCLUDING it for now and asking our client in the next meeting if she want the excluded version. 
+  
 \
 
-#### **Goal Reflection**
+### **Goal Reflection**
 
 \
 
-#### **Next Steps**
-
-
-
-
-
+### **Next Steps**
 
 
 

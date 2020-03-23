@@ -149,7 +149,9 @@ ui <- navbarPage("ZooMonitor",
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general")
+                              textOutput("selected_general"),
+                              h6("The dash line represents equally distributed observations.", align = "center")
+                              
                             ))),
                  
                  ############################### Category ###############################
@@ -198,10 +200,15 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              dateInput("date", "Date of the event:", value = NULL
-                              ),
-                              helpText("Choose a date from the dataset you uploaded. (Today's date by default)")),
+                              uiOutput("dateControls"),
+                              helpText("The date can only be chosen from the dataset you uploaded.")
+                            ),
                             mainPanel(
+                              #Removing the warning message that appears for a second 
+                              #This is a warning for not having either pie chart of before or after on the min/max date
+                              tags$style(type="text/css",
+                                         ".shiny-output-error { visibility: hidden; }",
+                                         ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
                               h6("The colors of slices will change every time you change the date.", align = "center")
@@ -364,6 +371,13 @@ server <- function(input, output) {
     facetedBarplots(input, output, animal_data)
     
     ############################### Pie Charts ###############################
+    output$dateControls <- renderUI({
+      date <- animal_data$Date
+      dateInput("date", "Date of the event:",
+                value = min(animal_data$Date),
+                min = min(animal_data$Date),
+                max = max(animal_data$Date))
+    })
     piechart(input, output, animal_data)
     
     return(animal_data)
@@ -393,9 +407,15 @@ server <- function(input, output) {
   })
   
   ############################### Pie Charts ###############################
+  output$dateControls <- renderUI({
+    date <- animal_data$Date
+    dateInput("date", "Date of the event:",
+              value = min(animal_data$Date),
+              min = min(animal_data$Date),
+              max = max(animal_data$Date))
+  })
   piechart(input, output, animal_data)
 }
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-

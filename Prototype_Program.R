@@ -149,7 +149,9 @@ ui <- navbarPage("ZooMonitor",
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general")
+                              textOutput("selected_general"),
+                              h6("The dash line represents equally distributed observations.", align = "center")
+                            
                             ))),
                  
                  ############################### Category ###############################
@@ -202,6 +204,11 @@ ui <- navbarPage("ZooMonitor",
                               helpText("The date can only be chosen from the dataset you uploaded.")
                             ),
                             mainPanel(
+                              #Removing the warning message that appears for a second 
+                              #This is a warning for not having either pie chart of before or after on the min/max date
+                              tags$style(type="text/css",
+                                         ".shiny-output-error { visibility: hidden; }",
+                                         ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
                               h6("The colors of slices will change every time you change the date.", align = "center")
