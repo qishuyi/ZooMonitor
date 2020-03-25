@@ -51,7 +51,7 @@ generalplot <- function(input, output, animal_data) {
 
 ############################### Category ###############################
 category <- function(input, output, animal_data) {
-  # TODO: Create plot here
+  
 }
 
 ############################### Behavior ###############################
@@ -169,12 +169,13 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Behavior ###############################
                  tabPanel("Behavior",
                           
-                          titlePanel("Placeholder for title 3"),
+                          titlePanel("Barplot of Chosen Behaviors per Animal"),
                           sidebarPanel(
-                            # TODO: Add filters here to get user inputs
+                            uiOutput("select_behavior")
+                            
                           ),
                           mainPanel(
-                            # TODO: Create plots here
+                            plotOutput(outputId = "behavior_output")
                           )
                  ),
                  
@@ -355,10 +356,9 @@ server <- function(input, output) {
     generalplot(input, output, animal_data)
     
     ############################### Category ###############################
-    # TODO: Create the reactive filter options here
     
     output$select_category <- renderUI({
-      category <- unique(animal_data$Category)
+      category <- sort(unique(animal_data$Category))
       checkboxGroupInput(inputId = "category_input", 
                          label= "Select Categories",
                          choices = category)
@@ -366,11 +366,20 @@ server <- function(input, output) {
     })
    
     
-    #Creates Barplots based on Chosen Behavior
+    #Creates Barplots based on Chosen Category
     category(input, output, animal_data)
     
     ############################### Behavior ###############################
-    # TODO: Create the reactive filter options here
+    
+    output$select_behavior <- renderUI({
+      behavior_options <- sort(unique(animal_data$Behavior))
+      checkboxGroupInput(inputId = "behavior_input",
+                         label = "Select Behaviors",
+                         choices = behavior_options)
+      
+    })
+    
+    #Creates Barplots based on Chosen Behavior
     behavior(input, output, animal_data)
     
     ############################### Faceted Barplots ###############################
@@ -403,17 +412,29 @@ server <- function(input, output) {
   generalplot(input, output, animal_data)
   
   ############################### Category ###############################
-  # TODO: Create the reactive filter options here
+  
   output$select_category <- renderUI({
-    category <- unique(animal_data$Category)
+    category_options <- sort(unique(animal_data$Category))
     checkboxGroupInput(inputId = "category_input", 
                        label= "Select Categories",
-                       choices = category)
+                       choices = category_options)
     
   })
   
+  #Creates Barplots based on Chosen Category
+  category(input, output, animal_data)
+  
   ############################### Behavior ###############################
-  # TODO: Create the reactive filter options here
+  
+  output$select_behavior <- renderUI({
+    behavior_options <- sort(unique(animal_data$Behavior))
+    checkboxGroupInput(inputId = "behavior_input",
+                       label = "Select Behaviors",
+                       choices = behavior_options)
+    
+  })
+  
+  #Creates Barplots based on Chosen Behavior
   behavior(input, output, animal_data)
   
   ############################### Faceted Barplots ###############################
