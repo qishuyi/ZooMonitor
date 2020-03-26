@@ -7,6 +7,7 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
+library(DT)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -51,12 +52,237 @@ generalplot <- function(input, output, animal_data) {
 
 ############################### Category ###############################
 category <- function(input, output, animal_data) {
-  # TODO: Create plot here
+  
+  #Reactive Category Visual
+  output$category_visual <- renderPlot({
+    
+    #Data frame to create visualization
+    animal_data$Category <- as.factor(animal_data$Category)
+    animal_category <- animal_data %>% 
+      group_by(Name, Category, .drop = FALSE) %>%
+      summarize(Count = n()) %>%
+      filter(Category %in% input$category_input) %>%
+      arrange(Name)
+    
+    #Counts total observations per animal
+    animal_count <- numeric()
+    for(i in sort(unique(animal_data$Name))){
+      count <- sum(animal_data$Name == i)
+      animal_count <- append(animal_count, count)
+    }
+    
+    #Adding percentages column to the "visualization" data frame 
+    animal_category <- animal_category %>% 
+      cbind(Percentage = animal_category$Count/ rep(animal_count,
+                                                    times = rep(length(input$category_input), length(animal_count))))
+    
+    #Creating the visualization
+    ggplot(data = animal_category) +
+      geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
+      labs(title = "Barplot of Selected Categories per Animal",
+           subtitle = "Percentages based on each animal's total number of observations",
+           x = "Animal Name", y = "Percentage") +
+      theme(plot.title = element_text(size = 12, face = "bold"),
+            plot.subtitle = element_text(size = 9, face = "italic"),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 8)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                         limits = c(0,1))
+    
+  })
+  
+  
+  #Reactive Category Table
+  output$category_table <- renderTable({
+    
+    if(length(input$category_input) == 0){
+      animal_category_table <- data.frame()
+      
+    } else {
+      
+      animal_data$Category <- as.factor(animal_data$Category)
+      animal_category_table <- animal_data %>% 
+        group_by(Name, Category, .drop = FALSE) %>%
+        summarize(Count = n()) %>%
+        filter(Category %in% input$category_input) %>%
+        arrange(Name)
+      
+      
+      animal_count <- numeric()
+      for(i in sort(unique(animal_data$Name))){
+        count <- sum(animal_data$Name == i)
+        animal_count <- append(animal_count, count)
+      }
+      
+      animal_category_table <- animal_category_table %>% 
+        cbind(Percentage = animal_category_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$category_input), length(animal_count))))
+      
+      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 4), nsmall = 4)
+      
+      return(animal_category_table)
+      
+    }
+    
+  })
+  
+  #Reactive Raw Category Table
+  output$raw_category_table <- renderTable({
+    
+    total_observations <- 0
+    
+    for(i in input$category_input){
+      total_observations <- total_observations + sum(animal_data$Category == i)
+    }
+    
+    if(total_observations <= 15 & total_observations != 0){
+      
+      output$category_text <- renderText({
+        ""
+      })
+      
+      animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
+        select(Name, Category, Behavior, Date, Time) %>%
+        mutate(Time = str_sub(Time, 1,5))
+      
+      
+      
+      animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+      
+      return(animal_raw_category_table)
+      
+    } else {
+      
+      output$category_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected categories"})
+      
+      animal_raw_category_table <- data.frame()
+      return(animal_raw_category_table)
+      
+    }
+    
+  })
+  
+  
+  
 }
+
 
 ############################### Behavior ###############################
 behavior <- function(input, output, animal_data) {
-  # TODO: Create plot here
+  
+  #Reactive Behavior Visual
+  output$behavior_visual <- renderPlot({
+    
+    #Data frame to create visualization
+    animal_data$Behavior <- as.factor(animal_data$Behavior)
+    animal_behavior <- animal_data %>% 
+      group_by(Name, Behavior, .drop = FALSE) %>%
+      summarize(Count = n()) %>%
+      filter(Behavior %in% input$behavior_input) %>%
+      arrange(Name)
+    
+    
+    #Counts total observations per animal
+    animal_count <- numeric()
+    for(i in sort(unique(animal_data$Name))){
+      count <- sum(animal_data$Name == i)
+      animal_count <- append(animal_count, count)
+    }
+    
+    #Adding percentages column to the "visualization" data frame 
+    animal_behavior <- animal_behavior %>% 
+      cbind(Percentage = animal_behavior$Count/ rep(animal_count,
+                                                    times = rep(length(input$behavior_input), length(animal_count))))
+    
+    
+    #Creating the visualization
+    ggplot(data = animal_behavior) +
+      geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
+      labs(title = "Barplot of Selected Behaviors per Animal",
+           subtitle = "Percentages based on each animal's total number of observations",
+           x = "Animal Name", y = "Percentage") +
+      theme(plot.title = element_text(size = 12, face = "bold"),
+            plot.subtitle = element_text(size = 9, face = "italic"),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 8)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                         limits = c(0,1))
+    
+    
+  })
+  
+  #Reactive Behavior Table
+  output$behavior_table <- renderTable({
+    
+    if(length(input$behavior_input) == 0){
+      animal_behavior_table <- data.frame()
+      
+    } else{
+      
+      animal_data$Behavior <- as.factor(animal_data$Behavior)
+      animal_behavior_table <- animal_data %>% 
+        group_by(Name, Behavior, .drop = FALSE) %>%
+        summarize(Count = n()) %>%
+        filter(Behavior %in% input$behavior_input) %>%
+        arrange(Name)
+      
+      animal_count <- numeric()
+      for(i in sort(unique(animal_data$Name))){
+        count <- sum(animal_data$Name == i)
+        animal_count <- append(animal_count, count)
+      }
+      
+      animal_behavior_table <- animal_behavior_table %>% 
+        cbind(Percentage = animal_behavior_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$behavior_input), length(animal_count))))
+      
+      
+      animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 4), nsmall = 4)
+      
+      return(animal_behavior_table)
+      
+      
+      
+    }
+    
+  })
+  
+  
+  #Reactive Raw Behavior Table
+  
+  output$raw_behavior_table <- renderTable({
+    
+    total_observations <- 0
+    
+    for(i in input$behavior_input){
+      total_observations <- total_observations + sum(animal_data$Behavior == i)
+    }
+    
+    
+    if(total_observations <= 15 & total_observations != 0){
+      
+      output$behavior_text <- renderText({""})
+      
+      animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
+        select(Name, Category, Behavior, Date, Time) %>%
+        mutate(Time = str_sub(Time, 1,5))
+      
+      animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+      
+      return(animal_raw_behavior_table)
+      
+    } else {
+      
+      output$behavior_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected behaviors"})
+      
+      animal_raw_behavior_table <- data.frame()
+      return(animal_raw_behavior_table)
+      
+    }
+    
+  })
+  
+  
 }
 
 ############################### Faceted Barplots ###############################
@@ -148,7 +374,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
-                          titlePanel("Upload a csv file"),
+                          titlePanel("Upload a CSV file"),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
@@ -162,7 +388,7 @@ ui <- navbarPage("ZooMonitor",
                             ),
                             # Display the data file
                             mainPanel(
-                              tableOutput("contents")
+                              dataTableOutput("contents")
                             ))),
                  
                  ############################### General Observations ###############################
@@ -189,24 +415,40 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Category ###############################
                  tabPanel("Category",
                           
-                          titlePanel("Placeholder for title 2"),
+                          titlePanel("Infographics of Chosen Categories per Animal"),
                           sidebarPanel(
-                            # TODO: Add filters here to get user inputs
+                            uiOutput("select_category")
+                            
                           ),
                           mainPanel(
-                            # TODO: Show plots here
-                          )),
+                            tabsetPanel(
+                              
+                              tabPanel("Visual", plotOutput(outputId = "category_visual")),
+                              tabPanel("Summary Table", tableOutput(outputId = "category_table")),
+                              tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
+                                       textOutput(outputId = "category_text"))
+                              
+                              
+                            ))),
                  
                  ############################### Behavior ###############################
                  tabPanel("Behavior",
                           
-                          titlePanel("Placeholder for title 3"),
+                          titlePanel("Infographics of Chosen Behaviors per Animal"),
                           sidebarPanel(
-                            # TODO: Add filters here to get user inputs
+                            uiOutput("select_behavior")
+                            
                           ),
                           mainPanel(
-                            # TODO: Create plots here
-                          )
+                            tabsetPanel(
+                              
+                              tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
+                              tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
+                              tabPanel("Raw Table", tableOutput(outputId = "raw_behavior_table"),
+                                       textOutput(outputId = "behavior_text"))
+                              
+                              
+                            ))
                  ),
                  
                  ############################### Faceted Barplot ###############################
@@ -253,7 +495,7 @@ server <- function(input, output) {
   source("generalized_cleaning.R")
   
   ############################### Upload Data ###############################
-  output$contents <- renderTable({
+  output$contents <- renderDT({
     
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
     # If input$file1 is unavailable, req will throw an exception.
@@ -387,11 +629,28 @@ server <- function(input, output) {
     generalplot(input, output, animal_data)
     
     ############################### Category ###############################
-    # TODO: Create the reactive filter options here
+    output$select_category <- renderUI({
+      category <- sort(unique(animal_data$Category))
+      checkboxGroupInput(inputId = "category_input", 
+                         label= "Select Categories",
+                         choices = category)
+      
+    })
+    
+    
+    #Creates Infographics based on Chosen Categories
     category(input, output, animal_data)
     
     ############################### Behavior ###############################
-    # TODO: Create the reactive filter options here
+    output$select_behavior <- renderUI({
+      behavior_options <- sort(unique(animal_data$Behavior))
+      checkboxGroupInput(inputId = "behavior_input",
+                         label = "Select Behaviors",
+                         choices = behavior_options)
+      
+    })
+    
+    #Creates Infographics based on Chosen Behaviors
     behavior(input, output, animal_data)
     
     ############################### Faceted Barplots ###############################
@@ -435,11 +694,27 @@ server <- function(input, output) {
   generalplot(input, output, animal_data)
   
   ############################### Category ###############################
-  # TODO: Create the reactive filter options here
+  output$select_category <- renderUI({
+    category_options <- sort(unique(animal_data$Category))
+    checkboxGroupInput(inputId = "category_input", 
+                       label= "Select Categories",
+                       choices = category_options)
+    
+  })
+  
+  #Creates Infographics based on Chosen Categories
   category(input, output, animal_data)
   
   ############################### Behavior ###############################
-  # TODO: Create the reactive filter options here
+  output$select_behavior <- renderUI({
+    behavior_options <- sort(unique(animal_data$Behavior))
+    checkboxGroupInput(inputId = "behavior_input",
+                       label = "Select Behaviors",
+                       choices = behavior_options)
+    
+  })
+  
+  #Creates Infographics based on Chosen Behaviors
   behavior(input, output, animal_data)
   
   ############################### Faceted Barplots ###############################
