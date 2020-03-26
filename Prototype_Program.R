@@ -329,7 +329,7 @@ facetedBarplots <- function(input, output, animal_data) {
 ############################### Pie Charts ###############################
 piechart <- function(input, output, animal_data) {
   output$event_pie_plot <- renderPlot({
-    req(input$date)
+  req(input$date)
     #Creates a dataset "After"
     if(input$date == min(animal_data$Date)){
       animal_data <- animal_data %>% group_by(Behavior)
