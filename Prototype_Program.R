@@ -7,6 +7,7 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
+library(DT)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -387,7 +388,7 @@ ui <- navbarPage("ZooMonitor",
                             ),
                             # Display the data file
                             mainPanel(
-                              tableOutput("contents")
+                              dataTableOutput("contents")
                             ))),
                  
                  ############################### General Observations ###############################
@@ -494,7 +495,7 @@ server <- function(input, output) {
   source("generalized_cleaning.R")
   
   ############################### Upload Data ###############################
-  output$contents <- renderTable({
+  output$contents <- renderDT({
     
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
     # If input$file1 is unavailable, req will throw an exception.
