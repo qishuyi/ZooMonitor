@@ -53,6 +53,7 @@ generalplot <- function(input, output, animal_data) {
 
 category <- function(input, output, animal_data) {
   
+  #Reactive Category Visual
   output$category_visual <- renderPlot({
     
     #Data frame to create visualization
@@ -72,12 +73,12 @@ category <- function(input, output, animal_data) {
     
     #Adding percentages column to the "visualization" data frame 
     animal_category <- animal_category %>% 
-      cbind(Percentages = animal_category$Count/ rep(animal_count,
+      cbind(Percentage = animal_category$Count/ rep(animal_count,
                                                      times = rep(length(input$category_input), length(animal_count))))
     
     #Creating the visualization
     ggplot(data = animal_category) +
-      geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
+      geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
       labs(title = "Barplot of Selected Categories per Animal",
            subtitle = "Percentages based on each animal's total number of observations",
            x = "Animal Name", y = "Percentage") +
@@ -90,28 +91,12 @@ category <- function(input, output, animal_data) {
       
   })
   
+  #Reactive Category Table
   
-    output$category_table <- renderTable({
-      
-      total_observations <- 0
-     
-       for(i in input$category_input){
-         total_observations <- total_observations + sum(animal_data$Category == i)
-       }
-      
-    
-      if(total_observations <= 15){
-      animal_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
-          mutate(Time = str_sub(Time, 1,5))
-      
-      
-      
-      return(animal_category_table)
-    
-      }
-      
-    })
+  #Reactive Raw Category Table
+  
+  #See if we can use text to show only when a raw table is NOT displayed
+  
   
    
   }
@@ -120,6 +105,7 @@ category <- function(input, output, animal_data) {
 ############################### Behavior ###############################
 behavior <- function(input, output, animal_data) {
   
+  #Reactive Behavior Visual
   output$behavior_visual <- renderPlot({
     
     #Data frame to create visualization
@@ -140,13 +126,13 @@ behavior <- function(input, output, animal_data) {
     
     #Adding percentages column to the "visualization" data frame 
     animal_behavior <- animal_behavior %>% 
-      cbind(Percentages = animal_behavior$Count/ rep(animal_count,
+      cbind(Percentage = animal_behavior$Count/ rep(animal_count,
                                                      times = rep(length(input$behavior_input), length(animal_count))))
     
     
     #Creating the visualization
     ggplot(data = animal_behavior) +
-      geom_bar(aes(x = Name, y = Percentages, fill = Behavior), stat = "identity", width = .4) +
+      geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
       labs(title = "Barplot of Selected Behaviors per Animal",
            subtitle = "Percentages based on each animal's total number of observations",
            x = "Animal Name", y = "Percentage") +
@@ -160,8 +146,65 @@ behavior <- function(input, output, animal_data) {
     
    })
   
+  #Reactive Behavior Table
+  output$behavior_table <- renderTable({
+    
+    if(length(input$behavior_input) == 0){
+      animal_behavior_table <- data.frame()
+      
+    } else{
+   
+      animal_data$Behavior <- as.factor(animal_data$Behavior)
+      animal_behavior_table <- animal_data %>% 
+      group_by(Name, Behavior, .drop = FALSE) %>%
+      summarize(Count = n()) %>%
+      filter(Behavior %in% input$behavior_input) %>%
+      arrange(Name)
+    
+    animal_count <- numeric()
+    for(i in sort(unique(animal_data$Name))){
+      count <- sum(animal_data$Name == i)
+      animal_count <- append(animal_count, count)
+    }
+    
+    animal_behavior_table <- animal_behavior_table %>% 
+      cbind(Percentage = animal_behavior_table$Count/ rep(animal_count,
+                                                    times = rep(length(input$behavior_input), length(animal_count))))
+    }
+    
+  })
   
   
+  #Reactive Raw Behavior Table
+  
+   output$raw_behavior_table <- renderTable({
+    
+    total_observations <- 0
+    
+    for(i in input$behavior_input){
+      total_observations <- total_observations + sum(animal_data$Behavior == i)
+    }
+    
+    
+    if(total_observations <= 15 & total_observations != 0){
+      animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
+        select(Name, Category, Behavior, Date, Time) %>%
+        mutate(Time = str_sub(Time, 1,5))
+      
+      animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+      
+      return(animal_raw_behavior_table)
+      
+    } else {
+      
+      animal_raw_behavior_table <- data.frame()
+      return(animal_raw_behavior_table)
+  
+    }
+    
+  })
+  
+
 }
 
 ############################### Faceted Barplots ###############################
@@ -277,16 +320,20 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Behavior ###############################
                  tabPanel("Behavior",
                           
-                          titlePanel("Barplot of Chosen Behaviors per Animal"),
+                          titlePanel("Infographics of Chosen Behaviors per Animal"),
                           sidebarPanel(
                             uiOutput("select_behavior")
                             
                           ),
                           mainPanel(
-                            plotOutput(outputId = "behavior_visual"),
-                            tableOutput(outputId = "behavior_table")
+                            tabsetPanel(
                             
-                          )
+                              tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
+                              tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
+                              tabPanel("Raw Table", 
+                                       tableOutput(outputId = "raw_behavior_table"),
+                                       em("Table appears only if there are fewer than 15 observations total for the selected behaviors", align = "center"))
+                          ))
                  ),
                  
                  ############################### Faceted Barplot ###############################
