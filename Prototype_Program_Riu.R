@@ -50,7 +50,6 @@ generalplot <- function(input, output, animal_data) {
 }
 
 ############################### Category ###############################
-
 category <- function(input, output, animal_data) {
   
   #Reactive Category Visual
@@ -606,7 +605,7 @@ server <- function(input, output) {
     })
    
     
-    #Creates Barplots based on Chosen Categories
+    #Creates Infographics based on Chosen Categories
     category(input, output, animal_data)
     
     ############################### Behavior ###############################
@@ -619,7 +618,7 @@ server <- function(input, output) {
       
     })
     
-    #Creates Barplots based on Chosen Behaviors
+    #Creates Infographics based on Chosen Behaviors
     behavior(input, output, animal_data)
     
     ############################### Faceted Barplots ###############################
@@ -661,7 +660,7 @@ server <- function(input, output) {
     
   })
   
-  #Creates Barplots based on Chosen Categories
+  #Creates Infographics based on Chosen Categories
   category(input, output, animal_data)
   
   ############################### Behavior ###############################
@@ -674,7 +673,7 @@ server <- function(input, output) {
     
   })
   
-  #Creates Barplots based on Chosen Behaviors
+  #Creates Infographics based on Chosen Behaviors
   behavior(input, output, animal_data)
   
   ############################### Faceted Barplots ###############################
