@@ -325,7 +325,7 @@ facetedBarplots <- function(input, output, animal_data) {
 ############################### Pie Charts ###############################
 piechart <- function(input, output, animal_data) {
   output$event_pie_plot <- renderPlot({
-    
+    req(input$date)
     #Creates a dataset "After"
     if(input$date == min(animal_data$Date)){
       animal_data <- animal_data %>% group_by(Behavior)
@@ -333,11 +333,10 @@ piechart <- function(input, output, animal_data) {
       names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
       a_summary_only_after <- sum(summary_only_after$counts)
       summary_only_after <- summary_only_after %>%
-        mutate(Percent = round(counts/summary_only_after*100, 1)) %>%
-        mutate(Period = "After")
-      
+        mutate(Percent = round(counts/a_summary_only_after*100, 1))
+  
       #Creates a pie chart "After"
-      ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+      ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
@@ -358,16 +357,16 @@ piechart <- function(input, output, animal_data) {
       summary_only_before <- as.data.frame(summarise(animal_data,n()))
       names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
       a_summary_only_before <- sum(summary_only_before$counts)
-      summary_only_after <- summary_only_after %>%
-        mutate(Percent = round(counts/summary_only_before*100, 1)) %>%
+      summary_only_before <- summary_only_before %>%
+        mutate(Percent = round(counts/a_summary_only_before*100, 1)) %>%
         mutate(Period = "After")
       
       #Creates a pie chart "Before"
-      ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+      ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
-             subtitle = paste("Raw Counts: Before = ", a_summary_only_after, ", After = 0")) +
+             subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0")) +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
