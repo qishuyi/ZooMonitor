@@ -50,9 +50,56 @@ generalplot <- function(input, output, animal_data) {
 }
 
 ############################### Category ###############################
+
 category <- function(input, output, animal_data) {
   
-}
+  output$category_visual <- renderPlot({
+    
+    #Data frame to create visualization
+    animal_category <- animal_data %>% filter(Category == input$category_input) %>%
+      group_by(Name, Category) %>%
+      summarize(Count = n()) %>%
+      arrange(Name)
+    
+    #Counts observations per animal
+    animal_count <- numeric()
+    for(i in sort(unique(animal_data$Name))){
+      count <- sum(animal_data$Name == i)
+      animal_count <- append(animal_count, count)
+    }
+    
+    #Adding percentages column to the "visualization" data frame 
+    animal_category <- animal_category %>% 
+      cbind(Percentages = animal_category$Count/ rep(animal_count,
+                                                     times = rep(length(input$category_input), length(animal_count))))
+    
+    #Creating the visualization
+    ggplot(data = animal_category) +
+      geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
+      labs(title = "Barplot of Selected Behaviors per Animal",
+           subtitle = "Percentages based on each animal's total number of observations",
+           x = "Animal Name", y = "Percentage") +
+      theme(plot.title = element_text(size = 12, face = "bold"),
+            plot.subtitle = element_text(size = 9, face = "italic"),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 8)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                         limits = c(0,1))
+      
+    
+    
+
+  
+    
+  })
+  
+    
+  }
+  
+  
+
+
+
 
 ############################### Behavior ###############################
 behavior <- function(input, output, animal_data) {
@@ -163,7 +210,10 @@ ui <- navbarPage("ZooMonitor",
                             
                           ),
                           mainPanel(
-                            plotOutput(outputId = "category_output")
+                            plotOutput(outputId = "category_visual"),
+                            tableOutput(outputId = "category_table")
+                            
+                            
                           )),
                  
                  ############################### Behavior ###############################
@@ -175,7 +225,9 @@ ui <- navbarPage("ZooMonitor",
                             
                           ),
                           mainPanel(
-                            plotOutput(outputId = "behavior_output")
+                            plotOutput(outputId = "behavior_visual"),
+                            tableOutput(outputId = "behavior_table")
+                            
                           )
                  ),
                  
@@ -366,7 +418,7 @@ server <- function(input, output) {
     })
    
     
-    #Creates Barplots based on Chosen Category
+    #Creates Barplots based on Chosen Categories
     category(input, output, animal_data)
     
     ############################### Behavior ###############################
@@ -379,7 +431,7 @@ server <- function(input, output) {
       
     })
     
-    #Creates Barplots based on Chosen Behavior
+    #Creates Barplots based on Chosen Behaviors
     behavior(input, output, animal_data)
     
     ############################### Faceted Barplots ###############################
@@ -421,7 +473,7 @@ server <- function(input, output) {
     
   })
   
-  #Creates Barplots based on Chosen Category
+  #Creates Barplots based on Chosen Categories
   category(input, output, animal_data)
   
   ############################### Behavior ###############################
@@ -434,7 +486,7 @@ server <- function(input, output) {
     
   })
   
-  #Creates Barplots based on Chosen Behavior
+  #Creates Barplots based on Chosen Behaviors
   behavior(input, output, animal_data)
   
   ############################### Faceted Barplots ###############################
