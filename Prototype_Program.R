@@ -42,7 +42,7 @@ generalplot <- function(input, output, animal_data) {
     else {
       a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name)) +
-        geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .75) +
+        geom_bar(aes(y = ..count../nrow(animal_data)*100), fill = "aquamarine3", width = .5) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
@@ -153,7 +153,9 @@ category <- function(input, output, animal_data) {
       
     } else {
       
-      output$category_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected categories"})
+      output$category_text <- renderUI(HTML(paste(
+        em("Table appears only if there are 15 or less observations in total for the selected categories")
+      )))
       
       animal_raw_category_table <- data.frame()
       return(animal_raw_category_table)
@@ -273,7 +275,9 @@ behavior <- function(input, output, animal_data) {
       
     } else {
       
-      output$behavior_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected behaviors"})
+      output$behavior_text <- renderUI(HTML(paste(
+        em("Table appears only if there are 15 or less observations in total for the selected behaviors")
+      )))
       
       animal_raw_behavior_table <- data.frame()
       return(animal_raw_behavior_table)
@@ -304,7 +308,7 @@ facetedBarplots <- function(input, output, animal_data) {
     
     # Choose x-axis of the barplots
     plot_caption <- paste(animal_name, ": Barplots of Behaviors per")
-    if (input$select_faceted_barplot == "Time of Day") {
+    if (input$select_faceted_barplot == "Hour of Day") {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
@@ -392,9 +396,9 @@ ui <- navbarPage("ZooMonitor",
                             ))),
                  
                  ############################### General Observations ###############################
-                 tabPanel("General Observations",
+                 tabPanel("Observations",
                           
-                          titlePanel("Distribution of Observations"),
+                          titlePanel(h3("Distribution of Observations")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
@@ -415,7 +419,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Category ###############################
                  tabPanel("Category",
                           
-                          titlePanel("Infographics of Chosen Categories per Animal"),
+                          titlePanel(h3("Infographics of Selected Categories")),
                           sidebarPanel(
                             uiOutput("select_category")
                             
@@ -426,7 +430,7 @@ ui <- navbarPage("ZooMonitor",
                               tabPanel("Visual", plotOutput(outputId = "category_visual")),
                               tabPanel("Summary Table", tableOutput(outputId = "category_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
-                                       textOutput(outputId = "category_text"))
+                                       uiOutput(outputId = "category_text"))
                               
                               
                             ))),
@@ -434,7 +438,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Behavior ###############################
                  tabPanel("Behavior",
                           
-                          titlePanel("Infographics of Chosen Behaviors per Animal"),
+                          titlePanel(h3("Infographics of Selected Behaviors")),
                           sidebarPanel(
                             uiOutput("select_behavior")
                             
@@ -445,20 +449,20 @@ ui <- navbarPage("ZooMonitor",
                               tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
                               tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_behavior_table"),
-                                       textOutput(outputId = "behavior_text"))
+                                       uiOutput(outputId = "behavior_text"))
                               
                               
                             ))
                  ),
                  
                  ############################### Faceted Barplot ###############################
-                 tabPanel("Faceted Barplot",
+                 tabPanel("Daily/Weekly",
                           
-                          titlePanel("Frequency of Animal Behaviors"),
+                          titlePanel(h3("Frequency of Animal Behaviors")),
                           sidebarPanel(
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", "Show behavior by:",
-                                         choices = list("Time of Day", "Day of Week")),
+                                         choices = list("Hour of Day", "Day of Week")),
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
@@ -467,9 +471,9 @@ ui <- navbarPage("ZooMonitor",
                           )),
                  
                  ############################### Pie Chart ###############################
-                 tabPanel("Pie Chart",
+                 tabPanel("Events",
                           
-                          titlePanel("Event's Impact on Behaviors"),
+                          titlePanel(h3("Event's Impact on Behaviors")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
@@ -657,7 +661,7 @@ server <- function(input, output) {
     #Let user select an animal name
     output$nameControls4 <- renderUI({
       prefix <- c('All animals')
-      names <- unique(animal_data$Name)
+      names <- sort(unique(animal_data$Name))
       names <- c(prefix, names)
       radioButtons('names4', "Choose Animal", names)
     })
@@ -722,7 +726,7 @@ server <- function(input, output) {
   # run the APP during the prototyping process. It probably will be removed in the final APP.
   output$nameControls4 <- renderUI({
     prefix <- c('All animals')
-    names <- unique(animal_data$Name)
+    names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
     radioButtons('names4', "Choose Animal", names)
   })
