@@ -91,11 +91,76 @@ category <- function(input, output, animal_data) {
       
   })
   
+  
   #Reactive Category Table
+  output$category_table <- renderTable({
+    
+    if(length(input$category_input) == 0){
+      animal_category_table <- data.frame()
+      
+    } else {
+      
+      animal_data$Category <- as.factor(animal_data$Category)
+      animal_category_table <- animal_data %>% 
+        group_by(Name, Category, .drop = FALSE) %>%
+        summarize(Count = n()) %>%
+        filter(Category %in% input$category_input) %>%
+        arrange(Name)
+      
+      
+      animal_count <- numeric()
+      for(i in sort(unique(animal_data$Name))){
+        count <- sum(animal_data$Name == i)
+        animal_count <- append(animal_count, count)
+      }
+    
+      animal_category_table <- animal_category_table %>% 
+        cbind(Percentage = animal_category_table$Count/ rep(animal_count,
+                                                      times = rep(length(input$category_input), length(animal_count))))
+      
+      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 4), nsmall = 4)
+      
+      return(animal_category_table)
+    
+    }
+    
+  })
   
   #Reactive Raw Category Table
-  
-  #See if we can use text to show only when a raw table is NOT displayed
+  output$raw_category_table <- renderTable({
+    
+    total_observations <- 0
+    
+    for(i in input$category_input){
+      total_observations <- total_observations + sum(animal_data$Category == i)
+    }
+    
+    if(total_observations <= 15 & total_observations != 0){
+      
+      output$category_text <- renderText({
+        ""
+      })
+      
+      animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
+        select(Name, Category, Behavior, Date, Time) %>%
+        mutate(Time = str_sub(Time, 1,5))
+      
+      
+      
+      animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+      
+      return(animal_raw_category_table)
+      
+    } else {
+      
+      output$category_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected categories"})
+      
+      animal_raw_category_table <- data.frame()
+      return(animal_raw_category_table)
+      
+    }
+
+  })
   
   
    
@@ -170,6 +235,14 @@ behavior <- function(input, output, animal_data) {
     animal_behavior_table <- animal_behavior_table %>% 
       cbind(Percentage = animal_behavior_table$Count/ rep(animal_count,
                                                     times = rep(length(input$behavior_input), length(animal_count))))
+    
+    
+    animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 4), nsmall = 4)
+    
+    return(animal_behavior_table)
+    
+    
+    
     }
     
   })
@@ -187,6 +260,9 @@ behavior <- function(input, output, animal_data) {
     
     
     if(total_observations <= 15 & total_observations != 0){
+      
+      output$behavior_text <- renderText({""})
+      
       animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
         select(Name, Category, Behavior, Date, Time) %>%
         mutate(Time = str_sub(Time, 1,5))
@@ -196,6 +272,8 @@ behavior <- function(input, output, animal_data) {
       return(animal_raw_behavior_table)
       
     } else {
+      
+      output$behavior_text <- renderText({"Table appears only if there are 15 or less observations in total for the selected behaviors"})
       
       animal_raw_behavior_table <- data.frame()
       return(animal_raw_behavior_table)
@@ -315,7 +393,8 @@ ui <- navbarPage("ZooMonitor",
                             
                               tabPanel("Visual", plotOutput(outputId = "category_visual")),
                               tabPanel("Summary Table", tableOutput(outputId = "category_table")),
-                              tabPanel("Raw Table")
+                              tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
+                                       textOutput(outputId = "category_text"))
                             
                             
                           ))),
@@ -333,9 +412,10 @@ ui <- navbarPage("ZooMonitor",
                             
                               tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
                               tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
-                              tabPanel("Raw Table", 
-                                       tableOutput(outputId = "raw_behavior_table"),
-                                       em("Table appears only if there are fewer than 15 observations total for the selected behaviors", align = "center"))
+                              tabPanel("Raw Table", tableOutput(outputId = "raw_behavior_table"),
+                                       textOutput(outputId = "behavior_text"))
+                                       
+                                       
                           ))
                  ),
                  
