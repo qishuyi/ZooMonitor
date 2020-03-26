@@ -305,17 +305,20 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Category ###############################
                  tabPanel("Category",
                           
-                          titlePanel("Barplot of Chosen Categories per Animal"),
+                          titlePanel("Infographics of Chosen Categories per Animal"),
                           sidebarPanel(
                             uiOutput("select_category")
                             
                           ),
                           mainPanel(
-                            plotOutput(outputId = "category_visual"),
-                            tableOutput(outputId = "category_table")
+                            tabsetPanel(
+                            
+                              tabPanel("Visual", plotOutput(outputId = "category_visual")),
+                              tabPanel("Summary Table", tableOutput(outputId = "category_table")),
+                              tabPanel("Raw Table")
                             
                             
-                          )),
+                          ))),
                  
                  ############################### Behavior ###############################
                  tabPanel("Behavior",
