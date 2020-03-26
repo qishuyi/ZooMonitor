@@ -23,7 +23,7 @@ generalplot <- function(input, output, animal_data) {
     #Time of Day plot
     if(input$select_general == "Time of Day"){
       ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data)*100)) + 
-        geom_bar(fill = "steelblue", width = .75) + 
+        geom_bar(fill = "steelblue", width = .5) + 
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
@@ -32,7 +32,7 @@ generalplot <- function(input, output, animal_data) {
     # Day of Week Plot 
     else if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data)*100)) +
-        geom_bar(fill = "steelblue2", width = .75) +
+        geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
@@ -42,7 +42,7 @@ generalplot <- function(input, output, animal_data) {
     else {
       a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data)*100)) +
-        geom_bar(fill = "aquamarine3", width = .75) +
+        geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(limits = c(0,100)) +
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
         geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
@@ -325,6 +325,60 @@ facetedBarplots <- function(input, output, animal_data) {
 ############################### Pie Charts ###############################
 piechart <- function(input, output, animal_data) {
   output$event_pie_plot <- renderPlot({
+    
+    #Creates a dataset "After"
+    if(input$date == min(animal_data$Date)){
+      animal_data <- animal_data %>% group_by(Behavior)
+      summary_only_after <- as.data.frame(summarise(animal_data, n()))
+      names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
+      a_summary_only_after <- sum(summary_only_after$counts)
+      summary_only_after <- summary_only_after %>%
+        mutate(Percent = round(counts/summary_only_after*100, 1)) %>%
+        mutate(Period = "After")
+      
+      #Creates a pie chart "After"
+      ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+        geom_bar(stat="identity", width=1) +
+        coord_polar("y", start=0) + 
+        labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
+             subtitle = paste("Raw Counts: Before = 0", ", After = ", a_summary_only_after)) +
+        guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+        theme_classic() + theme(axis.line = element_blank(),
+                                axis.text = element_blank(),
+                                axis.ticks = element_blank(),
+                                plot.title = element_text(hjust = 0.5, face = "bold"),
+                                plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                legend.position="bottom") +
+        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+    } 
+    
+    #Creates a dataset "Before"
+    else if(input$date == max(animal_data$Date)){
+      animal_data <- animal_data %>% group_by(Behavior)
+      summary_only_before <- as.data.frame(summarise(animal_data,n()))
+      names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
+      a_summary_only_before <- sum(summary_only_before$counts)
+      summary_only_after <- summary_only_after %>%
+        mutate(Percent = round(counts/summary_only_before*100, 1)) %>%
+        mutate(Period = "After")
+      
+      #Creates a pie chart "Before"
+      ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+        geom_bar(stat="identity", width=1) +
+        coord_polar("y", start=0) + 
+        labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
+             subtitle = paste("Raw Counts: Before = ", a_summary_only_after, ", After = 0")) +
+        guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+        theme_classic() + theme(axis.line = element_blank(),
+                                axis.text = element_blank(),
+                                axis.ticks = element_blank(),
+                                plot.title = element_text(hjust = 0.5, face = "bold"),
+                                plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                legend.position="bottom") +
+        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+      
+    }
+    else{
     #Creates a before dataset
     before <- subset(animal_data, Date < input$date)
     before <- before %>% group_by(Behavior)
@@ -349,6 +403,7 @@ piechart <- function(input, output, animal_data) {
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
+    #Pie charts for both before and after
     ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
       geom_bar(stat="identity", width=1) +
       facet_grid(.~ Period) +
@@ -364,7 +419,7 @@ piechart <- function(input, output, animal_data) {
                               legend.position="bottom") +
       scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     
-    
+    }
   })
 }
 
