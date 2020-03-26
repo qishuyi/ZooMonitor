@@ -33,6 +33,9 @@ behavior <- function(input, output, animal_data) {
 ############################### Faceted Barplots ###############################
 facetedBarplots <- function(input, output, animal_data) {
   output$faceted_barplot <- renderPlot({
+    # Wait until the program loads up
+    req(input$daterange4)
+    
     # Choose the date range of the data we want to work with
     start_date <- input$daterange4[1]
     end_date <- input$daterange4[2]
@@ -48,20 +51,20 @@ facetedBarplots <- function(input, output, animal_data) {
     plot_caption <- paste(animal_name, ": Barplots of Behaviors per")
     if (input$select_faceted_barplot == "Time of Day") {
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "hour")
+      plot_caption <- paste(plot_caption, "Hour")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Hour, ncol=3) + 
+        facet_wrap(~ Hour, ncol = 3) + 
         theme(axis.text.x = element_text(angle = 90, size = 10)) + 
         labs(title = plot_caption, y = "Frequency")
     }else {# Day of Week
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "day of week")
+      plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol=3) + 
+        facet_wrap(~ Day_of_Week, ncol = 3) + 
         theme(axis.text.x = element_text(angle = 90, size = 10)) + 
         labs(title = plot_caption, y = "Frequency")
     }
-    }, height = 700, width = 800)
+    }, height = 600)
 }
 
 ############################### Pie Charts ###############################
@@ -130,7 +133,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Faceted Barplot ###############################
                  tabPanel("Faceted Barplot",
                           
-                          titlePanel("Placeholder for title 4"),
+                          titlePanel("Frequency of Animal Behaviors"),
                           sidebarPanel(
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", "Show behavior by:",

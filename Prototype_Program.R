@@ -61,7 +61,39 @@ behavior <- function(input, output, animal_data) {
 
 ############################### Faceted Barplots ###############################
 facetedBarplots <- function(input, output, animal_data) {
-  # TODO: Create plot here
+  output$faceted_barplot <- renderPlot({
+    # Wait until the program loads up
+    req(input$daterange4)
+    
+    # Choose the date range of the data we want to work with
+    start_date <- input$daterange4[1]
+    end_date <- input$daterange4[2]
+    animal_data <- animal_data %>% filter(Date >= start_date & Date <= end_date)
+    
+    # Choose the animal(s) whose behaviors we will display
+    animal_name <- input$names4
+    if (animal_name != "All animals") {
+      animal_data <- animal_data %>% filter(Name == animal_name)
+    }
+    
+    # Choose x-axis of the barplots
+    plot_caption <- paste(animal_name, ": Barplots of Behaviors per")
+    if (input$select_faceted_barplot == "Time of Day") {
+      # Change caption of the plot
+      plot_caption <- paste(plot_caption, "Hour")
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+        facet_wrap(~ Hour, ncol = 3) + 
+        theme(axis.text.x = element_text(angle = 90, size = 10)) + 
+        labs(title = plot_caption, y = "Frequency")
+    }else {# Day of Week
+      # Change caption of the plot
+      plot_caption <- paste(plot_caption, "Day of Week")
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+        facet_wrap(~ Day_of_Week, ncol = 3) + 
+        theme(axis.text.x = element_text(angle = 90, size = 10)) + 
+        labs(title = plot_caption, y = "Frequency")
+    }
+  }, height = 600)
 }
 
 ############################### Pie Charts ###############################
@@ -180,15 +212,16 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Faceted Barplot ###############################
                  tabPanel("Faceted Barplot",
                           
-                          titlePanel("Placeholder for title 4"),
+                          titlePanel("Frequency of Animal Behaviors"),
                           sidebarPanel(
-                            
-                            uiOutput("nameControls")
-                            
-                            # TODO: If necessary, add more filters here to get user inputs
+                            uiOutput("dateControls4"),
+                            radioButtons("select_faceted_barplot", "Show behavior by:",
+                                         choices = list("Time of Day", "Day of Week")),
+                            uiOutput("nameControls4")
                           ),
                           mainPanel(
-                            # TODO: Show plots here
+                            # Create the faceted barplot for frequency of behaviors
+                            plotOutput("faceted_barplot")
                           )),
                  
                  ############################### Pie Chart ###############################
@@ -362,10 +395,21 @@ server <- function(input, output) {
     behavior(input, output, animal_data)
     
     ############################### Faceted Barplots ###############################
-    #Add filter options for animal names based on the input data file
-    output$nameControls <- renderUI({
+    #Let user select an animal name
+    output$nameControls4 <- renderUI({
+      prefix <- c('All animals')
       names <- unique(animal_data$Name)
-      checkboxGroupInput('names', "Choose Animal", names)
+      names <- c(prefix, names)
+      radioButtons('names4', "Choose Animal", names)
+    })
+    #Let user select a date range
+    output$dateControls4 <- renderUI({
+      date <- animal_data$Date
+      dateRangeInput("daterange4", "Select a date range:",
+                     start = min(animal_data$Date),
+                     end = max(animal_data$Date),
+                     min = min(animal_data$Date),
+                     max = max(animal_data$Date))
     })
     #Create the faceted barplots
     facetedBarplots(input, output, animal_data)
@@ -401,10 +445,23 @@ server <- function(input, output) {
   ############################### Faceted Barplots ###############################
   # This function is here because it will be easier to not have to upload data files every time we try to
   # run the APP during the prototyping process. It probably will be removed in the final APP.
-  output$nameControls <- renderUI({
+  output$nameControls4 <- renderUI({
+    prefix <- c('All animals')
     names <- unique(animal_data$Name)
-    checkboxGroupInput('names', "Choose Animal", names)
+    names <- c(prefix, names)
+    radioButtons('names4', "Choose Animal", names)
   })
+  #Let user select a date range
+  output$dateControls4 <- renderUI({
+    date <- animal_data$Date
+    dateRangeInput("daterange4", "Select a date range:",
+                   start = min(animal_data$Date),
+                   end = max(animal_data$Date),
+                   min = min(animal_data$Date),
+                   max = max(animal_data$Date))
+  })
+  #Create the faceted barplots
+  facetedBarplots(input, output, animal_data)
   
   ############################### Pie Charts ###############################
   output$dateControls <- renderUI({
