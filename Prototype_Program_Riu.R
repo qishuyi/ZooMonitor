@@ -56,12 +56,14 @@ category <- function(input, output, animal_data) {
   output$category_visual <- renderPlot({
     
     #Data frame to create visualization
-    animal_category <- animal_data %>% filter(Category == input$category_input) %>%
-      group_by(Name, Category) %>%
+    animal_data$Category <- as.factor(animal_data$Category)
+    animal_category <- animal_data %>% 
+      group_by(Name, Category, .drop = FALSE) %>%
       summarize(Count = n()) %>%
+      filter(Category %in% input$category_input) %>%
       arrange(Name)
     
-    #Counts observations per animal
+    #Counts total observations per animal
     animal_count <- numeric()
     for(i in sort(unique(animal_data$Name))){
       count <- sum(animal_data$Name == i)
@@ -76,7 +78,7 @@ category <- function(input, output, animal_data) {
     #Creating the visualization
     ggplot(data = animal_category) +
       geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
-      labs(title = "Barplot of Selected Behaviors per Animal",
+      labs(title = "Barplot of Selected Categories per Animal",
            subtitle = "Percentages based on each animal's total number of observations",
            x = "Animal Name", y = "Percentage") +
       theme(plot.title = element_text(size = 12, face = "bold"),
@@ -86,24 +88,80 @@ category <- function(input, output, animal_data) {
       scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                          limits = c(0,1))
       
-    
-    
-
-  
-    
   })
   
+  
+    output$category_table <- renderTable({
+      
+      total_observations <- 0
+     
+       for(i in input$category_input){
+         total_observations <- total_observations + sum(animal_data$Category == i)
+       }
+      
     
+      if(total_observations <= 15){
+      animal_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
+          select(Name, Category, Behavior, Date, Time) %>%
+          mutate(Time = str_sub(Time, 1,5))
+      
+      
+      
+      return(animal_category_table)
+    
+      }
+      
+    })
+  
+   
   }
   
   
-
-
-
-
 ############################### Behavior ###############################
 behavior <- function(input, output, animal_data) {
-  # TODO: Create plot here
+  
+  output$behavior_visual <- renderPlot({
+    
+    #Data frame to create visualization
+    animal_data$Behavior <- as.factor(animal_data$Behavior)
+    animal_behavior <- animal_data %>% 
+      group_by(Name, Behavior, .drop = FALSE) %>%
+      summarize(Count = n()) %>%
+      filter(Behavior %in% input$behavior_input) %>%
+      arrange(Name)
+    
+    
+    #Counts total observations per animal
+    animal_count <- numeric()
+    for(i in sort(unique(animal_data$Name))){
+      count <- sum(animal_data$Name == i)
+      animal_count <- append(animal_count, count)
+    }
+    
+    #Adding percentages column to the "visualization" data frame 
+    animal_behavior <- animal_behavior %>% 
+      cbind(Percentages = animal_behavior$Count/ rep(animal_count,
+                                                     times = rep(length(input$behavior_input), length(animal_count))))
+    
+    
+    #Creating the visualization
+    ggplot(data = animal_behavior) +
+      geom_bar(aes(x = Name, y = Percentages, fill = Behavior), stat = "identity", width = .4) +
+      labs(title = "Barplot of Selected Behaviors per Animal",
+           subtitle = "Percentages based on each animal's total number of observations",
+           x = "Animal Name", y = "Percentage") +
+      theme(plot.title = element_text(size = 12, face = "bold"),
+            plot.subtitle = element_text(size = 9, face = "italic"),
+            legend.title = element_text(size = 10),
+            legend.text = element_text(size = 8)) +
+      scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                         limits = c(0,1))
+    
+    
+   })
+  
+  
+  
 }
 
 ############################### Faceted Barplots ###############################
