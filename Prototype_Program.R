@@ -22,30 +22,33 @@ generalplot <- function(input, output, animal_data) {
   output$general_plot <- renderPlot({
     #Time of Day plot
     if(input$select_general == "Time of Day"){
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data)*100)) + 
+      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_discrete(limits = 9:16) +
-        scale_y_continuous(limits = c(0,100)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
         labs(title = "Percentage of Observations (Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
-        geom_hline(yintercept = (1/8)*100, color = "darkmagenta", alpha = .45, linetype = "longdash")
+        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash")
     } 
     # Day of Week Plot 
     else if (input$select_general == "Day of Week"){
-      ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data)*100)) +
+      ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-        scale_y_continuous(limits = c(0,100)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
         labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
-        geom_hline(yintercept = (1/7)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
     #Animal Plot
     else {
       a <- length(unique(animal_data$Name))
-      ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data)*100)) +
+      ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
-        scale_y_continuous(limits = c(0,100)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
         labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
-        geom_hline(yintercept = (1/a)*100, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") 
     }
   })
 }
@@ -88,6 +91,7 @@ category <- function(input, output, animal_data) {
             legend.text = element_text(size = 8)) +
       scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                          limits = c(0,1))
+      
     
   })
   
@@ -115,10 +119,12 @@ category <- function(input, output, animal_data) {
       }
       
       animal_category_table <- animal_category_table %>% 
-        cbind(Percentage = animal_category_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$category_input), length(animal_count))))
+        cbind(Percentage = (animal_category_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$category_input), length(animal_count)))) * 100)
       
-      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 4), nsmall = 4)
+      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 2), nsmall = 2)
+      
+      animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
       
       return(animal_category_table)
       
@@ -235,16 +241,16 @@ behavior <- function(input, output, animal_data) {
       }
       
       animal_behavior_table <- animal_behavior_table %>% 
-        cbind(Percentage = animal_behavior_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$behavior_input), length(animal_count))))
+        cbind(Percentage = (animal_behavior_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$behavior_input), length(animal_count))))*100)
       
       
-      animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 4), nsmall = 4)
+      animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 2), nsmall = 2)
+      
+    
+      animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
       
       return(animal_behavior_table)
-      
-      
-      
     }
     
   })
@@ -539,7 +545,7 @@ ui <- navbarPage("ZooMonitor",
                                        ))),
                             
                             
-                            tabPanel("Behavior",
+                            tabPanel("Behaviors",
                                      
                                      titlePanel(h3("Infographics of Selected Behaviors")),
                                      sidebarPanel(
