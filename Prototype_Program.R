@@ -55,7 +55,7 @@ generalplot <- function(input, output, animal_data) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
 
-        labs(title = "Barplot of Observations", x = "Animal's Name", y = "Percentage") +
+        labs(title = "Barplot of Observations", x = "Animal Name", y = "Percentage") +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
 
@@ -323,7 +323,9 @@ facetedBarplots <- function(input, output, animal_data) {
     }
     
     # Choose x-axis of the barplots
-    plot_caption <- paste(animal_name, ": Barplots of Behaviors per")
+    if(animal_name == "All animals") animal_name <- "All Animals"
+    
+    plot_caption <- paste(animal_name, ": Barplots of Behaviors per", sep = "")
     if (input$select_faceted_barplot == "Hour of Day") {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour")
@@ -332,8 +334,6 @@ facetedBarplots <- function(input, output, animal_data) {
         theme(axis.text.x = element_text(angle = 90, size = 10),
               plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
-      theme(plot.title = element_text(size = 12, face = "bold"))
-      
     }else {# Day of Week
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Day of Week")
