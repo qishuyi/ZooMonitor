@@ -21,13 +21,13 @@ generalplot <- function(input, output, animal_data) {
   ##Bar plot of observation distribution
   output$general_plot <- renderPlot({
     #Time of Day plot
-    if(input$select_general == "Time of Day"){
+    if(input$select_general == "Hour of Day"){
       ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Barplot of Observations", x = "Time of Day", y = "Percentage") + 
+        labs(title = "Barplot of Observations", x = "Hour of Day", y = "Percentage") + 
         geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
             
@@ -331,6 +331,8 @@ facetedBarplots <- function(input, output, animal_data) {
         facet_wrap(~ Hour, ncol = 3) + 
         theme(axis.text.x = element_text(angle = 90, size = 10)) + 
         labs(title = plot_caption, y = "Frequency")
+      theme(plot.title = element_text(size = 12, face = "bold"))
+      
     }else {# Day of Week
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Day of Week")
@@ -483,7 +485,7 @@ ui <- navbarPage("ZooMonitor",
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               radioButtons("select_general", "Show Observations by:",
-                                           choices = list("Time of Day", "Day of Week", "Animal's Name")
+                                           choices = list("Hour of Day", "Day of Week", "Animal's Name")
                               )
                             ),
                             mainPanel(
