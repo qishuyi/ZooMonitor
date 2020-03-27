@@ -44,50 +44,72 @@ source("Cleaning and Addition Scripts/sq_monkey_columns_addition.R")
 
 1. **Work with the Cattle data and answer the client's questions regarding the animal**
     + Measured by the creation of visualizations to send to the client
-2. **Work with another animal's data and answer the client’s questions regarding the animal**
+    
+2. **Work with Squirrel Monkey data and answer the client’s questions regarding the animal**
     + Measured by the creation of visualizations to send to the client
+    
 3. **Explore the differences in the structure of the animal datasets that we currently have.**
-    + Measured by the ability to articulate the differences during the next debriefing
-4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and the other animal** 
-    + Measured by a live demonstration during the next debriefing
+    + ~~Measured by the ability to articulate the differences during the next debriefing~~
+    + Measured by the creation of a table accompanied by bullet point comments, both detailing the various differences 
+    
+4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys** 
+    + ~~Measured by a live demonstration during the next debriefing~~
+    + Measured by the posting of a link for people to test out the prototype R Shiny Program
 
-\
+
+* We worked on the four goals listed above for Debriefing #3
+* For Goal 3 and Goal 4, we made slight modifications on how our progress can be measured, as debriefings are now deilivered in a written format
+
+
+
+***
 
 ### **Meeting with the Client**
 We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals and to interview her about the program.
 
-#### **Plots** 
-* We showed her 25 plots that answer her questions about Painted African Dogs, Cattles, and Squirrel Monkeys. (These plots include the ones we have already presented in our last debriefing)
-* This part of the meeting was mainly about the clarification of the plots.
- 
-#### **Program** 
-* We then asked her about her expectations for our final product, a program that will address all animals. Even though we had asked the same thing before, when we only had shown her some general plots, since we had created a wider variety of plots than then, we were curious if she had different ideas in mind. 
+\
 
-* Last time, she requested the three plots that we sent her at the first meeting (2/6) to be in the program:
+#### **Plots** 
+
+* We showed her plots and tables we created to answer her questions about Cattles and Squrrel Monkeys
+* We also showed her plots related to Painted African Dogs 
+    + Some of these plots were ones already presented in our last debriefing
+    + Some additional plots were not part of our four goals, but created nevertheless for our client
+* This part of the meeting was mainly about talking through some of the plots with the client
+
+\
+
+#### **Program** 
+* We then asked her about her expectations for our final product, a program that will address all animals
+* Even though we had asked similar things before, when we only had shown her some general plots back then 
+* Since we had created a wider variety of plots at this point, we were curious if she had different ideas in mind. 
+
+* Last time, she requested the three plots that we sent her during the first meeting (2/6/2020) to be in the program:
   + Behaviors throught the day (Frequency & Proportion)
   + Activeness throught the week (Frequency)
   + Proportion of the behavior "Others" within all inactive behaviors
 
-* We suggested that we create the input sections in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
-* She agreed on this suggestion and requested that we put some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
+* For the program, we suggested that we create various inputs in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
+* She agreed on this suggestion and requested that we incorporate some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
+
+\
 
 #### **Post Meeting**  
 
-* Based on our client's request, we finalized the plots and choices of inputs we put in the prototype program:
-  + Distribution of observations (by day of week/time of day/individual's name)
-  + Percentage of a Behavior/Behaviors of users' choice per each individual animal
-  + Percentage of a *Behavior Category/Behavior Categories of users' choice per each individual animal
-  + Percentage of Behaviors before/after a certain event, e.g., death of the baby JT (in the Painted African Dogs' case)
+* Based on our client's requests, we finalized the plots and choices of inputs we put in the prototype program:
+  + Barplots illustrating the distribution of observations (by hour of day/day of week/animal name)
+  + Barplots of user selected Behaviors (in percentages) per each individual animal, and accompanying tables
+  + Barplots of user selected Categories (in percentages) per each individual animal, and accompanying tables
+  + Pie chart of Behaviors before/after a certain event, e.g., death of the baby JT (in the Painted African Dogs' case)
+  + Barplot of Behaviors by hour of day and day of week, for all individual animals or just a specific name
   
-*Behavior Category is a variable that groups some similar behaviors.
+*Category is a variable that groups similar behaviors*
   
-\
-
-*Specific details regarding the program will be provided under Goal 4.* 
+***
 
 ### **Goal 1**
 
-***Visuals for Cattle***
+***Visuals for Cattles***
 
 \
 
@@ -102,7 +124,11 @@ cattle_agonistic <- cattle_data %>% filter(Category == "Agonistic") %>%
 ggplot(cattle_agonistic, aes(x=Name, fill=IC4_Social_Modifier)) +
   geom_bar(position = "stack", width = 0.4) +
   labs(title = "Cattle showing agonistic behaviors", x = "Animal Name", y = "Frequency of agonistic behaviors", fill = "Towards") + 
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3")) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
 
 colnames(cattle_agonistic)[1] <- 'Cattle showing agonistic behavior'
 colnames(cattle_agonistic)[2] <- 'Towards'
@@ -114,10 +140,12 @@ formattable(cattle_agonistic, align = c("l", rep("c",3)))
 
 
 * The visual displays how often each cattle shows agonistic behavior, while the table details the type of agonistic behavior and gives more insight about what happened during a conflict.
-* Visual:
+
+
+* **Visual:**
     + Batik and Chilly Jane often show agonistic behaviors towards each other.
     + Patty sometimes shows agonistic behaviors towards Batik and Chilly Jane.
-* Table:
+* **Table:**
     + 2019/05/26: Patty displays threat to the other two -- probably because it was being picked on?
     + 2019/07/18: Batick and Chilly Jane are aggressive towards one another -- there was a conflict between them.
     + 2019/07/21: Patty displays threat to Chilly Jane, Batick and Chilly Jane are aggressive towards each other -- a conflict between all three.
@@ -127,6 +155,26 @@ formattable(cattle_agonistic, align = c("l", rep("c",3)))
 
 #### **Stereotypic Behaviors**
 *How often are they showing Stereoptypic behaviors?*
+
+```{r Table for Stereotypic Behaviors}
+
+cattle_stereotypic <- cattle_data %>% filter(Category == "Stereotypic") %>%
+  select(Name, Activity, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1,5))
+
+cattle_stereotypic$Date <- format(cattle_stereotypic$Date, format = "%B %d, %Y")
+  
+
+formattable(cattle_stereotypic, align = c("l", rep("c",3)))
+
+```
+
+
+* Since there were only five observations in the data set where a cattle showed stereotypic behaviors, we decided to create just a table instead of a visualization
+* The table depicts the name of the cattle showing the stereotypic behavior, the type of stereotypic behavior, as well as the date and time of when the behavior occured 
+* With only five cases, it appears as though cattles showing stereotypic behaviors is very rare 
+* Also, of the three cattles at the zoo, only two of them were observed showing stereotypic behaviors
+
 
 \
 
@@ -161,7 +209,11 @@ ggplot(cattle_data_HR, aes(x = Category, y = counts)) +
   theme(axis.title.x = element_blank()) + 
   labs(title = "Bar Plot of Cattle's Behavior Category", subtitle = "Individuals", y="Counts") +
   facet_grid(Name ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring),
+        plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"))
+
+
 ```
 
 ```{r Visual for Cattle Active vs. Inactive for all cattles}
@@ -178,23 +230,60 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
   geom_bar(stat="identity", position=position_dodge(), fill = "salmon") +
   labs(x = "Behavior Category", subtitle = "General", y="Counts") +
   facet_grid(. ~ Hour) +
-  theme(axis.text.x = element_text(angle = 90, color = label_coloring))
+  theme(axis.text.x = element_text(angle = 90, color = label_coloring),
+        plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"))
 ```
 
-* Green = Active, Red = Inactive
+*Green = Active, Red = Inactive*
 
-\
 
-* Cattles generally spend more actively around 10am and 11am and more inactively after lunch time
-* All individuals behave similarly throuout the day
-* Significantly few observations at 12pm and 4pm, as in the Painted African Dogs' case
+* Cattles generally spend more activel around 10am and 11am and more inactive after lunch time
+* All three cattles behave similarly throuout the day
+* Significantly few observations at 12pm and 4pm, analogous to the Painted African Dogs' case
 
 \
 
 #### **Positive Behaviors**
 *Is there one animal that spends more time doing the positive behaviors (Enrichment-based, Maintenance, Social, Locomotion)?*
 
-\
+```{r (CATTLE) Positive Behavior Visual}
+
+#Creating Data Frame for Positive Behavior Visual
+cattle_positive <- cattle_data %>% filter(Behavior_Type == "Positive") %>%
+  group_by(Name, Category) %>% 
+  summarize(Count = n()) 
+
+cattle_positive <- cattle_positive %>% cbind(Percentages = cattle_positive$Count / rep(c(720, 761, 692), times = c(4,4,4)))
+
+#Positive Behavior Visual
+ggplot(data = cattle_positive) +
+  geom_bar(aes(x = Name, y = Percentages, fill = Category), stat = "identity", width = .4) +
+  labs(title = "Barplot of Positive Behaviors per Cattle",
+       subtitle = "Percentages based on each cattle's total number of observations",
+       x = "Cattle", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.4)) +
+  scale_fill_manual(values = c("deeppink1", "springgreen3", "cyan2", "gold3")) 
+  
+
+```
+
+* The visualization illustrates the percentage of times each cattle was observed doing a positive behavior
+  + The percentages for each cattle are based on the total number of observations for that specific cattle
+  + For example, considering **only** Batik's observations, roughly 36% of those observations are of a positive behavior
+
+* The visualization suggests that Batik spends the most time doing positive behaviors, followed by Patty, and then Chilly Jane
+* The coloring indicates that the composition that makes up the total percentage of positive behaviors differs for each cattle
+  + Chilly Jane spends a lot more time doing locomotion behaviors than maintanance behaviors
+  + Patty spends a lot more time doing maintanence behaviors than locomotion behaviors
+ 
+***
+
 
 ### **Goal 2**
 
@@ -213,7 +302,12 @@ monkey_aggression <- sq_monkey_data %>% filter(Activity == "Aggression") %>%
 ggplot(monkey_aggression, aes(x=Name, fill=AOV_Social_Modifier)) +
   geom_bar(position = "stack", width = 0.4) +
   labs(title = "Monkeys showing aggressive behaviors", x = "Animal Name", y = "Frequency of aggressive behaviors", fill = "Towards") + 
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan")) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
+ 
 
 colnames(monkey_aggression)[1] <- 'Monkey showing aggressive behavior'
 colnames(monkey_aggression)[2] <- 'Towards'
@@ -223,31 +317,63 @@ monkey_aggression$Date <- format(monkey_aggression$Date, format = "%B %d, %Y")
 formattable(monkey_aggression, align = c("l", rep("c",3)))
 ```
 
-* **Visual**:
+* **Visual:**
     + Isabel was recorded significantly more aggressive behaviors than other monkeys.
-* Again, the visual displays how often each monkey shows aggressive behaviors, while the table gives more insight about what happened on a particularly day.
-* **Table**:
+    + Again, the visual displays how often each monkey shows aggressive behaviors, while the table gives more insight about what happened on a particularly day.
+* **Table:**
     + 2017/11/06: Damian was aggressive towards Brazil; Pistachio was aggressive towards both Brazil and Filbert. There was probably a conflict between all four monkeys (Squirt has not come to the zoo yet at this point).
     + 2017/12/19, 2018/02/01, 2018/02/22: Isabel showed aggressive behaviors towards Brazil, Damian and Filbert respectively.
     + 2018/03/12: Isabel showed aggressive behaviors towards Pistacio, who is aggressive towards Filbert. There might have been a conflict between the three.
     + 2019/02/17: Both Isabel and Brazil were aggressive towards Filbert.
     + 2020/02/08: Filbert was aggressive towards Squirt.
+
+
 * Filbert seems to be involved in conflicts regularly.
 * Isabel is also constantly involved in conflicts and is always the one showing aggressive behaviors, which possibly suggests that Isabel is being picked on by other monkeys regularly.
 
 
 \
 
-#### **Headspin**
-*Which animal is doing headspins and how often?*
+#### **Head Spins**
+*Which animal is doing head spins and how often?*
 
+```{r (MONKEY) Head spins Visual }
+
+#Vector of total number of observations for each monkey
+
+obs_per_monkey <- c(638,234,594,620,256,178)
+
+#Barplot of Headspins (Percentage + Count)
+ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
+  geom_bar(aes(x = Name, y= ..count.. / obs_per_monkey), fill = "turquoise3", width = .6) +
+  labs(title = "Barplot of Head Spins per Monkey", 
+       subtitle = "Percentages based on each monkey's total number of observations",
+       x = "Monkey", y = "Percentage") +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic")) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                     limits = c(0,.125)) +
+  geom_text(aes(x = Name, y = ..count.. / obs_per_monkey, label = ..count..), 
+            stat = "count", vjust = -.4, size = 3.5, fontface = "italic")
+```
+
+
+* The visualization depicts the percentage of times each squirrel monkey was observed doing a head spin
+  + The percentages for each monkey are based on the total number of observations for that specific monkey
+  + For example, considering **only** Damian's observations, a little over 4% of those observations are of him doing a head spin. 
+  
+* The numbers on top of each bar represent the raw count of the number of head spins a particular animal was observed doing
+  + Even though Filbert had 30 head spin observations while Damain only had 10, the percentage of head spin observations relative to their total number of observations is similar
+
+* Notably, Brazil is observed doing a head spin on a more regular basis than the other monkeys. Roughly 11% of all her observations are of her doing a head spin
+* Isabel and Squirt are the monkeys that were observed doing a head spin the least often in percentage terms
 
 \
 
-#### **Impact of Events on Behaviors**
-*Did the deaths of Damian and Pistachio have an impact on the monkeys' behaviors?*
+#### **Impact of Events on Behavior**
+*Did the deaths of Damian and Pistachio have an impact on the monkeys' behavior?*
 
-*Did the addition of Squirt have an impact on the monkeys' behaviors?*
+*Did the addition of Squirt have an impact on the monkeys' behavior?*
 
 ```{r Visual for before and after the death of Damian}
 ##Damian's death
@@ -363,22 +489,21 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 ```
 
 * Deaths/Joining information
-  + Damian passed away on Feb 22, 2018,
+  + Damian passed away on Feb 22, 2018
   + Pistachio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
-* Included the raw counts of observations since they normally differ significantly between before/after
-* Only Damian has the period "One month after" since only he had observations soon after his death.
+* The raw counts of observations is included in the visual since they normally differ significantly between before/after
+* Only Damian has the period "One month after" since there were observations soon after his death. (Which was not the case for the other events)
 * We also created the same plots for Painted African Dogs' death/birth and sent them to our client since it was one of her initial interests. 
+* We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
-\
-
-* We see a larger proportion of "Sitting" after a certain event, but not clear what this explains.
-
-\
+***
 
 ### **Goal 3**
 
 ***Comparison among animal datasets***
+
+
 ![](Images used for R Markdown/Comparison_dataset_structure.png)
 
 * Interval v.s. All Occurrence
@@ -395,15 +520,25 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
     + Interval Channel 7: Stereotypic           (Cribbing, Pacing)
     + Interval Channel 8: Enrichment-based      (Interaction, Observation)
     + Interval Channel 9: Other                 (Other, Out of View)
-* The 'All Occurrence Value' column in the cattle dataset is empty, thus nothing needs to be done until we discover future datasets that have this column and contain values in it. 
+
+***
 
 ### **Goal 4**
 
-***R Shiny app Prototype***
+***Prototype R Shiny App***
 
-##link to it
+[Link to the Prototype R Shiny App](https://qishuyi.shinyapps.io/ZooMonitor_Prototype/?fbclid=IwAR3LvO6FB6JV9ckkpKy9So-2Wv5zOH5OLtXKAB21fM5xk87vgFUVRENmPco)
 
 \
+
+**Notes**
+
+* Above is the link to the Prototype R Shiny Program
+* Since we cannot give a live demo, we would like everyone to test out the program 
+* We have provided three data sets that the usercan choose for so that we do not have to send  Professor Miller and STA-395 classmates CSV Files.
+    + In the final version of the program, our client will be able to upload their own animal data
+    
+***    
 
 ### **Reflection and Discussion**
 
@@ -414,33 +549,53 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 **1. Things that went well**
 
 * Effective work distribution (using Trello)
-* Effective use of R documents; we created an individual, but shared, R scripts to avoid the possible merge conflicts on Github
+* Effective use of R documents; we created three individual (shared), R scripts to avoid the possible merge conflicts on Github
 * Creation of the visuals
   + 25 visuals (Including some created for Debriefing #2) were sent to our client
-  + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
+  + She liked the plots and made comments on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
 * Creation of the generalized cleaning script
-  + Created a script that is compatible with any animal's dataset
-  + This script takes the differences among the datasets into account and cleans any dataset in the same way 
+  + Created a script that is compatible with any animal dataset
+  + This script takes the into account the differences among the datasets and cleans any dataset in the same way 
 * Meeting with our client 
-  + She told us her more specific preferences on the plots that would possibly be included in the program than the last meeting
+  + She told us her more specific preferences on the plots to include in the program
   + We were able to envision the program soon after the meeting and decide the plots and inputs for each plot 
 
 **2. Things that were difficult**
 
 * Plot creations
   + It took time to figure out how to deal with the cases with extremely few observations
-  + Ended up creating a table for those ones
+  + We ended up creating a table for those ones
 * Pie chart aesthetics
-  + We had to choose between making the colors of the slice distinct to each other and sorting the slices by size (proportion)
-  + Ended up making the colors of the slice distinct to each other and putting the largest slice at the beginning
+  + We had to choose between making the colors of the slice distinct (for clarity) and sorting the slices by size (proportion)
+  + Ended up making the colors of the slice distinct from each other and putting the largest slice at the beginning
 * Pie chart's inclusion/exclusion of the subject animal
   + We discussed whether we should include the subject individual, the one who caused the event, in the pie chart or not. 
-  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion significantly.
+  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
-  + Ended up INCLUDING it for now and asking our client in the next meeting if she want the excluded version. 
+  + Ended up **INCLUDING** it for now and asking our client in the next meeting if she wants the excluded version. 
+
 \
 
 #### **Goal Reflection**
+
+1. Work with the Cattle data and answer the client's questions regarding the animal $\rightarrow$ **Complete**
+    + We created visualizations and/or tables for each of the 4 questions regarding cattles that the client had
+2. Work with Squirrel Monkey data and answer the client’s questions regarding the animal $\rightarrow$ **Complete**
+    + We created visualizations and/or tables for each of the 3 questions regarding squirrel monkeys that the client had
+3. Explore the differences in the structure of the animal datasets that we currently have $\rightarrow$ **Complete**
+    + We created a table that highlighted the similarities and differences in structure between the three datasets
+    + We also provided bullet point comments that provided further information
+4. Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys $\rightarrow$ **Complete**
+    + We created a fully functioning prototype R Shiny program compatible with the three data sets currently avaliable to us
+    + We published the program and posted a link so that people in STA-395 can test out the program
+
+\
+
+* We were able to successfully complete all four of our goals
+* The goals were feasible, but some goals took more time than others
+* The first two goals were fairly straightforward, even though we were working with completely new data sets
+* Since we had to explore the new data sets to complete the first two goals, the third goal relatively simple
+* The prototype R Shiny Program was the most complicated, and required a lot of preparation beforehand 
 
 \
 

@@ -120,7 +120,7 @@ ggplot(data = cattle_positive) +
 
 * The visualization illustrates the percentage of times each cattle was observed doing a positive behavior
   + The percentages for each cattle are based on the total number of observations for that specific cattle
-  + For example, considering **only** Batik's observations, roughly 36% is of those observations are of a positive behavior
+  + For example, considering **only** Batik's observations, roughly 36% of those observations are of a positive behavior
 
 * The visualization suggests that Batik spends the most time doing positive behaviors, followed by Patty, and then Chilly Jane
 * The coloring indicates that the composition that makes up the total percentage of positive behaviors differs for each cattle
@@ -160,10 +160,10 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
   + For example, considering **only** Damian's observations, a little over 4% of those observations are of him doing a head spin. 
   
 * The numbers on top of each bar represent the raw count of the number of head spins a particular animal was observed doing
-  + Even though Filbert had 30 head spin observations while Damain only had 10, the percentage of head spins relative to their total number of observations is similar
+  + Even though Filbert had 30 head spin observations while Damain only had 10, the percentage of head spin observations relative to their total number of observations is similar
 
-* Notably, Brazil is observed doing a head spin on far more regular basis. Roughly 11% of all her observations are of her doing a head spin
-* Isabel and Squirt are the monkeys that were observed doing a head spin least frequently relative to their total number of observations
+* Notably, Brazil is observed doing a head spin on a more regular basis than the other monkeys. Roughly 11% of all her observations are of her doing a head spin
+* Isabel and Squirt are the monkeys that were observed doing a head spin the least often in percentage terms
 
 
 
@@ -181,13 +181,12 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 4. Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys $\rightarrow$ **Complete**
     + We created a fully functioning prototype R Shiny program compatible with the three data sets currently avaliable to us
     + We published the program and posted a link so that people in STA-395 can test out the program
-    + We also provided comments that describe the program in detail
 
 \
 
 * We were able to successfully complete all four of our goals
-* All goals were feasible, but some goals took more time than others
-* The first two goals were fairly straightforward, even though we were working with a completely new data set
-* Since we had to explore the new data sets to complete the first two goals, the third goal was not troublesome
+* The goals were feasible, but some goals took more time than others
+* The first two goals were fairly straightforward, even though we were working with completely new data sets
+* Since we had to explore the new data sets to complete the first two goals, the third goal relatively simple
 * The prototype R Shiny Program was the most complicated, and required a lot of preparation beforehand 
 
