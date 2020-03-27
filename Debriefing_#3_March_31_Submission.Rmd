@@ -334,8 +334,8 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
 
 \
 
-#### **Headspin**
-*Which animal is doing headspins and how often?*
+#### **Head Spin**
+*Which animal is doing head spins and how often?*
 
 ```{r (MONKEY) Head spins Visual }
 
