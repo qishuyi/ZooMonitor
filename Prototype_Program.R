@@ -366,9 +366,9 @@ piechart <- function(input, output, animal_data) {
       ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
-        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event",
+        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
              subtitle = paste("Raw Counts: Before = 0", ", After = ", a_summary_only_after),
-             caption = "*This plot shows the behavior proportion for only after the selected date.") +
+             caption = "*This plot shows the behavior proportion for only the period after the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
@@ -393,9 +393,9 @@ piechart <- function(input, output, animal_data) {
       ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
-        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event",
+        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
              subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0"),
-             caption = "*This plot shows the behavior proportion for only before the selected date.") +
+             caption = "*This plot shows the behavior proportion for only the period before the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
