@@ -344,13 +344,15 @@ piechart <- function(input, output, animal_data) {
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
-             subtitle = paste("Raw Counts: Before = 0", ", After = ", a_summary_only_after)) +
+             subtitle = paste("Raw Counts: Before = 0", ", After = ", a_summary_only_after),
+             caption = "*This plot shows the behavior proportion for only after the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                plot.caption = element_text(hjust = 0, face = "bold"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     } 
@@ -370,13 +372,15 @@ piechart <- function(input, output, animal_data) {
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "The Event and Behaviors",
-             subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0")) +
+             subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0"),
+             ,caption = "*This plot shows the behavior proportion for only before the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                plot.caption = element_text(hjust = 0, face = "bold"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
