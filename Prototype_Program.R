@@ -329,7 +329,8 @@ facetedBarplots <- function(input, output, animal_data) {
       plot_caption <- paste(plot_caption, "Hour")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 3) + 
-        theme(axis.text.x = element_text(angle = 90, size = 10)) + 
+        theme(axis.text.x = element_text(angle = 90, size = 10),
+              plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
       theme(plot.title = element_text(size = 12, face = "bold"))
       
@@ -338,7 +339,8 @@ facetedBarplots <- function(input, output, animal_data) {
       plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 3) + 
-        theme(axis.text.x = element_text(angle = 90, size = 10)) + 
+        theme(axis.text.x = element_text(angle = 90, size = 10),
+          plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
     }
   }, height = 600)
