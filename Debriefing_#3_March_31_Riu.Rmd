@@ -30,12 +30,12 @@ library(forcats)
 
 
 ```{r Source}
-source("dogs_cleaning.R")
-source("cattle_cleaning.R")
-source("sq_monkey_cleaning.R")
-source("dogs_columns_addition.R")
-source("cattle_columns_addition.R")
-source("sq_monkey_columns_addition.R")
+source("Cleaning and Addition Scripts/dogs_cleaning.R")
+source("Cleaning and Addition Scripts/cattle_cleaning.R")
+source("Cleaning and Addition Scripts/sq_monkey_cleaning.R")
+source("Cleaning and Addition Scripts/dogs_columns_addition.R")
+source("Cleaning and Addition Scripts/cattle_columns_addition.R")
+source("Cleaning and Addition Scripts/sq_monkey_columns_addition.R")
 ```
 
 \
@@ -54,7 +54,7 @@ source("sq_monkey_columns_addition.R")
     
 4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys** 
     + ~~Measured by a live demonstration during the next debriefing~~
-    + Measured by the posting of a link for people to test out the prototype R Shiny Program, alongside a set of bullet point comments describing the program  
+    + Measured by the posting of a link for people to test out the prototype R Shiny Program
 
 
 * We worked on the four goals listed above for Debriefing #3
@@ -190,5 +190,4 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 * The first two goals were fairly straightforward, even though we were working with a completely new data set
 * Since we had to explore the new data sets to complete the first two goals, the third goal was not troublesome
 * The prototype R Shiny Program was the most complicated, and required a lot of preparation beforehand 
-
 
