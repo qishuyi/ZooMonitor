@@ -5,7 +5,7 @@ library(tidyr)
 library(stringr)
 
 #Importing Dogs Data
-dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1579790635.csv", col_types = cols(Notes = col_character()))
+dogs_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1579790635.csv", col_types = cols(Notes = col_character()))
 
 #Renaming Columns
 dogs_data <- dogs_data %>% rename(Session_Start_Time = `Session Start Time`,

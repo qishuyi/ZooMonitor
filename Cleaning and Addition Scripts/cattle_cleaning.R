@@ -3,7 +3,7 @@ library(dplyr)
 library(tidyr)
 
 #Importing Cattle Data
-cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/report_study_1582236321.csv", 
+cattle_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1582236321.csv", 
                         col_types = cols(.default = col_character(),
                                          SessionID = col_double(), 
                                          `Session Start Time` = col_datetime(format = ""),
