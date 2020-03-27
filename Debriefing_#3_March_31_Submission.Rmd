@@ -302,7 +302,12 @@ monkey_aggression <- sq_monkey_data %>% filter(Activity == "Aggression") %>%
 ggplot(monkey_aggression, aes(x=Name, fill=AOV_Social_Modifier)) +
   geom_bar(position = "stack", width = 0.4) +
   labs(title = "Monkeys showing aggressive behaviors", x = "Animal Name", y = "Frequency of aggressive behaviors", fill = "Towards") + 
-  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan"))
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan")) +
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 9, face = "italic"),
+        legend.title = element_text(size = 10),
+        legend.text = element_text(size = 8))
+ 
 
 colnames(monkey_aggression)[1] <- 'Monkey showing aggressive behavior'
 colnames(monkey_aggression)[2] <- 'Towards'
@@ -497,6 +502,8 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 ### **Goal 3**
 
 ***Comparison among animal datasets***
+
+
 ![](Images used for R Markdown/Comparison_dataset_structure.png)
 
 * Interval v.s. All Occurrence
@@ -521,6 +528,8 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 ***Prototype R Shiny App***
 
 [Link to the Prototype R Shiny App](https://qishuyi.shinyapps.io/ZooMonitor_Prototype/?fbclid=IwAR3LvO6FB6JV9ckkpKy9So-2Wv5zOH5OLtXKAB21fM5xk87vgFUVRENmPco)
+
+\
 
 **Notes**
 
