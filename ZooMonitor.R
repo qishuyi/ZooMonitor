@@ -16,14 +16,14 @@ library(forcats)
 library(viridis)
 
 #Run Data cleaning script for each animal
-source("dogs_cleaning.R")
-source("cattle_cleaning.R")
-source("sq_monkey_cleaning.R")
+source("Cleaning and Addition Scripts/dogs_cleaning.R")
+source("Cleaning and Addition Scripts/cattle_cleaning.R")
+source("Cleaning and Addition Scripts/sq_monkey_cleaning.R")
 
 #Run column addition script
-source("dogs_columns_addition.R")
-source("cattle_columns_addition.R")
-source("sq_monkey_columns_addition.R")
+source("Cleaning and Addition Scripts/dogs_columns_addition.R")
+source("Cleaning and Addition Scripts/cattle_columns_addition.R")
+source("Cleaning and Addition Scripts/sq_monkey_columns_addition.R")
 
 
 
@@ -683,3 +683,9 @@ monkey_aggression$Date <- format(monkey_aggression$Date, format = "%B %d, %Y")
 
 formattable(monkey_aggression, align = c("l", rep("c",3)))
 
+#Data frame to create visualization
+animal_data_copy <- animal_data
+animal_data_copy$Category <- as.factor(animal_data_copy$Category)
+animal_category <- animal_data_copy %>% group_by(Name, Category, .drop = FALSE) %>% 
+  summarize(Count = n()) %>%
+  filter(Category == "Stereotypic")

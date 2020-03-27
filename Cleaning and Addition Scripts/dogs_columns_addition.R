@@ -1,3 +1,5 @@
+library(zoo)
+
 ##Day_of_Week Column
 dogs_data <- mutate(dogs_data, Day_of_Week = wday(Date, label = TRUE))
 
