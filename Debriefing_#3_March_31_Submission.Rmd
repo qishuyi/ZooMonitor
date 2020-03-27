@@ -94,6 +94,35 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 #### **Agonistic Behaviors**
 *How often are they showing Agonistic behaviors?*
 
+```{r visual/table for Cattle agonistic behaviors, fig.width = 6, fig.height = 4}
+cattle_agonistic <- cattle_data %>% filter(Category == "Agonistic") %>%
+  select(Name, IC4_Social_Modifier, Activity, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1,5))
+
+ggplot(cattle_agonistic, aes(x=Name, fill=IC4_Social_Modifier)) +
+  geom_bar(position = "stack", width = 0.4) +
+  labs(title = "Cattle showing agonistic behaviors", x = "Animal Name", y = "Frequency of agonistic behaviors", fill = "Towards") + 
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3"))
+
+colnames(cattle_agonistic)[1] <- 'Cattle showing agonistic behavior'
+colnames(cattle_agonistic)[2] <- 'Towards'
+
+cattle_agonistic$Date <- format(cattle_agonistic$Date, format = "%B %d, %Y")
+
+formattable(cattle_agonistic, align = c("l", rep("c",3)))
+```
+
+
+* The visual displays how often each cattle shows agonistic behavior, while the table details the type of agonistic behavior and gives more insight about what happened during a conflict.
+* Visual:
+    + Batik and Chilly Jane often show agonistic behaviors towards each other.
+    + Patty sometimes shows agonistic behaviors towards Batik and Chilly Jane.
+* Table:
+    + 2019/05/26: Patty displays threat to the other two -- probably because it was being picked on?
+    + 2019/07/18: Batick and Chilly Jane are aggressive towards one another -- there was a conflict between them.
+    + 2019/07/21: Patty displays threat to Chilly Jane, Batick and Chilly Jane are aggressive towards each other -- a conflict between all three.
+    + 2019/08/02, 2019/08/20, 2019/09/19: conflicts between Batick and Chilly Jane.
+
 \
 
 #### **Stereotypic Behaviors**
@@ -175,6 +204,36 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 #### **Aggressive Behaviors**
 *Is it one squirrel monkey being aggressive to all the others or is it one being picked on regularly?*
+
+```{r visual/table for Monkey aggressive behaviors, fig.width = 6, fig.height = 4}
+monkey_aggression <- sq_monkey_data %>% filter(Activity == "Aggression") %>%
+  select(Name, AOV_Social_Modifier, Date, Time) %>%
+  mutate(Time = str_sub(Time, 1, 5))
+
+ggplot(monkey_aggression, aes(x=Name, fill=AOV_Social_Modifier)) +
+  geom_bar(position = "stack", width = 0.4) +
+  labs(title = "Monkeys showing aggressive behaviors", x = "Animal Name", y = "Frequency of aggressive behaviors", fill = "Towards") + 
+  scale_fill_manual(values = c("coral","cornflowerblue", "darkolivegreen3","darkorchid1", "darkcyan"))
+
+colnames(monkey_aggression)[1] <- 'Monkey showing aggressive behavior'
+colnames(monkey_aggression)[2] <- 'Towards'
+
+monkey_aggression$Date <- format(monkey_aggression$Date, format = "%B %d, %Y")
+
+formattable(monkey_aggression, align = c("l", rep("c",3)))
+```
+
+* **Visual**:
+    + Isabel was recorded significantly more aggressive behaviors than other monkeys.
+* Again, the visual displays how often each monkey shows aggressive behaviors, while the table gives more insight about what happened on a particularly day.
+* **Table**:
+    + 2017/11/06: Damian was aggressive towards Brazil; Pistachio was aggressive towards both Brazil and Filbert. There was probably a conflict between all four monkeys (Squirt has not come to the zoo yet at this point).
+    + 2017/12/19, 2018/02/01, 2018/02/22: Isabel showed aggressive behaviors towards Brazil, Damian and Filbert respectively.
+    + 2018/03/12: Isabel showed aggressive behaviors towards Pistacio, who is aggressive towards Filbert. There might have been a conflict between the three.
+    + 2019/02/17: Both Isabel and Brazil were aggressive towards Filbert.
+    + 2020/02/08: Filbert was aggressive towards Squirt.
+* Filbert seems to be involved in conflicts regularly.
+* Isabel is also constantly involved in conflicts and is always the one showing aggressive behaviors, which possibly suggests that Isabel is being picked on by other monkeys regularly.
 
 
 \
@@ -320,7 +379,23 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 ### **Goal 3**
 
 ***Comparison among animal datasets***
+![](Images used for R Markdown/Comparison_dataset_structure.png)
 
+* Interval v.s. All Occurrence
+    + Interval: a behavior is recorded at most once per one-minute interval.
+    + All Occurrence: behaviors are recorded every time they occur even if it is more than once during a one-minute interval.
+* Painted African dogs and squirrel monkeys only have two interval channels: active and inactive. Cattle has eight detailed categories for active behaviors.
+* Cattle's nine interval channels:
+    + Interval Channel 1: Inactive              (Alert, Resting, Ruminating)
+    + Interval Channel 2: Locomotion            (Walk)
+    + Interval Channel 3: Social                (Allogrooming, Grooming other, Play, Sniff, Vocalization)
+    + Interval Channel 4: Agonistic             (Aggression, Threat display)
+    + Interval Channel 5: Maintenance           (Dust bath, Grooming, Horn rubbing, Rubbing)
+    + Interval Channel 6: Exploratory & Feeding (Consumption, Foraging, Object manipulation)
+    + Interval Channel 7: Stereotypic           (Cribbing, Pacing)
+    + Interval Channel 8: Enrichment-based      (Interaction, Observation)
+    + Interval Channel 9: Other                 (Other, Out of View)
+* The 'All Occurrence Value' column in the cattle dataset is empty, thus nothing needs to be done until we discover future datasets that have this column and contain values in it. 
 
 ### **Goal 4**
 
@@ -370,6 +445,9 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 \
 
 #### **Next Steps**
+* Refine R Shiny APP functionalities (e.g., Provide a 'select all' checkbox that checks all boxes, provide multiple fill options, etc.)
+* Improve aesthetics of the APP (e.g., bar width)
+* Test the R Shiny APP with more datasets and solve problems as they come up
 
 
 
