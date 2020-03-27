@@ -30,12 +30,12 @@ library(forcats)
 
 
 ```{r Source}
-source("dogs_cleaning.R")
-source("cattle_cleaning.R")
-source("sq_monkey_cleaning.R")
-source("dogs_columns_addition.R")
-source("cattle_columns_addition.R")
-source("sq_monkey_columns_addition.R")
+source("Cleaning and Addition Scripts/dogs_cleaning.R")
+source("Cleaning and Addition Scripts/cattle_cleaning.R")
+source("Cleaning and Addition Scripts/sq_monkey_cleaning.R")
+source("Cleaning and Addition Scripts/dogs_columns_addition.R")
+source("Cleaning and Addition Scripts/cattle_columns_addition.R")
+source("Cleaning and Addition Scripts/sq_monkey_columns_addition.R")
 ```
 
 \

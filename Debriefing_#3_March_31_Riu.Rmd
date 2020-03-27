@@ -190,4 +190,3 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 * Since we had to explore the new data sets to complete the first two goals, the third goal relatively simple
 * The prototype R Shiny Program was the most complicated, and required a lot of preparation beforehand 
 
-
