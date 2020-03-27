@@ -27,8 +27,11 @@ generalplot <- function(input, output, animal_data) {
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Percentage of Observations (Time of Day)", x = "Time of Day", y = "Percentage (%)") + 
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash")
+        labs(title = "Barplot of Observations", x = "Time of Day", y = "Percentage") + 
+        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"))
+            
+              
     } 
     # Day of Week Plot 
     else if (input$select_general == "Day of Week"){
@@ -37,8 +40,9 @@ generalplot <- function(input, output, animal_data) {
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Percentage of Observations (Day of Week)", x = "Day of Week", y = "Percentage (%)") +
-        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+        labs(title = "Barplot of Observations", x = "Day of Week", y = "Percentage") +
+        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"))
     }
     #Animal Plot
     else {
@@ -47,8 +51,9 @@ generalplot <- function(input, output, animal_data) {
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Percentage of Observations (Animal's Name)", x = "Animal's Name", y = "Percentage (%)") +
-        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") 
+        labs(title = "Barplot of Observations", x = "Animal's Name", y = "Percentage") +
+        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"))
     }
   })
 }
