@@ -432,13 +432,13 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
-                          titlePanel("Upload a CSV file"),
+                          titlePanel(h3("Upload a CSV File")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to upload a csv file
-                              fileInput("file1", "Choose CSV File",
+                              fileInput("file1", "Choose a CSV File",
                                         multiple = TRUE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
@@ -458,7 +458,7 @@ ui <- navbarPage("ZooMonitor",
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              radioButtons("select_general", "Choose an Input",
+                              radioButtons("select_general", "Show Observations by:",
                                            choices = list("Time of Day", "Day of Week", "Animal's Name")
                               )
                             ),
@@ -470,52 +470,14 @@ ui <- navbarPage("ZooMonitor",
                             
                             ))),
                  
-                 ############################### Category ###############################
-                 tabPanel("Category",
-                          
-                          titlePanel(h3("Infographics of Selected Categories")),
-                          sidebarPanel(
-                            uiOutput("select_category")
-                            
-                          ),
-                          mainPanel(
-                            tabsetPanel(
-                              
-                              tabPanel("Visual", plotOutput(outputId = "category_visual")),
-                              tabPanel("Summary Table", tableOutput(outputId = "category_table")),
-                              tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
-                                       uiOutput(outputId = "category_text"))
-                              
-                              
-                            ))),
-                 
-                 ############################### Behavior ###############################
-                 tabPanel("Behavior",
-                          
-                          titlePanel(h3("Infographics of Selected Behaviors")),
-                          sidebarPanel(
-                            uiOutput("select_behavior")
-                            
-                          ),
-                          mainPanel(
-                            tabsetPanel(
-                              
-                              tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
-                              tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
-                              tabPanel("Raw Table", tableOutput(outputId = "raw_behavior_table"),
-                                       uiOutput(outputId = "behavior_text"))
-                              
-                              
-                            ))
-                 ),
-                 
+                
                  ############################### Faceted Barplot ###############################
                  tabPanel("Daily/Weekly",
                           
                           titlePanel(h3("Frequency of Animal Behaviors")),
                           sidebarPanel(
                             uiOutput("dateControls4"),
-                            radioButtons("select_faceted_barplot", "Show behavior by:",
+                            radioButtons("select_faceted_barplot", "Show Behaviors by:",
                                          choices = list("Hour of Day", "Day of Week")),
                             uiOutput("nameControls4")
                           ),
@@ -527,14 +489,14 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Pie Chart ###############################
                  tabPanel("Events",
                           
-                          titlePanel(h3("Event's Impact on Behaviors")),
+                          titlePanel(h3("Impact of Event on Behaviors")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               uiOutput("dateControls"),
-                              helpText("The date can only be chosen from the dataset you uploaded.")
+                              helpText("Selectable dates depend on the uploaded data set")
                             ),
                             mainPanel(
                               #Removing the warning message that appears for a second 
@@ -545,7 +507,51 @@ ui <- navbarPage("ZooMonitor",
                               # Show the plot of general obervations
                               plotOutput("event_pie_plot"),
                               h6("The colors of slices will change every time you change the date.", align = "center")
-                            ))))
+                            ))),
+                 
+                 ############################### Category/Behavior ###############################
+                 navbarMenu("Activities",
+                            
+                            tabPanel("Categories",
+                                     
+                                     titlePanel(h3("Infographics of Selected Categories")),
+                                     sidebarPanel(
+                                       uiOutput("select_category")
+                                       
+                                     ),
+                                     mainPanel(
+                                       tabsetPanel(
+                                         
+                                         tabPanel("Visual", plotOutput(outputId = "category_visual")),
+                                         tabPanel("Summary Table", tableOutput(outputId = "category_table")),
+                                         tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
+                                                  uiOutput(outputId = "category_text"))
+                                         
+                                         
+                                       ))),
+                            
+                            
+                            tabPanel("Behavior",
+                                     
+                                     titlePanel(h3("Infographics of Selected Behaviors")),
+                                     sidebarPanel(
+                                       uiOutput("select_behavior")
+                                       
+                                     ),
+                                     mainPanel(
+                                       tabsetPanel(
+                                         
+                                         tabPanel("Visual", plotOutput(outputId = "behavior_visual")),
+                                         tabPanel("Summary Table", tableOutput(outputId = "behavior_table")),
+                                         tabPanel("Raw Table", tableOutput(outputId = "raw_behavior_table"),
+                                                  uiOutput(outputId = "behavior_text"))
+                                         
+                                         
+                                       ))))
+                                     
+                         
+                 
+                )
 
 # Define server logic
 server <- function(input, output) {
@@ -717,12 +723,12 @@ server <- function(input, output) {
       prefix <- c('All animals')
       names <- sort(unique(animal_data$Name))
       names <- c(prefix, names)
-      radioButtons('names4', "Choose Animal", names)
+      radioButtons('names4', "Select Animal", names)
     })
     #Let user select a date range
     output$dateControls4 <- renderUI({
       date <- animal_data$Date
-      dateRangeInput("daterange4", "Select a date range:",
+      dateRangeInput("daterange4", "Select Date Range",
                      start = min(animal_data$Date),
                      end = max(animal_data$Date),
                      min = min(animal_data$Date),
@@ -734,7 +740,7 @@ server <- function(input, output) {
     ############################### Pie Charts ###############################
     output$dateControls <- renderUI({
       date <- animal_data$Date
-      dateInput("date", "Date of the event:",
+      dateInput("date", "Select Event Date",
                 value = min(animal_data$Date),
                 min = min(animal_data$Date),
                 max = max(animal_data$Date))
@@ -782,12 +788,12 @@ server <- function(input, output) {
     prefix <- c('All animals')
     names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
-    radioButtons('names4', "Choose Animal", names)
+    radioButtons('names4', "Select Animal", names)
   })
   #Let user select a date range
   output$dateControls4 <- renderUI({
     date <- animal_data$Date
-    dateRangeInput("daterange4", "Select a date range:",
+    dateRangeInput("daterange4", "Select Date Range",
                    start = min(animal_data$Date),
                    end = max(animal_data$Date),
                    min = min(animal_data$Date),
@@ -799,7 +805,7 @@ server <- function(input, output) {
   ############################### Pie Charts ###############################
   output$dateControls <- renderUI({
     date <- animal_data$Date
-    dateInput("date", "Date of the event:",
+    dateInput("date", "Select Event Date",
               value = min(animal_data$Date),
               min = min(animal_data$Date),
               max = max(animal_data$Date))
