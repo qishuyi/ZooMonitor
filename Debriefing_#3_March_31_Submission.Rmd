@@ -509,7 +509,7 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 * Interval v.s. All Occurrence
     + Interval: a behavior is recorded at most once per one-minute interval.
     + All Occurrence: behaviors are recorded every time they occur even if it is more than once during a one-minute interval.
-* Painted African dogs and squirrel monkeys only have two interval channels: active and inactive. Cattle has eight detailed categories for active behaviors.
+* Painted African dogs and squirrel monkeys only have two interval channels: active and inactive. Cattles have eight detailed categories for active behaviors.
 * Cattle's nine interval channels:
     + Interval Channel 1: Inactive              (Alert, Resting, Ruminating)
     + Interval Channel 2: Locomotion            (Walk)
