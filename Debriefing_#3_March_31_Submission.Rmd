@@ -103,7 +103,7 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
   + Pie chart of Behaviors before/after a certain event, e.g., death of the baby JT (in the Painted African Dogs' case)
   + Barplot of Behaviors by hour of day and day of week, for all individual animals or just a specific name
   
-*Category is a variable that groups similar behaviors.
+*Category is a variable that groups similar behaviors*
   
 ***
 
@@ -140,6 +140,8 @@ formattable(cattle_agonistic, align = c("l", rep("c",3)))
 
 
 * The visual displays how often each cattle shows agonistic behavior, while the table details the type of agonistic behavior and gives more insight about what happened during a conflict.
+
+
 * **Visual:**
     + Batik and Chilly Jane often show agonistic behaviors towards each other.
     + Patty sometimes shows agonistic behaviors towards Batik and Chilly Jane.
@@ -235,7 +237,6 @@ ggplot(cattle_data_HR2, aes(x = Category, y = counts)) +
 
 *Green = Active, Red = Inactive*
 
-\
 
 * Cattles generally spend more activel around 10am and 11am and more inactive after lunch time
 * All three cattles behave similarly throuout the day
@@ -320,6 +321,8 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
     + 2018/03/12: Isabel showed aggressive behaviors towards Pistacio, who is aggressive towards Filbert. There might have been a conflict between the three.
     + 2019/02/17: Both Isabel and Brazil were aggressive towards Filbert.
     + 2020/02/08: Filbert was aggressive towards Squirt.
+
+
 * Filbert seems to be involved in conflicts regularly.
 * Isabel is also constantly involved in conflicts and is always the one showing aggressive behaviors, which possibly suggests that Isabel is being picked on by other monkeys regularly.
 
@@ -487,11 +490,9 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 * The raw counts of observations is included in the visual since they normally differ significantly between before/after
 * Only Damian has the period "One month after" since there were observations soon after his death. (Which was not the case for the other events)
 * We also created the same plots for Painted African Dogs' death/birth and sent them to our client since it was one of her initial interests. 
-
-
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
-\
+***
 
 ### **Goal 3**
 
@@ -512,15 +513,23 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
     + Interval Channel 7: Stereotypic           (Cribbing, Pacing)
     + Interval Channel 8: Enrichment-based      (Interaction, Observation)
     + Interval Channel 9: Other                 (Other, Out of View)
-* The 'All Occurrence Value' column in the cattle dataset is empty, thus nothing needs to be done until we discover future datasets that have this column and contain values in it. 
+
+***
 
 ### **Goal 4**
 
-***R Shiny app Prototype***
+***Prototype R Shiny App***
 
-##link to it
+[Link to the Prototype R Shiny App](https://qishuyi.shinyapps.io/ZooMonitor_Prototype/?fbclid=IwAR3LvO6FB6JV9ckkpKy9So-2Wv5zOH5OLtXKAB21fM5xk87vgFUVRENmPco)
 
-\
+**Notes**
+
+* Above is the link to the Prototype R Shiny Program
+* Since we cannot give a live demo, we would like everyone to test out the program 
+* We have provided three data sets that the usercan choose for so that we do not have to send  Professor Miller and STA-395 classmates CSV Files.
+    + In the final version of the program, our client will be able to upload their own animal data
+    
+***    
 
 ### **Reflection and Discussion**
 
@@ -531,30 +540,31 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 **1. Things that went well**
 
 * Effective work distribution (using Trello)
-* Effective use of R documents; we created an individual, but shared, R scripts to avoid the possible merge conflicts on Github
+* Effective use of R documents; we created three individual (shared), R scripts to avoid the possible merge conflicts on Github
 * Creation of the visuals
   + 25 visuals (Including some created for Debriefing #2) were sent to our client
-  + She liked the plots and commented on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
+  + She liked the plots and made comments on some of them; expecially, she mentioned that the weather/temperature data would not be too useful since those two factors might be different from those at the recorded place (Pueblo Airport)
 * Creation of the generalized cleaning script
-  + Created a script that is compatible with any animal's dataset
-  + This script takes the differences among the datasets into account and cleans any dataset in the same way 
+  + Created a script that is compatible with any animal dataset
+  + This script takes the into account the differences among the datasets and cleans any dataset in the same way 
 * Meeting with our client 
-  + She told us her more specific preferences on the plots that would possibly be included in the program than the last meeting
+  + She told us her more specific preferences on the plots to include in the program
   + We were able to envision the program soon after the meeting and decide the plots and inputs for each plot 
 
 **2. Things that were difficult**
 
 * Plot creations
   + It took time to figure out how to deal with the cases with extremely few observations
-  + Ended up creating a table for those ones
+  + We ended up creating a table for those ones
 * Pie chart aesthetics
-  + We had to choose between making the colors of the slice distinct to each other and sorting the slices by size (proportion)
-  + Ended up making the colors of the slice distinct to each other and putting the largest slice at the beginning
+  + We had to choose between making the colors of the slice distinct (for clarity) and sorting the slices by size (proportion)
+  + Ended up making the colors of the slice distinct from each other and putting the largest slice at the beginning
 * Pie chart's inclusion/exclusion of the subject animal
   + We discussed whether we should include the subject individual, the one who caused the event, in the pie chart or not. 
-  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion significantly.
+  + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
-  + Ended up INCLUDING it for now and asking our client in the next meeting if she want the excluded version. 
+  + Ended up **INCLUDING** it for now and asking our client in the next meeting if she wants the excluded version. 
+
 \
 
 #### **Goal Reflection**
