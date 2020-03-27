@@ -16,14 +16,14 @@ library(forcats)
 library(viridis)
 
 #Run Data cleaning script for each animal
-source("dogs_cleaning.R")
-source("cattle_cleaning.R")
-source("sq_monkey_cleaning.R")
+source("Cleaning and Addition Scripts/dogs_cleaning.R")
+source("Cleaning and Addition Scripts/cattle_cleaning.R")
+source("Cleaning and Addition Scripts/sq_monkey_cleaning.R")
 
 #Run column addition script
-source("dogs_columns_addition.R")
-source("cattle_columns_addition.R")
-source("sq_monkey_columns_addition.R")
+source("Cleaning and Addition Scripts/dogs_columns_addition.R")
+source("Cleaning and Addition Scripts/cattle_columns_addition.R")
+source("Cleaning and Addition Scripts/sq_monkey_columns_addition.R")
 
 
 
