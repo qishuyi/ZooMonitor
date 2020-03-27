@@ -329,8 +329,11 @@ facetedBarplots <- function(input, output, animal_data) {
 ############################### Pie Charts ###############################
 piechart <- function(input, output, animal_data) {
   output$event_pie_plot <- renderPlot({
-  req(input$date)
-    #Creates a dataset "After"
+    
+    #Calls the input
+    req(input$date)
+    
+    #If the minimum date was selected (The very first date of the dataset)
     if(input$date == min(animal_data$Date)){
       animal_data <- animal_data %>% group_by(Behavior)
       summary_only_after <- as.data.frame(summarise(animal_data, n()))
@@ -339,7 +342,7 @@ piechart <- function(input, output, animal_data) {
       summary_only_after <- summary_only_after %>%
         mutate(Percent = round(counts/a_summary_only_after*100, 1))
   
-      #Creates a pie chart "After"
+      #Creates a pie chart for only after
       ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
@@ -357,7 +360,7 @@ piechart <- function(input, output, animal_data) {
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     } 
     
-    #Creates a dataset "Before"
+    #If the maximum date was selected (The very last date)
     else if(input$date == max(animal_data$Date)){
       animal_data <- animal_data %>% group_by(Behavior)
       summary_only_before <- as.data.frame(summarise(animal_data,n()))
@@ -366,7 +369,7 @@ piechart <- function(input, output, animal_data) {
       summary_only_before <- summary_only_before %>%
         mutate(Percent = round(counts/a_summary_only_before*100, 1))
       
-      #Creates a pie chart "Before"
+      #Creates a pie chart for only before
       ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
@@ -384,7 +387,9 @@ piechart <- function(input, output, animal_data) {
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
     }
+    #If the date in-between the max and min dates was selected
     else{
+      
     #Creates a before dataset
     before <- subset(animal_data, Date < input$date)
     before <- before %>% group_by(Behavior)
@@ -409,7 +414,7 @@ piechart <- function(input, output, animal_data) {
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
-    #Pie charts for both before and after
+    #Creates pie charts for both before and after
     ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
       geom_bar(stat="identity", width=1) +
       facet_grid(.~ Period) +
