@@ -325,10 +325,10 @@ facetedBarplots <- function(input, output, animal_data) {
     # Choose x-axis of the barplots
     if(animal_name == "All animals") animal_name <- "All Animals"
     
-    plot_caption <- paste(animal_name, ": Barplots of Behaviors per", sep = "")
+    plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
     if (input$select_faceted_barplot == "Hour of Day") {
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Hour")
+      plot_caption <- paste(plot_caption, "Hour of Day")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2) + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
@@ -393,7 +393,7 @@ piechart <- function(input, output, animal_data) {
       ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
-        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behaviors Before an Event",
+        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
              subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0"),
              caption = "*This plot shows the behavior proportion for only the period before the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
@@ -502,10 +502,10 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Faceted Barplot ###############################
                  tabPanel("Daily/Weekly",
                           
-                          titlePanel(h3("Frequency of Animal Behaviors")),
+                          titlePanel(h3("Frequency of Behaviors")),
                           sidebarPanel(
                             uiOutput("dateControls4"),
-                            radioButtons("select_faceted_barplot", "Show Behaviors by:",
+                            radioButtons("select_faceted_barplot", "Show Behavior by:",
                                          choices = list("Hour of Day", "Day of Week")),
                             uiOutput("nameControls4")
                           ),
@@ -517,7 +517,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Pie Chart ###############################
                  tabPanel("Events",
                           
-                          titlePanel(h3("Impact of Event on Behaviors")),
+                          titlePanel(h3("Impact of Events on Behavior")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
