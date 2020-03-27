@@ -119,10 +119,12 @@ category <- function(input, output, animal_data) {
       }
       
       animal_category_table <- animal_category_table %>% 
-        cbind(Percentage = animal_category_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$category_input), length(animal_count))))
+        cbind(Percentage = (animal_category_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$category_input), length(animal_count)))) * 100)
       
-      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 4), nsmall = 4)
+      animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 2), nsmall = 2)
+      
+      animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
       
       return(animal_category_table)
       
@@ -239,16 +241,16 @@ behavior <- function(input, output, animal_data) {
       }
       
       animal_behavior_table <- animal_behavior_table %>% 
-        cbind(Percentage = animal_behavior_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$behavior_input), length(animal_count))))
+        cbind(Percentage = (animal_behavior_table$Count/ rep(animal_count,
+                                                            times = rep(length(input$behavior_input), length(animal_count))))*100)
       
       
-      animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 4), nsmall = 4)
+      animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 2), nsmall = 2)
+      
+    
+      animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
       
       return(animal_behavior_table)
-      
-      
-      
     }
     
   })
