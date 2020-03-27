@@ -487,7 +487,7 @@ ui <- navbarPage("ZooMonitor",
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               radioButtons("select_general", "Show Observations by:",
-                                           choices = list("Hour of Day", "Day of Week", "Animal's Name")
+                                           choices = list("Hour of Day", "Day of Week", "Animal")
                               )
                             ),
                             mainPanel(
