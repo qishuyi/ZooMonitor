@@ -54,7 +54,7 @@ source("sq_monkey_columns_addition.R")
     
 4. **Create a prototype R Shiny program for only the Painted African Dogs, Cattles, and Squirrel Monkeys** 
     + ~~Measured by a live demonstration during the next debriefing~~
-    + Measured by the posting of a link for people to test out the prototype R Shiny Program, alongside a set of bullet point comments describing the program  
+    + Measured by the posting of a link for people to test out the prototype R Shiny Program
 
 
 * We worked on the four goals listed above for Debriefing #3
