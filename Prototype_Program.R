@@ -27,7 +27,7 @@ generalplot <- function(input, output, animal_data) {
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Barplot of Observations", x = "Hour of Day", y = "Percentage") + 
+        labs(title = "Barplot of Observations per Hour of Day", x = "Hour of Day", y = "Percentage") + 
         geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
             
@@ -42,7 +42,7 @@ generalplot <- function(input, output, animal_data) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
 
-        labs(title = "Barplot of Observations", x = "Day of Week", y = "Percentage") +
+        labs(title = "Barplot of Observations per Day of Week", x = "Day of Week", y = "Percentage") +
         geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
 
@@ -55,7 +55,7 @@ generalplot <- function(input, output, animal_data) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
 
-        labs(title = "Barplot of Observations", x = "Animal Name", y = "Percentage") +
+        labs(title = "Barplot of Observations per Animal", x = "Animal Name", y = "Percentage") +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
 
