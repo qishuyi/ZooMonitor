@@ -330,7 +330,7 @@ facetedBarplots <- function(input, output, animal_data) {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Hour, ncol = 3) + 
+        facet_wrap(~ Hour, ncol = 2) + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
               plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
@@ -338,7 +338,7 @@ facetedBarplots <- function(input, output, animal_data) {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol = 3) + 
+        facet_wrap(~ Day_of_Week, ncol = 2) + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
           plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
@@ -393,7 +393,7 @@ piechart <- function(input, output, animal_data) {
       ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
         coord_polar("y", start=0) + 
-        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
+        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behaviors Before an Event",
              subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0"),
              caption = "*This plot shows the behavior proportion for only the period before the selected date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +

@@ -138,5 +138,6 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
 
 
 #### **Next Steps**
-* Generalize the R Shiny APP so that it works for more animal datasets.
-
+* Refine R Shiny APP functionalities (e.g., Provide a 'select all' checkbox that checks all boxes, provide multiple fill options, etc.)
+* Improve aesthetics of the APP (e.g., bar width)
+* Test the R Shiny APP with more datasets and solve problems as they come up
