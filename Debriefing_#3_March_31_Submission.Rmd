@@ -378,8 +378,9 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 *Did the addition of Squirt have an impact on the monkeys' behavior?*
 
 \
+##### **Damian's Death**
 
-##### **Including the Subject Animal**
+**Including Damian**
 
 ```{r Visual for before and after the death of Damian}
 ##Damian's death
@@ -411,9 +412,9 @@ summary_Damian <- rbind(summary_Damian_before, summary_Damian_amonth, summary_Da
 summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
   
 ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
-  facet_grid(.~ Period) +
+  facet_wrap(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity", subtitle = "Raw Counts: Before = 399, One month after = 159, After = 1962") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Death and Activity", subtitle = "Raw Counts: Before = 399, One month after = 159, After = 1962") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
@@ -424,6 +425,54 @@ ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(16)[sample(1:16)])
 ```
 
+**Excluding Damian**
+
+```{r Visual for Without Damian}
+##Damian's death
+D_before <- subset(sq_monkey_data, Date < "2018-02-23" & Name != "Damian")
+D_before <- D_before %>% group_by(Activity)
+summary_D_before <- as.data.frame(summarise(D_before, n()))
+names(summary_D_before)[names(summary_D_before) == "n()"] <- "counts"
+summary_D_before <- summary_D_before %>%
+  mutate(percent = round(counts/317*100, 1)) %>%
+  mutate(Period = "Before")
+
+D_amonth <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21" & Name != "Damian")
+D_amonth <- D_amonth %>% group_by(Activity)
+summary_D_amonth <- as.data.frame(summarise(D_amonth, n()))
+names(summary_D_amonth)[names(summary_D_amonth) == "n()"] <- "counts"
+summary_D_amonth <- summary_D_amonth %>%
+  mutate(percent = round(counts/158*100, 1)) %>%
+  mutate(Period = "One month after")
+
+D_after <- subset(sq_monkey_data, Date > "2018-03-21" & Name != "Damian")
+D_after <- D_after %>% group_by(Activity)
+summary_D_after <- as.data.frame(summarise(D_after, n()))
+names(summary_D_after)[names(summary_D_after) == "n()"] <- "counts"
+summary_D_after <- summary_D_after %>%
+  mutate(percent = round(counts/1841*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Damian <- rbind(summary_D_before, summary_D_amonth, summary_D_after)
+summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
+  
+ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Death and Activity (without Damian)", subtitle = "Raw Counts: Before = 317, One month after = 158, After = 1841") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(16)[sample(1:16)])
+```
+
+##### **Pistacio's Death**
+
+**Including Pistacio**
 ```{r Visual for before and after the death of Pistacio}
 ##Pistacio's death
 Pistacio_before <- subset(sq_monkey_data, Date < "2018-12-03")
@@ -448,7 +497,7 @@ summary_Pistacio$Period <- factor(summary_Pistacio$Period, levels = c("Before", 
 ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(.~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Passing and Activity", subtitle = "Raw Counts: Before = 760, After = 1760") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Death and Activity", subtitle = "Raw Counts: Before = 760, After = 1760") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
@@ -459,6 +508,46 @@ ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(pe
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
+**Excluding Pistacio**
+
+```{r Visual for Without Pistacio}
+##Pistacio's death
+P_before <- subset(sq_monkey_data, Date < "2018-12-03" & Name != "Pistacio")
+P_before <- P_before %>% group_by(Activity)
+summary_P_before <- as.data.frame(summarise(P_before, n()))
+names(summary_P_before)[names(summary_P_before) == "n()"] <- "counts"
+summary_P_before <- summary_P_before %>%
+  mutate(percent = round(counts/591*100, 1)) %>%
+  mutate(Period = "Before")
+
+P_after <- subset(sq_monkey_data, Date >= "2018-12-03" & Name != "Pistacio")
+P_after <- P_after %>% group_by(Activity)
+summary_P_after <- as.data.frame(summarise(P_after, n()))
+names(summary_P_after)[names(summary_P_after) == "n()"] <- "counts"
+summary_P_after <- summary_P_after %>%
+  mutate(percent = round(counts/1673*100, 1)) %>%
+  mutate(Period = "After")
+
+summary_Pistacio <- rbind(summary_P_before, summary_P_after)
+summary_Pistacio$Period <- factor(summary_Pistacio$Period, levels = c("Before", "After"))
+
+ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
+  facet_grid(.~ Period) +
+  coord_polar("y", start=0) + 
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Death and Activity (without Pistacio)", subtitle = "Raw Counts: Before = 591, After = 1673") +
+  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+  theme_classic() + theme(axis.line = element_blank(),
+                          axis.text = element_blank(),
+                          axis.ticks = element_blank(),
+                          plot.title = element_text(hjust = 0.5, face = "bold"),
+                          plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                          legend.position="bottom") +
+  scale_fill_manual(values = rainbow(27)[sample(1:27)])
+```
+
+##### **Squirt's joining**
+
+**Including Squirt**
 ```{r Visual for before and after the joining of Squirt}
 ##Squirt's joining
 Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
@@ -494,96 +583,7 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
-* Deaths/Joining information
-  + Damian passed away on Feb 22, 2018
-  + Pistacio passed away on Dec 3, 2018
-  + Squirt came to the zoo on June 13, 2019
-* The raw counts of observations is included in the visual since they normally differ substantially between before/after
-* Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
-* We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
-* Note that the subject animal (the one that passed away/joined the zoo) is **included** in the pie charts
-
-\
-
-##### **Excluding the Subject Animal**
-
-```{r Visual for Without Damian}
-##Damian's death
-D_before <- subset(sq_monkey_data, Date < "2018-02-23" & Name != "Damian")
-D_before <- D_before %>% group_by(Activity)
-summary_D_before <- as.data.frame(summarise(D_before, n()))
-names(summary_D_before)[names(summary_D_before) == "n()"] <- "counts"
-summary_D_before <- summary_D_before %>%
-  mutate(percent = round(counts/317*100, 1)) %>%
-  mutate(Period = "Before")
-
-D_amonth <- subset(sq_monkey_data, Date >= "2018-02-23" & Date <= "2018-03-21" & Name != "Damian")
-D_amonth <- D_amonth %>% group_by(Activity)
-summary_D_amonth <- as.data.frame(summarise(D_amonth, n()))
-names(summary_D_amonth)[names(summary_D_amonth) == "n()"] <- "counts"
-summary_D_amonth <- summary_D_amonth %>%
-  mutate(percent = round(counts/158*100, 1)) %>%
-  mutate(Period = "One month after")
-
-D_after <- subset(sq_monkey_data, Date > "2018-03-21" & Name != "Damian")
-D_after <- D_after %>% group_by(Activity)
-summary_D_after <- as.data.frame(summarise(D_after, n()))
-names(summary_D_after)[names(summary_D_after) == "n()"] <- "counts"
-summary_D_after <- summary_D_after %>%
-  mutate(percent = round(counts/1841*100, 1)) %>%
-  mutate(Period = "After")
-
-summary_Damian <- rbind(summary_D_before, summary_D_amonth, summary_D_after)
-summary_Damian$Period <- factor(summary_Damian$Period, levels = c("Before", "One month after", "After"))
-  
-ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
-  facet_grid(.~ Period) +
-  coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Damian's Passing and Activity (without Damian)", subtitle = "Raw Counts: Before = 317, One month after = 158, After = 1841") +
-  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-  theme_classic() + theme(axis.line = element_blank(),
-                          axis.text = element_blank(),
-                          axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5, face = "bold"),
-                          plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                          legend.position="bottom") +
-  scale_fill_manual(values = rainbow(16)[sample(1:16)])
-```
-
-```{r Visual for Without Pistacio}
-##Pistacio's death
-P_before <- subset(sq_monkey_data, Date < "2018-12-03" & Name != "Pistacio")
-P_before <- P_before %>% group_by(Activity)
-summary_P_before <- as.data.frame(summarise(P_before, n()))
-names(summary_P_before)[names(summary_P_before) == "n()"] <- "counts"
-summary_P_before <- summary_P_before %>%
-  mutate(percent = round(counts/591*100, 1)) %>%
-  mutate(Period = "Before")
-
-P_after <- subset(sq_monkey_data, Date >= "2018-12-03" & Name != "Pistacio")
-P_after <- P_after %>% group_by(Activity)
-summary_P_after <- as.data.frame(summarise(P_after, n()))
-names(summary_P_after)[names(summary_P_after) == "n()"] <- "counts"
-summary_P_after <- summary_P_after %>%
-  mutate(percent = round(counts/1673*100, 1)) %>%
-  mutate(Period = "After")
-
-summary_Pistacio <- rbind(summary_P_before, summary_P_after)
-summary_Pistacio$Period <- factor(summary_Pistacio$Period, levels = c("Before", "After"))
-
-ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
-  facet_grid(.~ Period) +
-  coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Passing and Activity (without Pistacio)", subtitle = "Raw Counts: Before = 591, After = 1673") +
-  guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-  theme_classic() + theme(axis.line = element_blank(),
-                          axis.text = element_blank(),
-                          axis.ticks = element_blank(),
-                          plot.title = element_text(hjust = 0.5, face = "bold"),
-                          plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                          legend.position="bottom") +
-  scale_fill_manual(values = rainbow(27)[sample(1:27)])
-```
+**Excluding Squirt**
 
 ```{r Visual for Without Squirt}
 ##Squirt's joining
@@ -620,8 +620,18 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
-* Note that the subject animal (the one that passed away/joined the zoo) is **excluded** from the pie charts, that is to say, both pie charts (before and after) represent the proportions of the behavior of all animals but the subject one.
-* These pie charts, with the exclusion of the subject animals, convey the impact of their death/joining on the other animals. 
+* Note that, for each animal, the first pie charts *include* the subject animal (the one that passed away/joined the zoo) and the second ones *exclude* them.
+  + The pie charts, with the *exclusion* of the subject animals, convey the impact of their death/joining on the other animals. 
+  + Inclusion of the subject animals may obscure the actual change in the overall animals' behavior since the subject animals are present in only one of the pie charts (either before or after)
+* Deaths/Joining information
+  + Damian passed away on Feb 22, 2018
+  + Pistacio passed away on Dec 3, 2018
+  + Squirt came to the zoo on June 13, 2019
+* The raw counts of observations are included in the visuals since they normally differ substantially between before/after
+* Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
+* We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
+
+
 
 
 ***
