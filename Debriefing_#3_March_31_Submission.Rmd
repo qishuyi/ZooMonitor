@@ -617,6 +617,10 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
+* Note that the subject animal (the one that passed away/joined the zoo) is **excluded** in the pie charts, that is to say, both pie charts (before and after) represent the proportion of the behaviors of all animals but the subject one.
+* These pie charts, with the exclusion of the subject animals, convey the impact of their death/joining on the other animals. 
+
+
 ***
 
 ### **Goal 3**
@@ -692,7 +696,13 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + We discussed whether we should include the subject individual, the one who caused the event, in the pie chart or not. 
   + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportion
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
-  + Ended up **INCLUDING** it for now and asking our client in the next meeting if she wants the excluded version. 
+  + Ended up including the subject animal because we wanted to broaden the functionality of the app by not limiting the events to some animal's death/joining but allowing it to include the events that do not involve any animal, such as earthquake and renovation of the zoo. 
+* Pie chart: fasely reported events' dates
+  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, repectively.
+  + However, the observations of them existed after those dates, even until recently.
+  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" preiord, which is not supposed to be the case (since they are not supposed to have existed then)
+  + Since Anna did not know the actual dates of their deaths, this issue is yet to be solved. 
+  + This does not affect our app because we let the users choose any date, so as long as they know the actual date of the event, the app must function properly.
 
 \
 
