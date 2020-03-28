@@ -714,10 +714,10 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 
 * Pie chart: Falsely reported events' dates
-  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, repectively.
+  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
   + However, observations of them existed after those dates, even until recently.
   + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, which is not supposed to be the case (since they are not supposed to have existed then)
-  + Since Anna did not know the actual dates of their deaths, this issue is yet to be solved. 
+  + This might have happened because the zoo keepers might have mistakenly recorded some other animal under Damian's/Pistacio's name (they have their names recorded sporadiacally after their reporded date of death).
   + This does not affect our app because we let the users choose any date, so as long as they know the actual date of the event, the app will function properly.
 
 \
