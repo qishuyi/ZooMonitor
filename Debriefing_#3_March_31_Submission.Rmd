@@ -659,7 +659,7 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 * Above is the link to the Prototype R Shiny Program
 * Since we cannot give a live demo, we would like everyone to test out the program 
-* We have provided three data sets that the usercan choose for so that we do not have to send  Professor Miller and STA-395 classmates CSV Files.
+* We have provided three datasets that the user can choose so that we do not have to send Professor Miller and STA-395 class the CSV Files of the animals' data.
     + In the final version of the program, our client will be able to upload their own animal data
     
 ***    
