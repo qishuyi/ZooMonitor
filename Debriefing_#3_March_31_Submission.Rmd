@@ -729,13 +729,13 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
   + For the pie charts in the app, we ended up including the subject animal because we wanted to broaden its funcionality by not limiting the events to some animal's death/joining but allowing it to include the events that do not involve any animal, such as natural disasters or renovation of the zoo. 
 
-
-* Pie chart: Falsely reported events' dates
+* Dealing with falsely reported animal names
   + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
   + However, observations of them existed after those dates, even until recently.
-  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, which is not supposed to be the case (since they are not supposed to have existed then)
-  + This might have happened because the zoo keepers might have mistakenly recorded some other animal under Damian's/Pistacio's name (they have their names recorded sporadiacally after their reporded date of death).
-  + This does not affect our app because we let the users choose any date, so as long as they know the actual date of the event, the app will function properly.
+  + This might have happened because the zoo keepers mistakenly recorded some other animal under Damian's/Pistacio's name (they only have their names recorded sporadiacally after their reporded date of death).
+  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, where we may have removed observations of an alive animal that was falsely reported
+
+
 
 \
 
