@@ -636,14 +636,15 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Pistacio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
 * The raw counts of observations are included in the visuals since they normally differ substantially between before/after
-* Dealing with falsely reported animal names
-  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
-  + However, observations of them existed after those dates, even until recently.
-  + This might have happened because the zoo keepers mistakenly recorded some other animal under Damian's/Pistacio's name (they only have their names recorded sporadiacally after their reporded date of death).
-  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, where we may have removed observations of an alive animal that was falsely reported
 * Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
+
+* Observations with wrongly recorded animal names
+  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
+  + However, some observations of them existed after those dates, even until recently.
+  + This might have happened because the zoo keepers mistakenly recorded some other animal under Damian's/Pistacio's name (they only have their names recorded sporadiacally after their reporded date of death).
+  + By excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period. This is because misrecorded observations of an alive animal was removed in the process. 
 
 
 
