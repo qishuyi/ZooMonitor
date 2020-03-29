@@ -378,7 +378,10 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 *Did the addition of Squirt have an impact on the monkeys' behavior?*
 
 \
+
 ##### **Damian's Death**
+
+\
 
 **Including Damian**
 
@@ -472,6 +475,8 @@ ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 ##### **Pistacio's Death**
 
+\
+
 **Including Pistacio**
 ```{r Visual for before and after the death of Pistacio}
 ##Pistacio's death
@@ -546,6 +551,8 @@ ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(pe
 ```
 
 ##### **Squirt's joining**
+
+\
 
 **Including Squirt**
 ```{r Visual for before and after the joining of Squirt}
