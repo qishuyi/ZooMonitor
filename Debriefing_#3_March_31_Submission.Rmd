@@ -635,6 +635,12 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Pistacio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
 * The raw counts of observations are included in the visuals since they normally differ substantially between before/after
+* Pie chart: False records
+  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
+  + However, observations of them existed after those dates, even until recently.
+  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, which is not supposed to be the case (since they are not supposed to have existed then)
+  + This might have happened because the zoo keepers might have mistakenly recorded some other animal under Damian's/Pistacio's name (they have their names recorded sporadiacally after their reporded date of death).
+  + This is why we observe decresed row counts for the "after" pie chart of the ones without Damian/Pistacio.
 * Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
@@ -729,13 +735,6 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
   + For the pie charts in the app, we ended up including the subject animal because we wanted to broaden its funcionality by not limiting the events to some animal's death/joining but allowing it to include the events that do not involve any animal, such as natural disasters or renovation of the zoo. 
 
-
-* Pie chart: Falsely reported events' dates
-  + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
-  + However, observations of them existed after those dates, even until recently.
-  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, which is not supposed to be the case (since they are not supposed to have existed then)
-  + This might have happened because the zoo keepers might have mistakenly recorded some other animal under Damian's/Pistacio's name (they have their names recorded sporadiacally after their reporded date of death).
-  + This does not affect our app because we let the users choose any date, so as long as they know the actual date of the event, the app will function properly.
 
 \
 
