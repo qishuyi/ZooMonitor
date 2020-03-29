@@ -375,7 +375,7 @@ piechart <- function(input, output, animal_data) {
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                plot.caption = element_text(hjust = 0, face = "bold"),
+                                plot.caption = element_text(hjust = 0.5, face = "bold"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     } 
@@ -402,7 +402,7 @@ piechart <- function(input, output, animal_data) {
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                plot.caption = element_text(hjust = 0, face = "bold"),
+                                plot.caption = element_text(hjust = 0.5, face = "bold"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
