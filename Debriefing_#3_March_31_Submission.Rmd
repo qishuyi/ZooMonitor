@@ -378,9 +378,12 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 *Did the addition of Squirt have an impact on the monkeys' behavior?*
 
 \
+
 ##### **Damian's Death**
 
-**Including Damian**
+\
+
+***Including Damian***
 
 ```{r Visual for before and after the death of Damian}
 ##Damian's death
@@ -425,7 +428,7 @@ ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(16)[sample(1:16)])
 ```
 
-**Excluding Damian**
+***Excluding Damian***
 
 ```{r Visual for Without Damian}
 ##Damian's death
@@ -472,7 +475,9 @@ ggplot(summary_Damian, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 
 ##### **Pistacio's Death**
 
-**Including Pistacio**
+\
+
+***Including Pistacio***
 ```{r Visual for before and after the death of Pistacio}
 ##Pistacio's death
 Pistacio_before <- subset(sq_monkey_data, Date < "2018-12-03")
@@ -508,7 +513,7 @@ ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(pe
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
-**Excluding Pistacio**
+***Excluding Pistacio***
 
 ```{r Visual for Without Pistacio}
 ##Pistacio's death
@@ -547,7 +552,9 @@ ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(pe
 
 ##### **Squirt's joining**
 
-**Including Squirt**
+\
+
+***Including Squirt***
 ```{r Visual for before and after the joining of Squirt}
 ##Squirt's joining
 Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
@@ -583,7 +590,7 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
-**Excluding Squirt**
+***Excluding Squirt***
 
 ```{r Visual for Without Squirt}
 ##Squirt's joining
