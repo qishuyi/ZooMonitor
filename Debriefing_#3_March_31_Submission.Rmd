@@ -146,10 +146,10 @@ The visual displays how often each cattle shows agonistic behavior, while the ta
     + Batik and Chilly Jane often show agonistic behaviors towards each other.
     + Patty sometimes shows agonistic behaviors towards Batik and Chilly Jane.
 * **Table:**
-    + 2019/05/26: Patty displays threat to the other two -- probably because it was being picked on?
-    + 2019/07/18: Batick and Chilly Jane are aggressive towards one another -- there was a conflict between them.
-    + 2019/07/21: Patty displays threat to Chilly Jane, Batick and Chilly Jane are aggressive towards each other -- a conflict between all three.
-    + 2019/08/02, 2019/08/20, 2019/09/19: conflicts between Batick and Chilly Jane.
+    + 2019/05/26: Patty displays threat to the other two.
+    + 2019/07/18: Batik and Chilly Jane are aggressive towards one another -- a conflict between the two.
+    + 2019/07/21: Patty displays threat to Chilly Jane, Batik and Chilly Jane are aggressive towards each other -- a conflict between all three.
+    + 2019/08/02, 2019/08/20, 2019/09/19: conflicts between Batik and Chilly Jane.
 
 \
 
@@ -320,7 +320,7 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
 ```
 
 * **Visual:**
-    + Isabel was recorded significantly more aggressive behaviors than other monkeys.
+    + Isabel showed significantly more aggressive behaviors than other monkeys.
     + Again, the visual displays how often each monkey shows aggressive behaviors, while the table gives more insight about what happened on a particularly day.
 * **Table:**
     + 2017/11/06: Damian was aggressive towards Brazil; Pistacio was aggressive towards both Brazil and Filbert. There was probably a conflict between all four monkeys (Squirt has not come to the zoo yet at this point).
@@ -330,9 +330,10 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
     + 2020/02/08: Filbert was aggressive towards Squirt.
 
 
-* Filbert seems to be involved in conflicts regularly.
-* Isabel is also constantly involved in conflicts and is always the one showing aggressive behaviors, which possibly suggests that Isabel is being picked on by other monkeys regularly.
 
+
+* Isabel is constantly involved in conflicts and is showing aggressive behaviors to almost all other monkeys.
+* Filbert is also constantly involved in conflicts and is often the one being picked on.
 
 \
 
