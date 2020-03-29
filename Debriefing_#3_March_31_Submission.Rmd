@@ -146,10 +146,10 @@ The visual displays how often each cattle shows agonistic behavior, while the ta
     + Batik and Chilly Jane often show agonistic behaviors towards each other.
     + Patty sometimes shows agonistic behaviors towards Batik and Chilly Jane.
 * **Table:**
-    + 2019/05/26: Patty displays threat to the other two -- probably because it was being picked on?
-    + 2019/07/18: Batick and Chilly Jane are aggressive towards one another -- there was a conflict between them.
-    + 2019/07/21: Patty displays threat to Chilly Jane, Batick and Chilly Jane are aggressive towards each other -- a conflict between all three.
-    + 2019/08/02, 2019/08/20, 2019/09/19: conflicts between Batick and Chilly Jane.
+    + 2019/05/26: Patty displays threat to the other two.
+    + 2019/07/18: Batik and Chilly Jane are aggressive towards one another -- a conflict between the two.
+    + 2019/07/21: Patty displays threat to Chilly Jane, Batik and Chilly Jane are aggressive towards each other -- a conflict between all three.
+    + 2019/08/02, 2019/08/20, 2019/09/19: conflicts between Batik and Chilly Jane.
 
 \
 
@@ -320,7 +320,7 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
 ```
 
 * **Visual:**
-    + Isabel was recorded significantly more aggressive behaviors than other monkeys.
+    + Isabel showed significantly more aggressive behaviors than other monkeys.
     + Again, the visual displays how often each monkey shows aggressive behaviors, while the table gives more insight about what happened on a particularly day.
 * **Table:**
     + 2017/11/06: Damian was aggressive towards Brazil; Pistacio was aggressive towards both Brazil and Filbert. There was probably a conflict between all four monkeys (Squirt has not come to the zoo yet at this point).
@@ -330,9 +330,10 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
     + 2020/02/08: Filbert was aggressive towards Squirt.
 
 
-* Filbert seems to be involved in conflicts regularly.
-* Isabel is also constantly involved in conflicts and is always the one showing aggressive behaviors, which possibly suggests that Isabel is being picked on by other monkeys regularly.
 
+
+* Isabel is constantly involved in conflicts and is showing aggressive behaviors to almost all other monkeys.
+* Filbert is also constantly involved in conflicts and is often the one being picked on.
 
 \
 
@@ -635,12 +636,11 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + Pistacio passed away on Dec 3, 2018
   + Squirt came to the zoo on June 13, 2019
 * The raw counts of observations are included in the visuals since they normally differ substantially between before/after
-* Pie chart: False records
+* Dealing with falsely reported animal names
   + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
   + However, observations of them existed after those dates, even until recently.
-  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, which is not supposed to be the case (since they are not supposed to have existed then)
-  + This might have happened because the zoo keepers might have mistakenly recorded some other animal under Damian's/Pistacio's name (they have their names recorded sporadiacally after their reporded date of death).
-  + This is why we observe decresed row counts for the "after" pie chart of the ones without Damian/Pistacio.
+  + This might have happened because the zoo keepers mistakenly recorded some other animal under Damian's/Pistacio's name (they only have their names recorded sporadiacally after their reporded date of death).
+  + Therefore, by excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period, where we may have removed observations of an alive animal that was falsely reported
 * Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
@@ -734,7 +734,6 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
   + The problem we encountered is that the subject individual will be present in only one of the pies (before or after), and this might affect the behavior proportions
   + Inclusion of the subject individual may obscure the actual reason of the change in behavior proportion; it could be due to the impact of subject individual's presence/absence to the other animals or just the fact that the subject individual was added to/removed from the data. 
   + For the pie charts in the app, we ended up including the subject animal because we wanted to broaden its funcionality by not limiting the events to some animal's death/joining but allowing it to include the events that do not involve any animal, such as natural disasters or renovation of the zoo. 
-
 
 \
 
