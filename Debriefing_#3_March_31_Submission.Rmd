@@ -621,7 +621,7 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 
 \
 
-* Note that, for each animal, the first row of pie charts *include* the subject animal (the one that passed away/joined the zoo) and the second row of pie charts *exclude* them.
+* Note that, for each animal, the first row of pie charts *includes* the subject animal (the one that passed away/joined the zoo) and the second row of pie charts *excludes* them.
   + The pie charts, with the *exclusion* of the subject animal, convey the impact of their death/joining on the other animals. 
   + Inclusion of the subject animal may obscure the actual change in the overall animals' behavior since the subject animals are present in only one of the pie charts (either before or after)
 
@@ -638,7 +638,7 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
   + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
   + However, some observations of them existed after those dates, even until recently.
   + Observing the data, what probably happened was that the zoo keepers mistakenly recorded some other animal's behavior under Damian's/Pistacio's name 
-  + By excluding the subject animal (Damian or Pistacio), we obtained a decreased row count for the "After" period. This is because misrecorded observations of an alive animal was removed in the process. 
+  + By excluding the subject animal (Damian or Pistacio), we obtained a decreased raw count for the "After" period. This is because misrecorded observations of an alive animal was removed in the process. 
 
 
 
