@@ -695,6 +695,7 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * Since we cannot give a live demo, we would like everyone to test out the program 
 * We have provided three data sets that the user can choose so that we do not have to send Professor Miller and the STA-395 class the CSV Files of the animals' data.
     + In the final version of the program, our client will be able to upload their own animal data
+
     
 ***    
 
