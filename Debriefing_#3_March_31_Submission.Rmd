@@ -344,7 +344,7 @@ formattable(monkey_aggression, align = c("l", rep("c",3)))
 #### **Head Spins**
 *Which animal is doing head spins and how often?*
 
-```{r (MONKEY) Head spins Visual }
+```{r (MONKEY) Head spins Visual}
 
 #Vector of total number of observations for each monkey
 
@@ -388,7 +388,7 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
 \
 
-```{r Visual for before and after the death of Damian}
+```{r Visual for before and after the death of Damian, fig.width = 10, fig.height = 8}
 
 ######### Damian's death with Damian
 
@@ -481,7 +481,7 @@ ggplot(summary_DD, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 
 
 
-```{r Visual for before and after the death of Pistacio}
+```{r Visual for before and after the death of Pistacio, fig.width = 10, fig.height = 8}
 
 ########## Pistacio's death (with Pistacio)
 
@@ -555,7 +555,7 @@ ggplot(summary_PP, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 
 
 
-```{r Visual for before and after the joining of Squirt}
+```{r Visual for before and after the joining of Squirt, fig.width = 10, fig.height = 8}
 
 ######### Squirt's joining with Squirt
 
@@ -628,7 +628,6 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * Note that, for each animal, the first row of pie charts *includes* the subject animal (the one that passed away/joined the zoo) and the second row of pie charts *excludes* them.
   + The pie charts, with the *exclusion* of the subject animal, convey the impact of their death/joining on the other animals. 
   + Inclusion of the subject animal may obscure the actual change in the overall animals' behavior since the subject animals are present in only one of the pie charts (either before or after)
-
 * Deaths/Joining information
   + Damian passed away on Feb 22, 2018
   + Pistacio passed away on Dec 3, 2018
@@ -636,6 +635,8 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * The raw counts of observations are included in the visuals since they normally differ substantially between before/after
 * Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
+* We observe that excluding the subject animals does not make a stark difference from the ones including them
+* The pie charts in our app *include* the subject animals because we do not know if the selected event (date) involves any animal
 
 
 * *Observations with wrongly recorded animal names*
