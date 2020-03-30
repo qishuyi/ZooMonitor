@@ -71,25 +71,25 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 
 #### **Plots** 
 
-* We showed her plots and tables we created to answer her questions about Cattles and Squirrel Monkeys
-* We also showed her plots related to Painted African Dogs 
-    + Some of these plots were ones already presented in our last debriefing
-    + Some additional plots were not part of our four goals, but created nevertheless for our client
+* We showed her the plots and tables we had created to answer her questions about Cattles and Squirrel Monkeys
+* We also showed her the plots related to Painted African Dogs 
+    + Some of these plots were the ones already presented in our last debriefing
+    + Some additional plots were not part of our goals this time, but created nevertheless for our client
 * This part of the meeting was mainly about talking through some of the plots with the client
 
 \
 
 #### **Program** 
-* We then asked her about her expectations for our final product, a program that will address all animals
+* We then asked her about her expectations for our final product, a program that will show some plots/information, addressing all species
 * Even though we had asked similar things before, we had only shown her some general plots back then 
-* Since we had created a wider variety of plots at this point, we were curious if she had new ideas in mind. 
+* Since we had created a wider variety of plots by our last meeting, we were curious if she had new ideas in mind what to put into the program. 
 
 * Last time, she requested the three plots that we sent her during the first meeting (2/6/2020) to be in the program:
   + Behaviors throught the day (Frequency & Proportion)
   + Activeness throught the week (Frequency)
   + Proportion of the behavior "Others" within all inactive behaviors
 
-* For the program, we suggested that we create various inputs in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
+* We suggested that we create various inputs in the program so that the user can choose a factor by which they facet the data, e.g., day of week, time of day, animal's name, etc.
 * She agreed on this suggestion and requested that we incorporate some more detailed plots into the program, e.g., distribution of their observations, shift in animals' behaviors after a certain event, etc.
 
 \
