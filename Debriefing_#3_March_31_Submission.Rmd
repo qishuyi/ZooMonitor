@@ -391,6 +391,7 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 ```{r Visual for before and after the death of Damian}
 
 ######### Damian's death with Damian
+
 Damian_before <- subset(sq_monkey_data, Date < "2018-02-23")
 Damian_before <- Damian_before %>% group_by(Activity)
 summary_Damian_before <- as.data.frame(summarise(Damian_before, n()))
@@ -481,7 +482,9 @@ ggplot(summary_DD, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 
 
 ```{r Visual for before and after the death of Pistacio}
+
 ########## Pistacio's death (with Pistacio)
+
 Pistacio_before <- subset(sq_monkey_data, Date < "2018-12-03")
 Pistacio_before <- Pistacio_before %>% group_by(Activity)
 summary_Pistacio_before <- as.data.frame(summarise(Pistacio_before, n()))
@@ -555,6 +558,7 @@ ggplot(summary_PP, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 ```{r Visual for before and after the joining of Squirt}
 
 ######### Squirt's joining with Squirt
+
 Squirt_before <- subset(sq_monkey_data, Date < "2019-06-13")
 Squirt_before <- Squirt_before %>% group_by(Activity)
 summary_Squirt_before <- as.data.frame(summarise(Squirt_before, n()))
