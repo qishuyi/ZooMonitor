@@ -551,7 +551,7 @@ ggplot(summary_Pistacio, aes(x="", y=percent, fill=fct_reorder(Activity, desc(pe
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
-##### **Squirt's joining**
+##### **Squirt's Joining**
 
 \
 
@@ -640,7 +640,7 @@ ggplot(summary_Squirt, aes(x="", y=percent, fill=fct_reorder(Activity, desc(perc
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
 
 
-* Observations with wrongly recorded animal names
+* *Observations with wrongly recorded animal names*
   + Anna reported that Damian and Pistacio passed away on 2/22/2018 and 12/3/2018, respectively.
   + However, some observations of them existed after those dates, even until recently.
   + This might have happened because the zoo keepers mistakenly recorded some other animal under Damian's/Pistacio's name (they only have their names recorded sporadiacally after their reporded date of death).
