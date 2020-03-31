@@ -75,7 +75,7 @@ We had our 3rd meeting with Anna on 3/18/2020 (Wednesday) to show some visuals a
 * We showed her plots and tables we created to answer her questions about Cattles and Squirrel Monkeys
 * We also showed her plots related to Painted African Dogs 
     + Some of these plots were ones already presented in our last debriefing
-    + Some additional plots were not part of our four goals, but created nevertheless for our client
+    + Some of these plots were not part of our four goals, but created nevertheless for our client
 * This part of the meeting was mainly about talking through some of the plots with the client
 
 \
@@ -386,7 +386,7 @@ ggplot(data = sq_monkey_data %>% filter(Activity == "Head spin")) +
 
 ##### **Damian's Death**
 
-\
+
 
 ```{r Visual for before and after the death of Damian, fig.width = 10, fig.height = 8}
 
@@ -474,9 +474,10 @@ ggplot(summary_DD, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
   scale_fill_manual(values = rainbow(16)[sample(1:16)])
 ```
 
+\
+
 ##### **Pistacio's Death**
 
-\
 
 
 
@@ -549,9 +550,11 @@ ggplot(summary_PP, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
   scale_fill_manual(values = rainbow(27)[sample(1:27)])
 ```
 
+\
+
 ##### **Squirt's Joining**
 
-\
+
 
 
 
@@ -635,8 +638,8 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * The raw counts of observations are included in the visuals since they normally differ substantially between before/after
 * Only Damian has the "One month after" pie chart since there were observations soon after his death. (Which was not the case for the other events)
 * We observe a larger proportion of "Sitting" after certain events, but we are not sure exactly why this is the case
-* We observe that excluding the subject animals does not make a stark difference from the ones including them
-* The pie charts in our app *include* the subject animals because we do not know if the selected event (date) involves any animal
+* We observe that excluding the subject animals does not make a stark difference from including them
+* The pie charts in our app *include* the subject animals because we do not know if the selected event (date) involves an animal
 
 
 * *Observations with wrongly recorded animal names*
@@ -696,7 +699,10 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * We have provided three data sets that the user can choose so that we do not have to send Professor Miller and the STA-395 class the CSV Files of the animals' data.
     + In the final version of the program, our client will be able to upload their own animal data
 
-    
+**Additional Comment**
+
+* If you select the Cattle Data and go to the Behaviors Tab (Under Activities), there are two options for "Out of View". We did not realize at the time of making the program that there could be an instance where one behavior is recorded under multiple names. This will be fixed when we update the program for the next debriefing
+
 ***    
 
 ### **Reflection and Discussion**
@@ -718,6 +724,9 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * Meeting with our client 
   + She told us her more specific preferences regarding the plots to include in the program
   + We were able to envision the program soon after the meeting and decide the plots and inputs for each plot 
+
+\
+
 
 **2. Things that were difficult**
 
@@ -766,6 +775,7 @@ ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)
 * Refine R Shiny APP functionalities (e.g., Provide a 'select all' checkbox that checks all boxes, provide multiple fill options, etc.)
 * Improve aesthetics of the APP (e.g., bar width)
 * Test the R Shiny APP with more datasets and solve problems as they come up
+    + One problem we are already aware of is the case when a behavior is recorded under slightly different names
 
 
 
