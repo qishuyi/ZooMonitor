@@ -92,8 +92,7 @@ ui <- navbarPage("ZooMonitor",
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot"),
-                              h6("The colors of slices will change every time you change the date.", align = "center")
+                              plotOutput("event_pie_plot")
                             ))),
                  
                  ############################### Category/Behavior ###############################
