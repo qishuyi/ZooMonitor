@@ -19,7 +19,7 @@ ui <- navbarPage("ZooMonitor",
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
-                          titlePanel(h3("Upload a CSV File")),
+                          titlePanel(h3("Upload a CSV file")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
@@ -135,14 +135,11 @@ ui <- navbarPage("ZooMonitor",
                                          
                                          
                                        ))))
-                 
-                 
-                 
 )
+                 
 
 # Define server logic
 server <- function(input, output) {
-  
   
   data_input <- reactive({
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
@@ -456,8 +453,8 @@ server <- function(input, output) {
       return(animal_raw_category_table)
       
     }
-    
   })
+
     
   ############################### Behavior ###############################
   output$select_behavior <- renderUI({
