@@ -30,9 +30,9 @@ generalplot <- function(input, output, animal_data) {
         labs(title = "Barplot of Observations per Hour of Day", x = "Hour of Day", y = "Percentage") + 
         geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
-            
-              
-
+      
+      
+      
     } 
     # Day of Week Plot 
     else if (input$select_general == "Day of Week"){
@@ -41,11 +41,11 @@ generalplot <- function(input, output, animal_data) {
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-
+        
         labs(title = "Barplot of Observations per Day of Week", x = "Day of Week", y = "Percentage") +
         geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
-
+      
     }
     #Animal Plot
     else {
@@ -54,11 +54,11 @@ generalplot <- function(input, output, animal_data) {
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-
+        
         labs(title = "Barplot of Observations per Animal", x = "Animal Name", y = "Percentage") +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
-
+      
     }
   })
 }
@@ -101,7 +101,7 @@ category <- function(input, output, animal_data) {
             legend.text = element_text(size = 8)) +
       scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                          limits = c(0,1))
-      
+    
     
   })
   
@@ -130,7 +130,7 @@ category <- function(input, output, animal_data) {
       
       animal_category_table <- animal_category_table %>% 
         cbind(Percentage = (animal_category_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$category_input), length(animal_count)))) * 100)
+                                                             times = rep(length(input$category_input), length(animal_count)))) * 100)
       
       animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 2), nsmall = 2)
       
@@ -252,12 +252,12 @@ behavior <- function(input, output, animal_data) {
       
       animal_behavior_table <- animal_behavior_table %>% 
         cbind(Percentage = (animal_behavior_table$Count/ rep(animal_count,
-                                                            times = rep(length(input$behavior_input), length(animal_count))))*100)
+                                                             times = rep(length(input$behavior_input), length(animal_count))))*100)
       
       
       animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 2), nsmall = 2)
       
-    
+      
       animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
       
       return(animal_behavior_table)
@@ -338,9 +338,9 @@ facetedBarplots <- function(input, output, animal_data) {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol = 4, dir = "v") + 
+        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
-          plot.title = element_text(size = 12, face = "bold")) + 
+              plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
     }
   }, height = 600)
@@ -361,7 +361,7 @@ piechart <- function(input, output, animal_data) {
       a_summary_only_after <- sum(summary_only_after$counts)
       summary_only_after <- summary_only_after %>%
         mutate(Percent = round(counts/a_summary_only_after*100, 1))
-  
+      
       #Creates a pie chart for only after
       ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
         geom_bar(stat="identity", width=1) +
@@ -410,46 +410,46 @@ piechart <- function(input, output, animal_data) {
     #If the date in-between the max and min dates was selected
     else{
       
-    #Creates a before dataset
-    before <- subset(animal_data, Date < input$date)
-    before <- before %>% group_by(Behavior)
-    summary_before <- as.data.frame(summarise(before, n()))
-    names(summary_before)[names(summary_before) == "n()"] <- "counts"
-    a_before <- sum(summary_before$counts)
-    summary_before <- summary_before %>%
-      mutate(Percent = round(counts/a_before*100, 1)) %>%
-      mutate(Period = "Before")
-    
-    #Creates an after dataset 
-    after <- subset(animal_data, Date > input$date)
-    after <- after %>% group_by(Behavior)
-    summary_after <- as.data.frame(summarise(after, n()))
-    names(summary_after)[names(summary_after) == "n()"] <- "counts"
-    a_after <- sum(summary_after$counts)
-    summary_after <- summary_after %>%
-      mutate(Percent = round(counts/a_after*100, 1)) %>%
-      mutate(Period = "After")
-    
-    #Combines two summaries
-    summary <- rbind(summary_before, summary_after)
-    summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-    
-    #Creates pie charts for both before and after
-    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-      geom_bar(stat="identity", width=1) +
-      facet_grid(.~ Period) +
-      coord_polar("y", start=0) + 
-      labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-           subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after)) +
-      guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-      theme_classic() + theme(axis.line = element_blank(),
-                              axis.text = element_blank(),
-                              axis.ticks = element_blank(),
-                              plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                              legend.position="bottom") +
-      scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-    
+      #Creates a before dataset
+      before <- subset(animal_data, Date < input$date)
+      before <- before %>% group_by(Behavior)
+      summary_before <- as.data.frame(summarise(before, n()))
+      names(summary_before)[names(summary_before) == "n()"] <- "counts"
+      a_before <- sum(summary_before$counts)
+      summary_before <- summary_before %>%
+        mutate(Percent = round(counts/a_before*100, 1)) %>%
+        mutate(Period = "Before")
+      
+      #Creates an after dataset 
+      after <- subset(animal_data, Date > input$date)
+      after <- after %>% group_by(Behavior)
+      summary_after <- as.data.frame(summarise(after, n()))
+      names(summary_after)[names(summary_after) == "n()"] <- "counts"
+      a_after <- sum(summary_after$counts)
+      summary_after <- summary_after %>%
+        mutate(Percent = round(counts/a_after*100, 1)) %>%
+        mutate(Period = "After")
+      
+      #Combines two summaries
+      summary <- rbind(summary_before, summary_after)
+      summary$Period <- factor(summary$Period, levels = c("Before", "After"))
+      
+      #Creates pie charts for both before and after
+      ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+        geom_bar(stat="identity", width=1) +
+        facet_grid(.~ Period) +
+        coord_polar("y", start=0) + 
+        labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
+             subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after)) +
+        guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+        theme_classic() + theme(axis.line = element_blank(),
+                                axis.text = element_blank(),
+                                axis.ticks = element_blank(),
+                                plot.title = element_text(hjust = 0.5, face = "bold"),
+                                plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                legend.position="bottom") +
+        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+      
     }
   })
 }
@@ -495,10 +495,10 @@ ui <- navbarPage("ZooMonitor",
                               plotOutput("general_plot"),
                               textOutput("selected_general"),
                               h6("The dash line represents equally distributed observations.", align = "center")
-                            
+                              
                             ))),
                  
-                
+                 
                  ############################### Faceted Barplot ###############################
                  tabPanel("Daily/Weekly",
                           
@@ -576,25 +576,21 @@ ui <- navbarPage("ZooMonitor",
                                          
                                          
                                        ))))
-                                     
-                         
                  
-                )
+                 
+                 
+)
 
 # Define server logic
 server <- function(input, output) {
-  
-  source("generalized_cleaning.R")
-  
   ############################### Upload Data ###############################
   output$contents <- renderDT({
-    
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
     # If input$file1 is unavailable, req will throw an exception.
     req(input$file1)
     
     #Loading in Data
-    animal_data <- read_csv(input$file1$datapath, 
+    animal_data <- read_csv(input$file1$datapath,
                             col_types = cols(.default = col_character(),
                                              SessionID = col_double(), 
                                              `Session Start Time` = col_datetime(format = ""),
@@ -778,67 +774,6 @@ server <- function(input, output) {
     return(animal_data)
     
   })
-  
-  ## Note: Everything below that's within the server function might be deleted in the final version,
-  ##       depending on whether we want to provide a default data file for the users.
-  
-  ############################### General Observations ###############################
-  generalplot(input, output, animal_data)
-  
-  ############################### Category ###############################
-  output$select_category <- renderUI({
-    category_options <- sort(unique(animal_data$Category))
-    checkboxGroupInput(inputId = "category_input", 
-                       label= "Select Categories",
-                       choices = category_options)
-    
-  })
-  
-  #Creates Infographics based on Chosen Categories
-  category(input, output, animal_data)
-  
-  ############################### Behavior ###############################
-  output$select_behavior <- renderUI({
-    behavior_options <- sort(unique(animal_data$Behavior))
-    checkboxGroupInput(inputId = "behavior_input",
-                       label = "Select Behaviors",
-                       choices = behavior_options)
-    
-  })
-  
-  #Creates Infographics based on Chosen Behaviors
-  behavior(input, output, animal_data)
-  
-  ############################### Faceted Barplots ###############################
-  # This function is here because it will be easier to not have to upload data files every time we try to
-  # run the APP during the prototyping process. It probably will be removed in the final APP.
-  output$nameControls4 <- renderUI({
-    prefix <- c('All animals')
-    names <- sort(unique(animal_data$Name))
-    names <- c(prefix, names)
-    radioButtons('names4', "Select Animal", names)
-  })
-  #Let user select a date range
-  output$dateControls4 <- renderUI({
-    date <- animal_data$Date
-    dateRangeInput("daterange4", "Select Date Range",
-                   start = min(animal_data$Date),
-                   end = max(animal_data$Date),
-                   min = min(animal_data$Date),
-                   max = max(animal_data$Date))
-  })
-  #Create the faceted barplots
-  facetedBarplots(input, output, animal_data)
-  
-  ############################### Pie Charts ###############################
-  output$dateControls <- renderUI({
-    date <- animal_data$Date
-    dateInput("date", "Select Event Date",
-              value = min(animal_data$Date),
-              min = min(animal_data$Date),
-              max = max(animal_data$Date))
-  })
-  piechart(input, output, animal_data)
 }
 
 # Run the application 
