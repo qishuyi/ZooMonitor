@@ -6,7 +6,7 @@ library(stringr)
 library(lubridate)
 
 #Loading in Data
-animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1579790635.csv", 
+animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1583445158.csv", 
                            col_types = cols(.default = col_character(),
                                             SessionID = col_double(), 
                                             `Session Start Time` = col_datetime(format = ""),
@@ -37,10 +37,12 @@ IC_Name_Vector <- character()
 IC_Value_Vector <- character()
 
 if("All_Occurrence_Value" %in% names(animal_data)){
-  animal_data <- cbind(animal_data, Occurrence_Duplicate = animal_data$Channel_Type)
-  animal_data$Occurrence_Duplicate[animal_data$Occurrence_Duplicate == "Interval"] <- NA
-  IC_Name_Vector <- append(IC_Name_Vector, "Occurrence_Duplicate")
+  animal_data$Channel_Type[animal_data$Channel_Type == "Interval"] <- NA
+  IC_Name_Vector <- append(IC_Name_Vector, "Channel_Type")
   IC_Value_Vector <- append(IC_Value_Vector, "All_Occurrence_Value")
+  
+} else{
+    animal_data <- animal_data %>% select(-Channel_Type)
   
   }
 
@@ -122,8 +124,7 @@ animal_data <- separate_rows(animal_data, Category, Behavior, sep  = "_")
 #Removing Unnecessary Columns
 animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                             -DateTime, -Grid_Size, -Image_Size,
-                                            -Project_Animals, -Duration, -Channel_Type)
-
+                                            -Project_Animals, -Duration)
 
 
 
