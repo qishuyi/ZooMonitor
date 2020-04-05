@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(lubridate)
+library(tools)
 
 #Loading in Data
 animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1583445158.csv", 
@@ -128,12 +129,18 @@ animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
 
 
 
+#Combining potential same behaviors with slightly different names
+animal_data$Behavior <- toTitleCase(animal_data$Behavior)
+
+#Combining potential same categories with slightly
+animal_data$Category <- toTitleCase(animal_data$Category)
 
 
 ####################### Addition
 
 #Adding Day of Week
 animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
+
 
 
 
