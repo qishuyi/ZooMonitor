@@ -52,9 +52,7 @@ ui <- navbarPage("ZooMonitor",
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general"),
-                              h6("The dash line represents equally distributed observations.", align = "center")
-                              
+                              textOutput("selected_general")
                             ))),
                  
                  
@@ -288,7 +286,10 @@ server <- function(input, output) {
         scale_x_discrete(limits = 9:16) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        labs(title = "Barplot of Observations per Hour of Day", x = "Hour of Day", y = "Percentage") + 
+        labs(title = "Barplot of Observations per Hour of Day", 
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Hour of Day", y = "Percentage") + 
+        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
       
@@ -302,8 +303,10 @@ server <- function(input, output) {
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        
-        labs(title = "Barplot of Observations per Day of Week", x = "Day of Week", y = "Percentage") +
+        labs(title = "Barplot of Observations per Day of Week", 
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Day of Week", y = "Percentage") + 
+        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
       
@@ -315,8 +318,10 @@ server <- function(input, output) {
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        
-        labs(title = "Barplot of Observations per Animal", x = "Animal Name", y = "Percentage") +
+        labs(title = "Barplot of Observations per Animal Name", 
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Animal Name", y = "Percentage") + 
+        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold"))
       
@@ -689,14 +694,15 @@ server <- function(input, output) {
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
              subtitle = paste("Raw Counts: Before = 0", ", After = ", a_summary_only_after),
-             caption = "*This plot shows the behavior proportion for only the period after the selected date.") +
+             caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
+             The colors of slices will change every time you change the date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                plot.caption = element_text(hjust = 0.5, face = "bold"),
+                                plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     } 
@@ -716,14 +722,15 @@ server <- function(input, output) {
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
              subtitle = paste("Raw Counts: Before = ", a_summary_only_before, ", After = 0"),
-             caption = "*This plot shows the behavior proportion for only the period before the selected date.") +
+             caption = "This plot shows the behavior proportion for only the period before the selected date. \n
+             The colors of slices will change every time you change the date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                plot.caption = element_text(hjust = 0.5, face = "bold"),
+                                plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
@@ -761,13 +768,15 @@ server <- function(input, output) {
         facet_grid(.~ Period) +
         coord_polar("y", start=0) + 
         labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-             subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after)) +
+             subtitle = paste("Raw Counts: Before = ", a_before, ", After = ", a_after),
+             caption = "The colors of slices will change every time you change the date.") +
         guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
         theme_classic() + theme(axis.line = element_blank(),
                                 axis.text = element_blank(),
                                 axis.ticks = element_blank(),
                                 plot.title = element_text(hjust = 0.5, face = "bold"),
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
         scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
