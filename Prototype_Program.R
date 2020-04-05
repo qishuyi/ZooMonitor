@@ -180,10 +180,12 @@ server <- function(input, output) {
     IC_Value_Vector <- character()
     
     if("All_Occurrence_Value" %in% names(animal_data)){
-      animal_data <- cbind(animal_data, Occurrence_Duplicate = animal_data$Channel_Type)
-      animal_data$Occurrence_Duplicate[animal_data$Occurrence_Duplicate == "Interval"] <- NA
-      IC_Name_Vector <- append(IC_Name_Vector, "Occurrence_Duplicate")
+      animal_data$Channel_Type[animal_data$Channel_Type == "Interval"] <- NA
+      IC_Name_Vector <- append(IC_Name_Vector, "Channel_Type")
       IC_Value_Vector <- append(IC_Value_Vector, "All_Occurrence_Value")
+      
+    } else{
+      animal_data <- animal_data %>% select(-Channel_Type)
       
     }
     
@@ -265,7 +267,7 @@ server <- function(input, output) {
     #Removing Unnecessary Columns
     animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                           -DateTime, -Grid_Size, -Image_Size,
-                                          -Project_Animals, -Duration, -Channel_Type)
+                                          -Project_Animals, -Duration)
     
     ####################### Addition
     #Adding Day of Week
