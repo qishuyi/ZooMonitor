@@ -8,6 +8,9 @@ library(shiny)
 library(ggplot2)
 library(forcats)
 library(DT)
+library(RColorBrewer)
+library(viridis)
+library(wesanderson)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -704,7 +707,7 @@ server <- function(input, output) {
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                 plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
-        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+        scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
     } 
     
     #If the maximum date was selected (The very last date)
@@ -732,7 +735,7 @@ server <- function(input, output) {
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                 plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
-        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+        scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
     }
     #If the date in-between the max and min dates was selected
@@ -778,7 +781,7 @@ server <- function(input, output) {
                                 plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                 plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                 legend.position="bottom") +
-        scale_fill_manual(values = rainbow(length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+        scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       
     }
   })
