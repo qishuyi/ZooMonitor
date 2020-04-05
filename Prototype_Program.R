@@ -269,6 +269,13 @@ server <- function(input, output) {
                                           -DateTime, -Grid_Size, -Image_Size,
                                           -Project_Animals, -Duration)
     
+    #Combining potential same behaviors with slightly different names
+    animal_data$Behavior <- toTitleCase(animal_data$Behavior)
+    
+    #Combining potential same categories with slightly
+    animal_data$Category <- toTitleCase(animal_data$Category)
+    
+    
     ####################### Addition
     #Adding Day of Week
     animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
