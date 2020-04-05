@@ -11,6 +11,7 @@ library(DT)
 library(RColorBrewer)
 library(viridis)
 library(wesanderson)
+library(tools)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
