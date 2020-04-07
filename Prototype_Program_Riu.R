@@ -475,43 +475,27 @@ server <- function(input, output) {
     }
     
   })
-    
-  #Reactive Information Table
-    output$information_table <- renderTable({
-     
-      #Get updated data
-      animal_data <- data_input()
-      
-      selected_categories <- input$category_input
-      
-      b_vector <- character()
-      count_vector <- numeric()
-      
-      for(i in selected_categories){
-        temp_data <- animal_data %>% filter(Category == i)
-        behaviors <- unique(temp_data$Behavior)
-        
-        b_vector <- append(b_vector, behaviors)
-        count_vector <- append(length(behaviors))
-        
-      }
-    
-      for()
-      
-      
-      
-      
-      animal_information_table <- data.frame(ye = selected_categories)
-      
-      
-      
-      
-    })
-    
-    
-    
-    
 
+      
+  #Reactive Information Table
+  output$information_table <- renderTable({
+    #Get updated data
+    animal_data <- data_input()
+    
+    selected_categories <- input$category_input
+    
+    cb_list <- list()
+    for(i in 1:length(selected_categories)){
+      test_data <- animal_data %>% filter(Category == selected_categories[i])
+      b <- unique(test_data$Behavior)
+      cb_list[[i]] <- b
+      
+    }
+      
+    
+    
+    
+})
   
   
   ############################### Behavior ###############################
