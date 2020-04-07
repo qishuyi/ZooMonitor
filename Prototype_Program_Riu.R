@@ -115,7 +115,8 @@ ui <- navbarPage("ZooMonitor",
                                          tabPanel("Visual", plotOutput(outputId = "category_visual")),
                                          tabPanel("Summary Table", tableOutput(outputId = "category_table")),
                                          tabPanel("Raw Table", tableOutput(outputId = "raw_category_table"), 
-                                                  uiOutput(outputId = "category_text"))
+                                                  uiOutput(outputId = "category_text")),
+                                         tabPanel("Information", tableOutput(outputId = "information_table"))
                                          
                                          
                                        ))),
@@ -472,7 +473,45 @@ server <- function(input, output) {
       return(animal_raw_category_table)
       
     }
+    
   })
+    
+  #Reactive Information Table
+    output$information_table <- renderTable({
+     
+      #Get updated data
+      animal_data <- data_input()
+      
+      selected_categories <- input$category_input
+      
+      b_vector <- character()
+      count_vector <- numeric()
+      
+      for(i in selected_categories){
+        temp_data <- animal_data %>% filter(Category == i)
+        behaviors <- unique(temp_data$Behavior)
+        
+        b_vector <- append(b_vector, behaviors)
+        count_vector <- append(length(behaviors))
+        
+      }
+    
+      for()
+      
+      
+      
+      
+      animal_information_table <- data.frame(ye = selected_categories)
+      
+      
+      
+      
+    })
+    
+    
+    
+    
+
   
   
   ############################### Behavior ###############################
