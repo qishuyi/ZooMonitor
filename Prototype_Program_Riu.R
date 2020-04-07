@@ -12,6 +12,7 @@ library(RColorBrewer)
 library(viridis)
 library(wesanderson)
 library(tools)
+library(janitor)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -481,18 +482,49 @@ server <- function(input, output) {
   output$information_table <- renderTable({
     #Get updated data
     animal_data <- data_input()
+
+    #Requring input
+    req(input$category_input)
     
+    #Vector of selected inputs
     selected_categories <- input$category_input
     
-    cb_list <- list()
+    #Finding the maximum number of behaviors from the selected categories
+    max_len <- 0
     for(i in 1:length(selected_categories)){
-      test_data <- animal_data %>% filter(Category == selected_categories[i])
-      b <- unique(test_data$Behavior)
-      cb_list[[i]] <- b
+      select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
+        select(Category, Behavior)
+      check <- length(unique(select_data$Behavior))
       
+      if(check > max_len){
+        max_len <- check
+      
+      }
+    }      
+      
+    #Empty matrix
+    info_matrix <- matrix(nrow = max_len + 1, ncol = length(selected_categories))
+   
+    
+    #Adding to the matrix
+    for(i in 1:length(selected_categories)){
+      select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
+        select(Category, Behavior)
+      b <- selected_categories[i]
+      b <- append(b, sort(unique(select_data$Behavior)))  
+      need <- max_len + 1 - length(b)
+      add <- rep("", times = need)
+      b <- append(b, add)
+      
+      info_matrix[ , i] <- b
+
     }
       
+    #Converting matrix to dataframe and using first row as column names
+    info_data <- data.frame(info_matrix)
+    info_data <- info_data %>% row_to_names(row_number = 1)
     
+    return(info_data)
     
     
 })
