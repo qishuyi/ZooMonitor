@@ -740,7 +740,12 @@ server <- function(input, output) {
     if (input$select_faceted_barplot == "Hour of Day") {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
-      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+      
+      # Change hour format (e.g., from 9 to "9:00")
+      animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
+      animal_data_hour$Hour <- sapply(animal_data_hour$Hour, function(x) as.factor(sprintf("%d:00", x)))
+      
+      ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
               plot.title = element_text(size = 12, face = "bold")) + 
