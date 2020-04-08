@@ -903,7 +903,7 @@ server <- function(input, output) {
           scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
         
       }}
-    #If with subject animal exclusion was selected
+    #####If with subject animal exclusion was selected
     else {
       animal_data <- filter(animal_data, Name != input$subject_animal)
       if(input$date == min(animal_data$Date)){
