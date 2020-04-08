@@ -106,7 +106,7 @@ ui <- navbarPage("ZooMonitor",
                           
                           titlePanel(h3("Infographics of Selected Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = "Filter Activities by:",
+                            radioButtons(inputId = "filter_type", label = "Filter by:",
                                          c("Behavior", "Category"), selected = "Category"),
                             uiOutput("select_activity")
                             
