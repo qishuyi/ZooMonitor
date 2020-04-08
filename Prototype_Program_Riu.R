@@ -125,19 +125,8 @@ ui <- navbarPage("ZooMonitor",
                                          
                                          
                                        )))
-                            
-                            
-                           
-                                       
-                                    
-                                  
-                                         
+                          
                                         
-                                         
-                                        
-                                         
-                                         
-                                       
 )
 
 
