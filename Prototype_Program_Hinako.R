@@ -903,10 +903,47 @@ server <- function(input, output) {
           scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
         
       }}
-    #####If with subject animal exclusion was selected
+    ####If with subject animal exclusion was selected
     else {
+      #Excludes the subject animal
       animal_data <- filter(animal_data, Name != input$subject_animal)
+      
+      #Creates three vectors used to slice the data
+      unique_names <- unique(animal_data$Name)
+      min_date <- 0
+      min_date_final <- numeric()
+      
+      #Determines the last day all animals could be observed from the beginning
+      for (i in unique_names) {
+        for (j in 1:nrow(animal_data)){
+          if (animal_data$Name[j] == i) {
+            min_date <- j
+          }
+        }
+        min_date_final <- append(min_date_final, min_date)  
+      }
+      
+      #Creates vectors
+      max_date <- 0
+      max_date_final <- numeric()
+      
+      #Determines the first day all animals could be observed until the last day
+      for (m in unique_names) {
+        for (n in 1:nrow(animal_data)){
+          if (animal_data$Name[n] == m) {
+            min_date <- n
+          }
+        }
+        max_date_final <- append(max_date_final, max_date)  
+      }
+      
+      #If the first date of the dataset was selected
       if(input$date == min(animal_data$Date)){
+        
+        #Slices the data from the beginning until the last date that all remaining animals exist
+        animal_data <- slice(animal_data, 1:min(min_date_final))
+        
+        #Creates the summary data for only after
         animal_data <- animal_data %>% group_by(Behavior)
         summary_only_after <- as.data.frame(summarise(animal_data, n()))
         names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
@@ -933,8 +970,13 @@ server <- function(input, output) {
           scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       } 
       
-      #If the maximum date was selected (The very last date)
+      #If the last date of the dataset was selected 
       else if(input$date == max(animal_data$Date)){
+        
+        #Slices the data from the beginning until the last date that all remaining animals exist
+        animal_data <- slice(animal_data, max(max_date_final):nrow(animal_data))
+        
+        #Creates the summary data for only before
         animal_data <- animal_data %>% group_by(Behavior)
         summary_only_before <- as.data.frame(summarise(animal_data,n()))
         names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
@@ -961,8 +1003,9 @@ server <- function(input, output) {
           scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       }
       
-      #If the date in-between the max and min dates was selected
+      ##If the date in-between the max and min dates was selected
       else{
+        
         #Creates a before dataset
         before <- subset(animal_data, Date < input$date)
         before <- before %>% group_by(Behavior)
