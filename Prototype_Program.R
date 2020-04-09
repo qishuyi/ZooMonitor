@@ -26,7 +26,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
-                          titlePanel(h3("Upload a CSV file")),
+                          titlePanel(h3("Upload a CSV File")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
@@ -52,7 +52,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              radioButtons("select_general", "Show Observations by:",
+                              radioButtons("select_general", h4("Show Observations by:"),
                                            choices = list("Hour of Day", "Day of Week", "Animal")
                               )
                             ),
@@ -69,7 +69,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Frequency of Behaviors")),
                           sidebarPanel(
                             uiOutput("dateControls4"),
-                            radioButtons("select_faceted_barplot", "Show Behavior by:",
+                            radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
                                          choices = list("Hour of Day", "Day of Week")),
                             uiOutput("nameControls4")
                           ),
@@ -91,7 +91,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               uiOutput("dateControls"),
-                              radioButtons("select_exclusion", "Use:",
+                              radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               uiOutput("exclusionControls")
                             ),
@@ -111,7 +111,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           
                           titlePanel(h3("Infographics of Selected Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = "Filter Activities by:",
+                            radioButtons(inputId = "filter_type", label = h4("Filter Activities by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             actionButton(inputId = "select_all", label = "Select All"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
@@ -345,9 +345,11 @@ server <- function(input, output) {
   #Creative Reactive Input for either Categories/Behaviors
   
   #Making sure that everything is deselected as well, when the filter input changes
+  #Making sure that everything is deselected when a new data set is selected
   #Also incorporates the Deselect All Functionality
   
-  observeEvent(c(input$filter_type, input$deselect_all),  {
+  
+  observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
     
     output$select_activity <- renderUI({
       
@@ -367,7 +369,7 @@ server <- function(input, output) {
         
         behavior_options <- sort(unique(animal_data$Behavior))
         checkboxGroupInput(inputId = "behavior_input",
-                           label = "Select Behaviors",
+                           label = h4("Select Behaviors"),
                            choices = behavior_options)
         
         
@@ -393,14 +395,14 @@ server <- function(input, output) {
         
         category <- sort(unique(animal_data$Category))
         checkboxGroupInput(inputId = "category_input", 
-                           label= "Select Categories",
+                           label= h4("Select Categories"),
                            choices = category, 
                            selected = category)
       } else { 
         
         behavior_options <- sort(unique(animal_data$Behavior))
         checkboxGroupInput(inputId = "behavior_input",
-                           label = "Select Behaviors",
+                           label = h4("Select Behaviors"),
                            choices = behavior_options,
                            selected = behavior_options)
       }
@@ -760,7 +762,7 @@ server <- function(input, output) {
     prefix <- c('All animals')
     names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
-    radioButtons('names4', "Select Animal", names)
+    radioButtons('names4', h4("Select Animal"), names)
   })
   #Let user select a date range
   output$dateControls4 <- renderUI({
@@ -768,7 +770,7 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     date <- animal_data$Date
-    dateRangeInput("daterange4", "Select Date Range",
+    dateRangeInput("daterange4", h4("Select Date Range"),
                    start = min(animal_data$Date),
                    end = max(animal_data$Date),
                    min = min(animal_data$Date),
@@ -867,7 +869,7 @@ server <- function(input, output) {
     date <- animal_data$Date
     
     #Date input
-    dateInput("date", "Select Event Date",
+    dateInput("date", h4("Select Event Date"),
               value = min(animal_data$Date),
               min = min(animal_data$Date),
               max = max(animal_data$Date))
@@ -883,7 +885,7 @@ server <- function(input, output) {
       
       #Radio Button
       names <- sort(unique(animal_data$Name))
-      radioButtons("subject_animal", "Select Animal to Exclude", names)
+      radioButtons("subject_animal", h4("Select Animal to Exclude"), names)
     }
   })
   
