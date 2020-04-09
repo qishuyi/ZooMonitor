@@ -32,7 +32,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to upload a csv file
-                              fileInput("file1", "Choose a CSV File",
+                              fileInput("file1", h4("Choose a CSV File"),
                                         multiple = TRUE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
