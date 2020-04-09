@@ -55,7 +55,7 @@ for(i in names(animal_data)){
     
     IC_Name_Vector <- append(IC_Name_Vector, i)
   }
-}
+} 
 
 animal_data <- animal_data %>% unite("Category", IC_Name_Vector , remove = T)                                                                 
 
