@@ -943,7 +943,7 @@ server <- function(input, output) {
       #Excludes the subject animal
       animal_data <- filter(animal_data, Name != input$subject_animal)
       
-      #Creates three vectors used to slice the data
+      #Creates vectors used to slice the data
       unique_names <- unique(animal_data$Name)
       min_date <- 0
       min_date_final <- numeric()
@@ -969,7 +969,8 @@ server <- function(input, output) {
         }
         max_date_final <- append(max_date_final, max_date)  
       }
-      
+      ####If there is an overlapping period of all the remaining animals
+      if (max(max_date_final) <= min(min_date_final)){
       ###If the first date of the dataset was selected
       if (input$date == min(animal_data$Date)) {
         
@@ -1161,6 +1162,14 @@ server <- function(input, output) {
                                   legend.position="bottom") +
           scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
       }
+      }}
+  })
+  output$inclusionControls <- renderUI({
+    if (max(max_date_final) < min(min_date_final)) {
+      animal_data <- filter(animal_data, Name != input$subject_animal)
+      names <- sort(unique(animal_data$Name))
+      include_animal <- animal_data$Name
+      checkboxGroupInput("include_animal", "Select Animal to Include", names)
     }
   })
 }
