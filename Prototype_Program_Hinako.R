@@ -999,8 +999,7 @@ server <- function(input, output) {
       }
       
       ##If the date in-between the last and first dates was selected
-      else{
-        if (input$date >= max(max_data_final) & input$date <= min(min_date_final)) {
+      else if (input$date >= max(max_date_final) & input$date <= min(min_date_final)) {
           
           #Creates a before dataset
           before <- subset(animal_data, Date < input$date)
@@ -1133,7 +1132,6 @@ server <- function(input, output) {
                                     legend.position="bottom") +
             scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
         }
-      }
     }
   })
   }
