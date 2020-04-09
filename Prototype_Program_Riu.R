@@ -107,7 +107,9 @@ ui <- navbarPage("ZooMonitor",
                                      titlePanel(h3("Infographics of Selected Activities")),
                                      sidebarPanel(
                                        radioButtons(inputId = "filter_type", label = "Filter Activities by:",
-                                                    c("Behavior", "Category"), selected = "Category"),
+                                                    c("Category", "Behavior"), selected = "Category"),
+                                       actionButton(inputId = "select_all", label = "Select All"),
+                                       actionButton(inputId = "deselect_all", label = "Deselect All"),
                                        uiOutput("select_activity")
                                       
                                        
@@ -336,34 +338,84 @@ server <- function(input, output) {
   
   
   #Creative Reactive Input for either Categories/Behaviors
- output$select_activity <- renderUI({
+  
+  #Making sure that everything is deselected as well, when the filter input changes
+  #Also incorporates the Deselect All Functionality
+  
+  observeEvent(c(input$filter_type, input$deselect_all),  {
     
-   #Get updated data
-    animal_data <- data_input()
-    
-    req(input$filter_type)
-    
-    
-    if(input$filter_type == "Category"){
-    
-    category <- sort(unique(animal_data$Category))
-    checkboxGroupInput(inputId = "category_input", 
-                       label= "Select Categories",
-                       choices = category)
-    } else {
+    output$select_activity <- renderUI({
       
+      #Get updated data
+      animal_data <- data_input()
+      
+      req(input$filter_type)
+      
+      
+      if(input$filter_type == "Category"){
+        
+        category <- sort(unique(animal_data$Category))
+        checkboxGroupInput(inputId = "category_input", 
+                           label= "Select Categories",
+                           choices = category)
+      } else {
+        
+        behavior_options <- sort(unique(animal_data$Behavior))
+        checkboxGroupInput(inputId = "behavior_input",
+                           label = "Select Behaviors",
+                           choices = behavior_options)
+        
+        
+      }
+      
+      
+    })
+    
+  })
+  
+  
+  #Select All Functionality
+  
+  observeEvent(input$select_all, {
+    
+    output$select_activity <- renderUI({  
+    
+      animal_data <- data_input()
+      
+      
+      if(input$filter_type == "Category"){
+      
+      
+      category <- sort(unique(animal_data$Category))
+      checkboxGroupInput(inputId = "category_input", 
+                         label= "Select Categories",
+                         choices = category, 
+                         selected = category)
+      } else { 
+        
       behavior_options <- sort(unique(animal_data$Behavior))
       checkboxGroupInput(inputId = "behavior_input",
-                         label = "Select Behaviors",
-                         choices = behavior_options)
+                           label = "Select Behaviors",
+                           choices = behavior_options,
+                         selected = behavior_options)
+      }
+        
       
-      
-    }
-    
     })
-  
-  
-  
+  })
+      
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   #Creates Infographics based on Chosen Categories/Behaviors
  
    #Reactive Category Visual
