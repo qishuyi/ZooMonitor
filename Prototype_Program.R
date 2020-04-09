@@ -72,6 +72,9 @@ ui <- navbarPage("ZooMonitor",
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
+                            # If there are no available data, show helptext
+                            uiOutput("no_data_barplot"),
+                            
                             # Create the faceted barplot for frequency of behaviors
                             plotOutput("faceted_barplot")
                           )),
@@ -733,6 +736,8 @@ server <- function(input, output) {
       animal_data <- animal_data %>% filter(Name == animal_name)
     }
     
+    if (nrow(animal_data) == 0) return()
+    
     # Choose x-axis of the barplots
     if(animal_name == "All animals") animal_name <- "All Animals"
     
@@ -760,6 +765,40 @@ server <- function(input, output) {
         labs(title = plot_caption, y = "Frequency")
     }
   }, height = 600)
+  
+  output$no_data_barplot <- renderUI({
+    # Get updated data
+    animal_data <- data_input()
+    
+    # Wait until the program loads up
+    req(input$daterange4)
+    
+    # Choose the date range of the data we want to work with
+    start_date <- input$daterange4[1]
+    end_date <- input$daterange4[2]
+    animal_data <- animal_data %>% filter(Date >= start_date & Date <= end_date)
+    
+    # Choose the animal(s) whose behaviors we will display
+    animal_name <- input$names4
+    if (animal_name != "All animals") {
+      animal_data <- animal_data %>% filter(Name == animal_name)
+    }
+    
+    # Indicate if there are no data available for the animal and date range selected
+    if (nrow(animal_data) == 0) {
+      error_msg <- character()
+      if (start_date > end_date) {
+        error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
+                                ") must be no later than end date (", end_date, ").", sep = ""))
+        error_msg <- HTML(paste(em(error_msg)))
+      }else {
+        error_msg <- HTML(paste("There is no data for", animal_name, 
+                                "in your selected date range:", start_date, "to", end_date))
+        error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
+      }
+      return(error_msg)
+    }
+  })
   
   
   ############################### Pie Charts ###############################
