@@ -12,6 +12,7 @@ library(RColorBrewer)
 library(viridis)
 library(wesanderson)
 library(tools)
+library(RColorBrewer) 
 
 ############### UI and Server ###############
 ui <- navbarPage("ZooMonitor",
@@ -378,6 +379,12 @@ server <- function(input, output) {
       cbind(Percentage = animal_category$Count/ rep(animal_count,
                                                     times = rep(length(input$category_input), length(animal_count))))
     
+    # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+    # regardless of the order in which we select them.
+    colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+    names(colors) = levels(animal_category$Category)
+    colors <- colors[1:length(levels(animal_category$Category))]
+    
     #Creating the visualization
     ggplot(data = animal_category) +
       geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
@@ -389,7 +396,8 @@ server <- function(input, output) {
             legend.title = element_text(size = 10),
             legend.text = element_text(size = 8)) +
       scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                         limits = c(0,1))
+                         limits = c(0,1))  +
+      scale_fill_manual(values = colors)
     
     
   })
@@ -512,6 +520,12 @@ server <- function(input, output) {
                                                     times = rep(length(input$behavior_input), length(animal_count))))
     
     
+    # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+    # regardless of the order in which we select them.
+    colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+    names(colors) = levels(animal_behavior$Behavior)
+    colors <- colors[1:length(levels(animal_behavior$Behavior))]
+    
     #Creating the visualization
     ggplot(data = animal_behavior) +
       geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
@@ -523,7 +537,8 @@ server <- function(input, output) {
             legend.title = element_text(size = 10),
             legend.text = element_text(size = 8)) +
       scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                         limits = c(0,1))
+                         limits = c(0,1)) +
+      scale_fill_manual(values = colors)
     
     
   })
