@@ -1039,7 +1039,7 @@ server <- function(input, output) {
       
       ##If the date in-between the last and first dates was selected
       else{
-        if (input$date >= max(max_data_final) & input$date <= min(min_date_final)) {
+        if (input$date >= max(max_date_final) & input$date <= min(min_date_final)) {
           
           #Creates a before dataset
           before <- subset(animal_data, Date < input$date)
