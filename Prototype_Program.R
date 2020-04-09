@@ -20,7 +20,7 @@ library(janitor)
 ### filepath in generalized_cleaning.R.
 
 ############### UI and Server ###############
-ui <- navbarPage("ZooMonitor",
+ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           

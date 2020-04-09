@@ -13,6 +13,7 @@ library(viridis)
 library(wesanderson)
 library(tools)
 library(janitor)
+library(shinythemes)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -20,9 +21,9 @@ library(janitor)
 ### filepath in generalized_cleaning.R.
 
 ############### UI and Server ###############
-ui <- navbarPage("ZooMonitor",
+ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  ############################### Upload Data ###############################
-                 tabPanel("Upload Data",
+                 tabPanel("Upload Data", 
                           
                           titlePanel(h3("Upload a CSV file")),
                           
