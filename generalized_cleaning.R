@@ -140,8 +140,3 @@ animal_data$Category <- toTitleCase(animal_data$Category)
 
 #Adding Day of Week
 animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
-
-
-
-
-
