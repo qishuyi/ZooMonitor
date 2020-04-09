@@ -14,6 +14,7 @@ library(wesanderson)
 library(tools)
 library(janitor)
 library(RColorBrewer) 
+library(shinythemes)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -360,7 +361,7 @@ server <- function(input, output) {
         
         category <- sort(unique(animal_data$Category))
         checkboxGroupInput(inputId = "category_input", 
-                           label= "Select Categories",
+                           label= h4("Select Categories"),
                            choices = category)
       } else {
         
