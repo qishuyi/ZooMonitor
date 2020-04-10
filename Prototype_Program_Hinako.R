@@ -103,8 +103,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot"),
-                              textOutput("no_plot_to_show")
+                              plotOutput("event_pie_plot")
                             ))),
                  
                  ############################### Activity ###############################
@@ -140,7 +139,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
 
 
 # Define server logic
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   data_input <- reactive({
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
@@ -1221,15 +1220,21 @@ server <- function(input, output) {
                                     legend.position="bottom") +
             scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
         }}
-      #If there's no overlapping period
+      
+      ###If there's no overlapping period
       else {
         output$inclusionControls <- renderUI({
-          if (max(max_date_final) > min(min_date_final)) {
         #Sets the choices of the updatecheckboxgroupinput
         names2 <- sort(unique(animal_data$Name))
         #Sets the options of the updatecheckboxgroupinput
         checkboxGroupInput("include_animal", "Select Animal to Include",
-                               choices = names2)}})
+                               choices = names2)})
+        output$no_plot <- renderText({
+          if (is.na(input$include_animal)){
+            "There is no plot to show. Please select an animal/animals to include."
+        }})
+        
+        if (length(input$include_animal) >= 1) {
         #Filter by the selected animals to include (still without the subect animal)
         animal_data <- filter(animal_data, Name == input$inclusionControls)
         
@@ -1329,7 +1334,7 @@ server <- function(input, output) {
                                     legend.position="bottom") +
             scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
           
-        }
+        }}
       }}
   })
 }
