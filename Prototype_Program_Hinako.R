@@ -103,7 +103,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot")
+                              plotOutput("event_pie_plot"),
+                              textOutput("no_plot"),
+                              plotOutput("event_pie_plot_2")
                             ))),
                  
                  ############################### Activity ###############################
@@ -886,6 +888,38 @@ server <- function(input, output, session) {
     }
   })
   
+  output$inclusionControls <- renderUI({
+  if (input$select_exclusion == "Data Without the Subject Animal") {
+    #Get updated data
+    animal_data <- data_input()
+    #Excludes the subject animal
+    animal_data <- filter(animal_data, Name != input$subject_animal)
+    #Creates vectors used to slice the data
+    unique_names <- unique(animal_data$Name)
+    min_date <- 0
+    min_date_final <- numeric()
+    max_date <- 0
+    max_date_final <- numeric()
+    #Determines the last day all animals could be observed (counting from the first day)
+    for (i in unique_names) {
+      for (j in 1:nrow(animal_data)) {
+        if (animal_data$Name[j] == i) {
+          min_date <- j}}
+      min_date_final <- append(min_date_final, min_date)}
+    #Determines the first day all animals could be observed (counting until the last day)
+    for (m in unique_names) {
+      for (n in nrow(animal_data):1) {
+        if (animal_data$Name[n] == m) {
+          max_date <- n}}
+      max_date_final <- append(max_date_final, max_date)}
+    if (max(max_date_final) > min(min_date_final)) {
+      #Sets the choices of the checkboxgroupinput
+      names2 <- sort(unique(animal_data$Name))
+      #Sets the options of the checkboxgroupinput
+      checkboxGroupInput("include_animal", "Se]lect Animal to Include",
+                         choices = names2)}}})
+   
+  #Creates Plots 
   output$event_pie_plot <- renderPlot({
     
     #Get updated data
@@ -995,7 +1029,7 @@ server <- function(input, output, session) {
         
       }}
     
-    ####If "Data with subject animal exclusion" was selected
+    ####If "Data without the subject animal" was selected
     else {
       
       #Excludes the subject animal
@@ -1027,6 +1061,7 @@ server <- function(input, output, session) {
         }
         max_date_final <- append(max_date_final, max_date)  
       }
+      
       ####If there is an overlapping period of all the remaining animals
       if (max(max_date_final) <= min(min_date_final)) {
         ###If the first date of the dataset was selected
@@ -1220,25 +1255,11 @@ server <- function(input, output, session) {
                                     legend.position="bottom") +
             scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
         }}
-      
-      ###If there's no overlapping period
+      #If there's no overlapping period
       else {
-        output$inclusionControls <- renderUI({
-        #Sets the choices of the updatecheckboxgroupinput
-        names2 <- sort(unique(animal_data$Name))
-        #Sets the options of the updatecheckboxgroupinput
-        checkboxGroupInput("include_animal", "Select Animal to Include",
-                               choices = names2)})
-        output$no_plot <- renderText({
-          if (is.na(input$include_animal)){
-            "There is no plot to show. Please select an animal/animals to include."
-        }})
-        
-        if (length(input$include_animal) >= 1) {
-        #Filter by the selected animals to include (still without the subect animal)
-        animal_data <- filter(animal_data, Name == input$inclusionControls)
-        
-        #With the included animals
+        #If there's an entry in the include animal
+        if (length(input$inclusionControls) >= 1) {
+          
         if(input$date == min(animal_data$Date)) {
           animal_data <- animal_data %>% group_by(Behavior)
           summary_only_after <- as.data.frame(summarise(animal_data, n()))
@@ -1273,7 +1294,7 @@ server <- function(input, output, session) {
           summary_only_before <- summary_only_before %>%
             mutate(Percent = round(counts/sum(counts)*100, 1))
           
-         #Creates a pie chart for only before
+          #Creates a pie chart for only before
           ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
             geom_bar(stat="identity", width=1) +
             coord_polar("y", start=0) + 
@@ -1334,9 +1355,14 @@ server <- function(input, output, session) {
                                     legend.position="bottom") +
             scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
           
-        }}
-      }}
-  })
+        }}}}
+    })
+      
+   #If nothing was seleted
+        output$no_plot <- renderText({
+          if (is.na(input$include_animal)){
+            "There is no plot to show. Please select an animal/animals to include."
+        }})
 }
 
 # Run the application 
