@@ -918,6 +918,12 @@ server <- function(input, output, session) {
       #Sets the options of the checkboxgroupinput
       checkboxGroupInput("include_animal", "Se]lect Animal to Include",
                          choices = names2)}}})
+  
+  #If nothing was seleted then return a text
+  output$no_plot <- renderText({
+    if (length(input$include_animal) == 0) {
+      "There is no plot to show. Please select an animal/animals to include."
+    }})
    
   #Creates Plots 
   output$event_pie_plot <- renderPlot({
@@ -1359,12 +1365,6 @@ server <- function(input, output, session) {
           
         }}}}
     })
-      
-   #If nothing was seleted
-        output$no_plot <- renderText({
-          if (length(input$include_animal) == 0) {
-            "There is no plot to show. Please select an animal/animals to include."
-        }})
 }
 
 # Run the application 
