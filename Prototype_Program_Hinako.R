@@ -26,13 +26,13 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
-                          titlePanel(h3("Upload a CSV file")),
+                          titlePanel(h3("Upload a CSV File")),
                           
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to upload a csv file
-                              fileInput("file1", "Choose a CSV File",
+                              fileInput("file1", h4("Choose a CSV File"),
                                         multiple = TRUE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
@@ -52,7 +52,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis
-                              radioButtons("select_general", "Show Observations by:",
+                              radioButtons("select_general", h4("Show Observations by:"),
                                            choices = list("Hour of Day", "Day of Week", "Animal")
                               )
                             ),
@@ -69,7 +69,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Frequency of Behaviors")),
                           sidebarPanel(
                             uiOutput("dateControls4"),
-                            radioButtons("select_faceted_barplot", "Show Behavior by:",
+                            radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
                                          choices = list("Hour of Day", "Day of Week")),
                             uiOutput("nameControls4")
                           ),
@@ -91,7 +91,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               uiOutput("dateControls"),
-                              radioButtons("select_exclusion", "Use:",
+                              radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               uiOutput("exclusionControls"),
                               uiOutput("inclusionControls")
@@ -113,7 +113,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           
                           titlePanel(h3("Infographics of Selected Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = "Filter Activities by:",
+                            radioButtons(inputId = "filter_type", label = h4("Filter Activities by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             actionButton(inputId = "select_all", label = "Select All"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
@@ -140,7 +140,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
 
 
 # Define server logic
-server <- function(input, output, session) {
+server <- function(input, output) {
   
   data_input <- reactive({
     # input$file1 will be NULL initially, the req function ensures the value of input$file1 is available.
@@ -347,9 +347,11 @@ server <- function(input, output, session) {
   #Creative Reactive Input for either Categories/Behaviors
   
   #Making sure that everything is deselected as well, when the filter input changes
+  #Making sure that everything is deselected when a new data set is selected
   #Also incorporates the Deselect All Functionality
   
-  observeEvent(c(input$filter_type, input$deselect_all),  {
+  
+  observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
     
     output$select_activity <- renderUI({
       
@@ -369,7 +371,7 @@ server <- function(input, output, session) {
         
         behavior_options <- sort(unique(animal_data$Behavior))
         checkboxGroupInput(inputId = "behavior_input",
-                           label = "Select Behaviors",
+                           label = h4("Select Behaviors"),
                            choices = behavior_options)
         
         
@@ -395,14 +397,14 @@ server <- function(input, output, session) {
         
         category <- sort(unique(animal_data$Category))
         checkboxGroupInput(inputId = "category_input", 
-                           label= "Select Categories",
+                           label= h4("Select Categories"),
                            choices = category, 
                            selected = category)
       } else { 
         
         behavior_options <- sort(unique(animal_data$Behavior))
         checkboxGroupInput(inputId = "behavior_input",
-                           label = "Select Behaviors",
+                           label = h4("Select Behaviors"),
                            choices = behavior_options,
                            selected = behavior_options)
       }
@@ -762,7 +764,7 @@ server <- function(input, output, session) {
     prefix <- c('All animals')
     names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
-    radioButtons('names4', "Select Animal", names)
+    radioButtons('names4', h4("Select Animal"), names)
   })
   #Let user select a date range
   output$dateControls4 <- renderUI({
@@ -770,7 +772,7 @@ server <- function(input, output, session) {
     animal_data <- data_input()
     
     date <- animal_data$Date
-    dateRangeInput("daterange4", "Select Date Range",
+    dateRangeInput("daterange4", h4("Select Date Range"),
                    start = min(animal_data$Date),
                    end = max(animal_data$Date),
                    min = min(animal_data$Date),
@@ -869,7 +871,7 @@ server <- function(input, output, session) {
     date <- animal_data$Date
     
     #Date input
-    dateInput("date", "Select Event Date",
+    dateInput("date", h4("Select Event Date"),
               value = min(animal_data$Date),
               min = min(animal_data$Date),
               max = max(animal_data$Date))
@@ -878,46 +880,46 @@ server <- function(input, output, session) {
   #Let user choose the subject animal to exclude
   output$exclusionControls <- renderUI({
     if(input$select_exclusion == "Data Without the Subject Animal") {
-    #Get updated data
-    animal_data <- data_input()
-    #Radio Button
-    subject_animal <- animal_data$Name
-    names <- sort(unique(animal_data$Name))
-    radioButtons("subject_animal", "Select Animal to Exclude", names)
+      #Get updated data
+      animal_data <- data_input()
+      #Radio Button
+      subject_animal <- animal_data$Name
+      names <- sort(unique(animal_data$Name))
+      radioButtons("subject_animal", h4("Select Animal to Exclude"), names)
     }
   })
   
   #Let user choose the animal(s) to include
   output$inclusionControls <- renderUI({
-  if (input$select_exclusion == "Data Without the Subject Animal") {
-    #Get updated data
-    animal_data <- data_input()
-    #Excludes the subject animal
-    animal_data <- filter(animal_data, Name != input$subject_animal)
-    #Creates vectors used to slice the data
-    unique_names <- unique(animal_data$Name)
-    min_date <- 0
-    min_date_final <- numeric()
-    max_date <- 0
-    max_date_final <- numeric()
-    #Determines the last day all animals could be observed (counting from the first day)
-    for (i in unique_names) {
-      for (j in 1:nrow(animal_data)) {
-        if (animal_data$Name[j] == i) {
-          min_date <- j}}
-      min_date_final <- append(min_date_final, min_date)}
-    #Determines the first day all animals could be observed (counting until the last day)
-    for (m in unique_names) {
-      for (n in nrow(animal_data):1) {
-        if (animal_data$Name[n] == m) {
-          max_date <- n}}
-      max_date_final <- append(max_date_final, max_date)}
-    if (max(max_date_final) > min(min_date_final)) {
-      #Sets the choices of the checkboxgroupinput
-      names2 <- sort(unique(animal_data$Name))
-      #Creates the options of the checkboxgroupinput
-      checkboxGroupInput("include_animal", "Se]lect Animal to Include",
-                         choices = names2)}}})
+    if (input$select_exclusion == "Data Without the Subject Animal") {
+      #Get updated data
+      animal_data <- data_input()
+      #Excludes the subject animal
+      animal_data <- filter(animal_data, Name != input$subject_animal)
+      #Creates vectors used to slice the data
+      unique_names <- unique(animal_data$Name)
+      min_date <- 0
+      min_date_final <- numeric()
+      max_date <- 0
+      max_date_final <- numeric()
+      #Determines the last day all animals could be observed (counting from the first day)
+      for (i in unique_names) {
+        for (j in 1:nrow(animal_data)) {
+          if (animal_data$Name[j] == i) {
+            min_date <- j}}
+        min_date_final <- append(min_date_final, min_date)}
+      #Determines the first day all animals could be observed (counting until the last day)
+      for (m in unique_names) {
+        for (n in nrow(animal_data):1) {
+          if (animal_data$Name[n] == m) {
+            max_date <- n}}
+        max_date_final <- append(max_date_final, max_date)}
+      if (max(max_date_final) > min(min_date_final)) {
+        #Sets the choices of the checkboxgroupinput
+        names2 <- sort(unique(animal_data$Name))
+        #Creates the options of the checkboxgroupinput
+        checkboxGroupInput("include_animal", h4("Select Animal to Include"),
+                           choices = names2)}}})
   
   #If nothing was seleted then returns a text
   output$no_plot <- renderText({
@@ -946,9 +948,9 @@ server <- function(input, output, session) {
     if (input$select_exclusion == "Data Without the Subject Animal" &
         length(input$include_animal) == 0 &
         max(max_date_final) > min(min_date_final)) 
-      { "There is no plot to show. Please select an animal/animals to include."}
-    })
-   
+    { "There is no plot to show. Please select an animal/animals to include."}
+  })
+  
   #Creates Plots 
   output$event_pie_plot <- renderPlot({
     
@@ -1395,7 +1397,7 @@ server <- function(input, output, session) {
               scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
             
           }}}}
-    })
+  })
 }
 
 # Run the application 
