@@ -97,14 +97,14 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("inclusionControls")
                             ),
                             mainPanel(
+                              uiOutput("no_plot"),
                               #Removing the warning message that appears for a second 
                               #This is a warning for not having either pie chart of before or after on the min/max date
                               tags$style(type="text/css",
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot"),
-                              textOutput("no_plot")
+                              plotOutput("event_pie_plot")
                             ))),
                  
                  ############################### Activity ###############################
@@ -922,7 +922,7 @@ server <- function(input, output) {
                            choices = names2)}}})
   
   #If nothing was seleted then returns a text
-  output$no_plot <- renderText({
+  output$no_plot <- renderUI({
     #Get updated data
     animal_data <- data_input()
     #Excludes the subject animal
@@ -947,8 +947,12 @@ server <- function(input, output) {
       max_date_final <- append(max_date_final, max_date)}
     if (input$select_exclusion == "Data Without the Subject Animal" &
         length(input$include_animal) == 0 &
-        max(max_date_final) > min(min_date_final)) 
-    { "There is no plot to show. Please select an animal/animals to include."}
+        max(max_date_final) > min(min_date_final)) {
+      np <- character()
+      np <- HTML(paste("There is no data when", em(input$subject_animal), 
+                              "is excluded. Please select an animal/animals to include."))
+    }
+    return(np)
   })
   
   #Creates Plots 
