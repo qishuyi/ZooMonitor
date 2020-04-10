@@ -1064,6 +1064,7 @@ server <- function(input, output, session) {
       
       ####If there is an overlapping period of all the remaining animals
       if (max(max_date_final) <= min(min_date_final)) {
+        
         ###If the first date of the dataset was selected
         if (input$date == min(animal_data$Date)) {
           
@@ -1258,6 +1259,7 @@ server <- function(input, output, session) {
       #If there's no overlapping period
       else {
         #If there's an entry in the include animal
+        
         if (length(input$inclusionControls) >= 1) {
           
         if(input$date == min(animal_data$Date)) {
@@ -1360,7 +1362,7 @@ server <- function(input, output, session) {
       
    #If nothing was seleted
         output$no_plot <- renderText({
-          if (is.na(input$include_animal)){
+          if (length(input$include_animal) == 0) {
             "There is no plot to show. Please select an animal/animals to include."
         }})
 }
