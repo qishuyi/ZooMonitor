@@ -928,6 +928,10 @@ server <- function(input, output) {
   output$no_plot <- renderUI({
     #Get updated data
     animal_data <- data_input()
+    req(input$select_exclusion)
+    req(input$subject_animal)
+    req(input$include_animal)
+    if(input$select_exclusion == "Data Without the Subject Animal") {
     #Excludes the subject animal
     animal_data <- filter(animal_data, Name != input$subject_animal)
     #Creates vectors used to slice the data
@@ -948,13 +952,12 @@ server <- function(input, output) {
         if (animal_data$Name[n] == m) {
           max_date <- n}}
       max_date_final <- append(max_date_final, max_date)}
-    if (input$select_exclusion == "Data Without the Subject Animal" &
-        length(input$include_animal) == 0 &
-        max(max_date_final) > min(min_date_final)) {
+    if (max(max_date_final) > min(min_date_final)) {
+      if (length(input$include_animal) == 0) {
       noplot <- character()
       noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
                            "is excluded. Please select an animal/animals to include."))
-      return(noplot)}
+      return(noplot)}}}
   })
   
   #Creates Plots 

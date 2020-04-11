@@ -928,33 +928,36 @@ server <- function(input, output) {
   output$no_plot <- renderUI({
     #Get updated data
     animal_data <- data_input()
-    #Excludes the subject animal
-    animal_data <- filter(animal_data, Name != input$subject_animal)
-    #Creates vectors used to slice the data
-    unique_names <- unique(animal_data$Name)
-    min_date <- 0
-    min_date_final <- numeric()
-    max_date <- 0
-    max_date_final <- numeric()
-    #Determines the last day all animals could be observed (counting from the first day)
-    for (i in unique_names) {
-      for (j in 1:nrow(animal_data)) {
-        if (animal_data$Name[j] == i) {
-          min_date <- j}}
-      min_date_final <- append(min_date_final, min_date)}
-    #Determines the first day all animals could be observed (counting until the last day)
-    for (m in unique_names) {
-      for (n in nrow(animal_data):1) {
-        if (animal_data$Name[n] == m) {
-          max_date <- n}}
-      max_date_final <- append(max_date_final, max_date)}
-    if (input$select_exclusion == "Data Without the Subject Animal" &
-        length(input$include_animal) == 0 &
-        max(max_date_final) > min(min_date_final)) {
-      noplot <- character()
-      noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
-                              "is excluded. Please select an animal/animals to include."))
-    return(noplot)}
+    req(input$select_exclusion)
+    req(input$subject_animal)
+    req(input$include_animal)
+    if(input$select_exclusion == "Data Without the Subject Animal") {
+      #Excludes the subject animal
+      animal_data <- filter(animal_data, Name != input$subject_animal)
+      #Creates vectors used to slice the data
+      unique_names <- unique(animal_data$Name)
+      min_date <- 0
+      min_date_final <- numeric()
+      max_date <- 0
+      max_date_final <- numeric()
+      #Determines the last day all animals could be observed (counting from the first day)
+      for (i in unique_names) {
+        for (j in 1:nrow(animal_data)) {
+          if (animal_data$Name[j] == i) {
+            min_date <- j}}
+        min_date_final <- append(min_date_final, min_date)}
+      #Determines the first day all animals could be observed (counting until the last day)
+      for (m in unique_names) {
+        for (n in nrow(animal_data):1) {
+          if (animal_data$Name[n] == m) {
+            max_date <- n}}
+        max_date_final <- append(max_date_final, max_date)}
+      if (max(max_date_final) > min(min_date_final)) {
+        if (length(input$include_animal) == 0) {
+          noplot <- character()
+          noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
+                               "is excluded. Please select an animal/animals to include."))
+          return(noplot)}}}
   })
   
   #Creates Plots 
