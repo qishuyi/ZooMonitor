@@ -948,11 +948,11 @@ server <- function(input, output) {
     if (input$select_exclusion == "Data Without the Subject Animal" &
         length(input$include_animal) == 0 &
         max(max_date_final) > min(min_date_final)) {
-      np <- character()
-      np <- HTML(paste("There is no data when", em(input$subject_animal), 
+      noplot <- character()
+      nolotp <- HTML(paste("There is no data when", em(input$subject_animal), 
                        "is excluded. Please select an animal/animals to include."))
     }
-    return(np)
+    return(noplot)
   })
   
   #Creates Plots 
