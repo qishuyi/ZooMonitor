@@ -237,6 +237,8 @@ server <- function(input, output) {
       
     } else if(length(Social_Modifier_Vector) > 1){
       animal_data <- animal_data %>% unite("Social_Modifier", Social_Modifier_Vector, remove = TRUE)
+    } else {
+      animal_data$Social_Modifier <- NA
     }
     
     
