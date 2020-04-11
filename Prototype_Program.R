@@ -14,6 +14,7 @@ library(wesanderson)
 library(tools)
 library(janitor)
 library(RColorBrewer) 
+library(shinythemes)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -233,6 +234,8 @@ server <- function(input, output) {
       
     } else if(length(Social_Modifier_Vector) > 1){
       animal_data <- animal_data %>% unite("Social_Modifier", Social_Modifier_Vector, remove = TRUE)
+    } else {
+      animal_data$Social_Modifier <- NA
     }
     
     
