@@ -93,6 +93,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("dateControls"),
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
+                              helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
                               uiOutput("exclusionControls"),
                               uiOutput("inclusionControls")
                             ),
@@ -951,8 +952,7 @@ server <- function(input, output) {
       noplot <- character()
       noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
                               "is excluded. Please select an animal/animals to include."))
-    }
-    return(noplot)
+    return(noplot)}
   })
   
   #Creates Plots 
