@@ -299,7 +299,7 @@ server <- function(input, output) {
     if(input$select_general == "Hour of Day"){
       ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
-        scale_x_discrete(limits = 9:16) +
+        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
