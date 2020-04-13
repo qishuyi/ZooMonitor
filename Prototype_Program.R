@@ -894,6 +894,8 @@ server <- function(input, output) {
   
   #Let user choose the animal(s) to include
   output$inclusionControls <- renderUI({
+    req(input$select_exclusion)
+    req(input$subject_animal)
     if (input$select_exclusion == "Data Without the Subject Animal") {
       #Get updated data
       animal_data <- data_input()
