@@ -2,8 +2,6 @@ library(manip)
 
 #Function that generates fake data
 create_fake_data <- function(data){
-  data <- read.csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1582236321.csv")
-  
   #length of data
   data_length <- nrow(data)
   
@@ -26,7 +24,6 @@ create_fake_data <- function(data){
   social_modifier_column_indicies <- which(str_detect(colnames(data), "Social.Modifier"))
   social_modifier_column_indicies <- c(which(colnames(data) == "Focal.Name"), social_modifier_column_indicies)
   
-  #Create fake names for each animal name in the dataset
   for (i in 1:length(actual_names)) {
     for (j in social_modifier_column_indicies) {
       data[,j] <- as.character(data[,j])
@@ -44,8 +41,11 @@ create_fake_data <- function(data){
   #Number of observers in the data
   observer_name_length <- length(observer_names)
   
+  #Get unused fake names
+  fake_names2 <- fake_names[!fake_names %in% new_names]
+  
   #Vector of fake names to replace the real names
-  new_observer_names <- sample(fake_names, observer_name_length)
+  new_observer_names <- sample(fake_names2, observer_name_length)
   
   #Create fake names for each observer name in the dataset
   for (i in 1:length(observer_names)) {
@@ -64,9 +64,21 @@ create_fake_data <- function(data){
   selected_rows <- sort(sample(1:data_length, ceiling(.8 * data_length), replace = F))
   
   data <- data[selected_rows,]
+  
+  names(data) <- gsub("\\.", " ", names(data))
     
   return(data)
  
 }
 
-test <- create_fake_data(read.csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1582236321.csv"))
+datasets <- c("African%20Penguin%20Report.csv", "Hanging_Parrot_report.csv", "report_study_1579790635.csv", "Hogs_report.csv", "Lion_report.csv")
+
+for (i in 1:5) {
+  inputFile <- paste("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/", datasets[i], sep = "")
+  fake <- create_fake_data(read.csv(inputFile))
+  outputFile <- paste("FakeData/fakedata_", i, ".csv", sep = "")
+  fileName <- file.path(getwd(), outputFile)
+  write.csv(fake, fileName, row.names=FALSE)
+}
+
+

@@ -897,6 +897,8 @@ server <- function(input, output) {
     if (input$select_exclusion == "Data Without the Subject Animal") {
       #Get updated data
       animal_data <- data_input()
+      #Make sure input$subject_animal is ready
+      req(input$subject_animal)
       #Excludes the subject animal
       animal_data <- filter(animal_data, Name != input$subject_animal)
       #Creates vectors used to slice the data
