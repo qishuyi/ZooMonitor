@@ -33,13 +33,16 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to upload a csv file
                               fileInput("file1", h4("Choose a CSV File"),
-                                        multiple = TRUE,
+                                        multiple = FALSE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
                                                    ".csv"))
                             ),
                             # Display the data file
                             mainPanel(
+                              # If there is an error
+                              uiOutput("uploadError"),
+                              
                               dataTableOutput("contents")
                             ))),
                  
@@ -149,20 +152,30 @@ server <- function(input, output) {
     req(input$file1)
     
     #Loading in Data
-    animal_data <- read_csv(input$file1$datapath,
-                            col_types = cols(.default = col_character(),
-                                             SessionID = col_double(), 
-                                             `Session Start Time` = col_datetime(format = ""),
-                                             `Session End Time` = col_datetime(format = ""),
-                                             DateTime = col_datetime(format = ""),
-                                             Date = col_date(format = ""),
-                                             Time = col_time(format = ""),
-                                             Year = col_double(),
-                                             Month = col_double(),
-                                             Hour = col_double(),
-                                             Duration = col_double(),
-                                             `Frame Number` = col_double()))
-    
+    tryCatch(
+      {
+        animal_data <- read_csv(input$file1$datapath,
+                                col_types = cols(.default = col_character(),
+                                                 SessionID = col_double(), 
+                                                 `Session Start Time` = col_datetime(format = ""),
+                                                 `Session End Time` = col_datetime(format = ""),
+                                                 DateTime = col_datetime(format = ""),
+                                                 Date = col_date(format = ""),
+                                                 Time = col_time(format = ""),
+                                                 Year = col_double(),
+                                                 Month = col_double(),
+                                                 Hour = col_double(),
+                                                 Duration = col_double(),
+                                                 `Frame Number` = col_double()))
+      },
+      warning = function(w) {
+        if (str_detect(w$message, "column names")) {
+          output$uploadError <- renderUI(HTML(paste(
+            em("Data format not compatible")
+          )))  
+        }
+      }
+    )
     #Removing spaces and adding underscore
     names(animal_data) <- gsub(" ", "_", names(animal_data))
     
