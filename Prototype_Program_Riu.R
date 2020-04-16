@@ -325,12 +325,12 @@ server <- function(input, output) {
         geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
-            plot.subtitle = element_text(size = 12, face = "italic"),
-            plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
-            axis.title = element_text(size = 12, face = "bold"),
-            axis.text = element_text(size = 10),
-            legend.title = element_text(size = 12),
-            legend.text = element_text(size = 10))
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
     
@@ -352,7 +352,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
     } 
     
@@ -373,7 +373,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     }
@@ -507,9 +507,9 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
-   
+      
     } else {
       
       #Data frame to create visualization
@@ -553,7 +553,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     }
@@ -856,14 +856,14 @@ server <- function(input, output) {
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         labs(title = plot_caption, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
-            plot.subtitle = element_text(size = 12, face = "italic"),
-            plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
-            axis.title = element_text(size = 12, face = "bold"),
-            legend.title = element_text(size = 12),
-            legend.text = element_text(size = 10),
-            axis.text.x = element_text(size = 10, angle = 90),
-            axis.text.y = element_text(size = 10))
-   
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
       
     } else {
       # Change caption of the plot
@@ -880,7 +880,7 @@ server <- function(input, output) {
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10),
               axis.text.x = element_text(size = 10, angle = 90),
               axis.text.y = element_text(size = 10))
@@ -1063,7 +1063,7 @@ server <- function(input, output) {
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
       } 
-  
+      
       
       
       #If the last date of the dataset was selected
