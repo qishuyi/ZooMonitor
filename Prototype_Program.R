@@ -980,6 +980,10 @@ server <- function(input, output) {
   #Creates Plots 
   output$event_pie_plot <- renderPlot({
     
+    colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+    names(colors2) = levels(animal_data$Behavior)
+    colors2 <- colors[1:length(levels(animal_data$Behavior))]
+    
     #Get updated data
     animal_data <- data_input()
     #Calls the input
@@ -1012,7 +1016,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
       } 
       
       #If the last date of the dataset was selected
@@ -1040,7 +1044,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
       }
       
       #If a date in-between the last and first dates was selected
@@ -1083,7 +1087,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
         
       }}
     
