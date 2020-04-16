@@ -315,11 +315,13 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Day of Week", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        theme(plot.title = element_text(size = 12, face = "bold")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
       
     }
     
@@ -331,11 +333,13 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        theme(plot.title = element_text(size = 12, face = "bold")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
     } 
     
     #Animal Plot
@@ -346,11 +350,13 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Animal Name", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        theme(plot.title = element_text(size = 12, face = "bold")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
       
     }
   })  
