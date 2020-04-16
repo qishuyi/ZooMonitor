@@ -126,7 +126,8 @@ animal_data <- separate_rows(animal_data, Category, Behavior, sep  = "_")
 #Removing Unnecessary Columns
 animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                             -DateTime, -Grid_Size, -Image_Size,
-                                            -Project_Animals, -Duration)
+                                            -Project_Animals, -Duration,
+                                            -Notes, -Frame_Number)
 
 
 
@@ -136,6 +137,8 @@ animal_data$Behavior <- toTitleCase(animal_data$Behavior)
 #Combining potential same categories with slightly
 animal_data$Category <- toTitleCase(animal_data$Category)
 
+#Use titlecase for animal names
+animal_data$Name <- toTitleCase(animal_data$Name)
 
 ####################### Addition
 
