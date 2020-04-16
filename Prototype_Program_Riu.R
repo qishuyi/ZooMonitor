@@ -131,7 +131,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
-                              tabPanel("Information Table", tableOutput(outputId = "information_table"),
+                              tabPanel("Category Information", tableOutput(outputId = "information_table"),
                                        uiOutput(outputId = "info_text"))
                               
                               
@@ -319,13 +319,18 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Day of Week", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+            plot.subtitle = element_text(size = 12, face = "italic"),
+            plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+            axis.title = element_text(size = 12, face = "bold"),
+            axis.text = element_text(size = 10),
+            legend.title = element_text(size = 12),
+            legend.text = element_text(size = 10))
       
     }
     
@@ -337,13 +342,18 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Hour)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_text(size = 12),
+              legend.text = element_text(size = 10))
     } 
     
     #Animal Plot
@@ -353,13 +363,18 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Animal Name", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Name)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_text(size = 12),
+              legend.text = element_text(size = 10))
       
     }
   })  
@@ -482,16 +497,19 @@ server <- function(input, output) {
       ggplot(data = animal_category) +
         geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Categories per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages based on each animal's total number of observations",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
-      
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_text(size = 12),
+              legend.text = element_text(size = 10))
+   
     } else {
       
       #Data frame to create visualization
@@ -525,15 +543,18 @@ server <- function(input, output) {
       ggplot(data = animal_behavior) +
         geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Behaviors per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages based on each animal's total number of observations",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_text(size = 12),
+              legend.text = element_text(size = 10))
       
     }
     
@@ -833,9 +854,17 @@ server <- function(input, output) {
       plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+            plot.subtitle = element_text(size = 12, face = "italic"),
+            plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+            axis.title = element_text(size = 12, face = "bold"),
+            legend.title = element_text(size = 12),
+            legend.text = element_text(size = 10),
+            axis.text.x = element_text(size = 10, angle = 90),
+            axis.text.y = element_text(size = 10))
+   
+      
     } else {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
@@ -846,9 +875,16 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
     }
   }, height = 600)
   
@@ -1020,12 +1056,15 @@ server <- function(input, output) {
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
       } 
+  
+      
       
       #If the last date of the dataset was selected
       else if(input$date == max(animal_data$Date)) {
@@ -1052,9 +1091,10 @@ server <- function(input, output) {
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
       }
@@ -1100,8 +1140,10 @@ server <- function(input, output) {
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
         
@@ -1176,9 +1218,10 @@ server <- function(input, output) {
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1213,9 +1256,10 @@ server <- function(input, output) {
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1262,8 +1306,10 @@ server <- function(input, output) {
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
           
@@ -1308,8 +1354,10 @@ server <- function(input, output) {
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
           
@@ -1354,8 +1402,10 @@ server <- function(input, output) {
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1394,9 +1444,10 @@ server <- function(input, output) {
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
           } 
@@ -1426,9 +1477,10 @@ server <- function(input, output) {
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
           }
@@ -1474,8 +1526,10 @@ server <- function(input, output) {
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
             
