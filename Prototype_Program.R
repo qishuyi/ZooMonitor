@@ -337,8 +337,7 @@ server <- function(input, output) {
              x = "Day of Week", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+        theme(plot.title = element_text(size = 12, face = "bold"))
       
     }
     #Animal Plot
@@ -353,8 +352,7 @@ server <- function(input, output) {
              x = "Animal Name", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+        theme(plot.title = element_text(size = 12, face = "bold"))
       
     }
   })  
@@ -981,7 +979,6 @@ server <- function(input, output) {
   
   #Creates Plots 
   output$event_pie_plot <- renderPlot({
-
     #Get updated data
     animal_data <- data_input()
     #Calls the input
@@ -997,9 +994,6 @@ server <- function(input, output) {
         names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
         summary_only_after <- summary_only_after %>%
           mutate(Percent = round(counts/sum(counts)*100, 1))
-        colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
-        names(colors) = levels(summary_only_after$Behavior)
-        colors <- colors[1:length(levels(summary_only_after$Behavior))]
         
         #Assign colors palettes to behaviors
         summary_only_after$Behavior <- as.factor(summary_only_after$Behavior)
@@ -1023,7 +1017,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = colors)
+          scale_fill_manual(values = colors2)
       } 
       
       #If the last date of the dataset was selected
@@ -1185,7 +1179,6 @@ server <- function(input, output) {
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
-
         
         #If the last date of the dataset was selected 
         else if (input$date == max(animal_data$Date)) {
@@ -1223,7 +1216,6 @@ server <- function(input, output) {
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
-
         }
         
         ##If the date in-between the last and first dates was selected
@@ -1250,7 +1242,7 @@ server <- function(input, output) {
           #Combines two summaries
           summary <- rbind(summary_before, summary_after)
           summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-         
+          
           #Assign colors palettes to behaviors
           summary$Behavior <- as.factor(summary$Behavior)
           colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
@@ -1273,7 +1265,6 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-
             scale_fill_manual(values = colors2)
           
         }
@@ -1322,8 +1313,7 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-  scale_fill_manual(values = colors2)
-
+            scale_fill_manual(values = colors2)
           
         }
         else {
@@ -1374,7 +1364,6 @@ server <- function(input, output) {
             scale_fill_manual(values = colors2)
         }
       }
-
       
       #If there's no overlapping period
       else {
@@ -1424,7 +1413,7 @@ server <- function(input, output) {
             names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
             summary_only_before <- summary_only_before %>%
               mutate(Percent = round(counts/sum(counts)*100, 1))
-  
+            
             #Assign colors palettes to behaviors
             summary_only_before$Behavior <- as.factor(summary_only_before$Behavior)
             colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
