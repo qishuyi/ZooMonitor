@@ -329,7 +329,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     }
@@ -352,7 +352,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
     } 
     
@@ -373,7 +373,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     }
@@ -507,7 +507,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     } else {
@@ -553,7 +553,7 @@ server <- function(input, output) {
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
               axis.text = element_text(size = 10),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10))
       
     }
@@ -859,7 +859,7 @@ server <- function(input, output) {
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10),
               axis.text.x = element_text(size = 10, angle = 90),
               axis.text.y = element_text(size = 10))
@@ -880,7 +880,7 @@ server <- function(input, output) {
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
               axis.title = element_text(size = 12, face = "bold"),
-              legend.title = element_text(size = 12),
+              legend.title = element_blank(),
               legend.text = element_text(size = 10),
               axis.text.x = element_text(size = 10, angle = 90),
               axis.text.y = element_text(size = 10))
