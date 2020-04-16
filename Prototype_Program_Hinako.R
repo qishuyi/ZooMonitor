@@ -319,7 +319,7 @@ server <- function(input, output) {
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold")) +
         geom_text(stat='count', aes(label=..count..), vjust=-1)
       
@@ -337,14 +337,13 @@ server <- function(input, output) {
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_hline(yintercept = 1/length(unique(animal_data$Hour)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold")) +
         geom_text(stat='count', aes(label=..count..), vjust=-1)
     } 
     
     #Animal Plot
     else {
-      a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
@@ -354,7 +353,7 @@ server <- function(input, output) {
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_hline(yintercept = 1/length(unique(animal_data$Name)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
         theme(plot.title = element_text(size = 12, face = "bold")) +
         geom_text(stat='count', aes(label=..count..), vjust=-1)
       
