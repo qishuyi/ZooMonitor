@@ -10,7 +10,6 @@ library(forcats)
 library(DT)
 library(RColorBrewer)
 library(viridis)
-library(wesanderson)
 library(tools)
 library(janitor)
 library(RColorBrewer) 
@@ -56,7 +55,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               radioButtons("select_general", h4("Show Observations by:"),
-                                           choices = list("Hour of Day", "Day of Week", "Animal")
+                                           choices = list("Day of Week", "Hour of Day", "Animal")
                               )
                             ),
                             mainPanel(
@@ -73,7 +72,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarPanel(
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
-                                         choices = list("Hour of Day", "Day of Week")),
+                                         choices = list("Day of Week", "Hour of Day")),
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
@@ -308,25 +307,8 @@ server <- function(input, output) {
   output$general_plot <- renderPlot({
     animal_data <- data_input()
     
-    #Time of Day plot
-    if(input$select_general == "Hour of Day"){
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
-        geom_bar(fill = "steelblue", width = .5) + 
-        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                           limits = c(0,1)) +
-        labs(title = "Barplot of Observations per Hour of Day", 
-             caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
-      
-      
-      
-    } 
     # Day of Week Plot 
-    else if (input$select_general == "Day of Week"){
+    if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
@@ -340,6 +322,22 @@ server <- function(input, output) {
         theme(plot.title = element_text(size = 12, face = "bold"))
       
     }
+    
+    #Time of Day plot
+    else if(input$select_general == "Hour of Day"){
+      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+        geom_bar(fill = "steelblue", width = .5) + 
+        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
+        labs(title = "Barplot of Observations per Hour of Day", 
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Hour of Day", y = "Percentage") + 
+        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
+        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"))
+    } 
+    
     #Animal Plot
     else {
       a <- length(unique(animal_data$Name))
@@ -820,7 +818,16 @@ server <- function(input, output) {
     if(animal_name == "All animals") animal_name <- "All Animals"
     
     plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
-    if (input$select_faceted_barplot == "Hour of Day") {
+    if (input$select_faceted_barplot == "Day of Week") {
+      # Day of Week
+      # Change caption of the plot
+      plot_caption <- paste(plot_caption, "Day of Week")
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
+        theme(axis.text.x = element_text(angle = 90, size = 10),
+              plot.title = element_text(size = 12, face = "bold")) + 
+        labs(title = plot_caption, y = "Frequency")
+    } else {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
       
@@ -830,14 +837,6 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
-    }else {# Day of Week
-      # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week")
-      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
               plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
