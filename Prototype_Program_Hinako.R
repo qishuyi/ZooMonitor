@@ -33,13 +33,16 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to upload a csv file
                               fileInput("file1", h4("Choose a CSV File"),
-                                        multiple = TRUE,
+                                        multiple = FALSE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
                                                    ".csv"))
                             ),
                             # Display the data file
                             mainPanel(
+                              # If there is an error
+                              uiOutput("uploadError"),
+                              
                               dataTableOutput("contents")
                             ))),
                  
@@ -149,20 +152,30 @@ server <- function(input, output) {
     req(input$file1)
     
     #Loading in Data
-    animal_data <- read_csv(input$file1$datapath,
-                            col_types = cols(.default = col_character(),
-                                             SessionID = col_double(), 
-                                             `Session Start Time` = col_datetime(format = ""),
-                                             `Session End Time` = col_datetime(format = ""),
-                                             DateTime = col_datetime(format = ""),
-                                             Date = col_date(format = ""),
-                                             Time = col_time(format = ""),
-                                             Year = col_double(),
-                                             Month = col_double(),
-                                             Hour = col_double(),
-                                             Duration = col_double(),
-                                             `Frame Number` = col_double()))
-    
+    tryCatch(
+      {
+        animal_data <- read_csv(input$file1$datapath,
+                                col_types = cols(.default = col_character(),
+                                                 SessionID = col_double(), 
+                                                 `Session Start Time` = col_datetime(format = ""),
+                                                 `Session End Time` = col_datetime(format = ""),
+                                                 DateTime = col_datetime(format = ""),
+                                                 Date = col_date(format = ""),
+                                                 Time = col_time(format = ""),
+                                                 Year = col_double(),
+                                                 Month = col_double(),
+                                                 Hour = col_double(),
+                                                 Duration = col_double(),
+                                                 `Frame Number` = col_double()))
+      },
+      warning = function(w) {
+        if (str_detect(w$message, "column names")) {
+          output$uploadError <- renderUI(HTML(paste(
+            em("Data format not compatible")
+          )))  
+        }
+      }
+    )
     #Removing spaces and adding underscore
     names(animal_data) <- gsub(" ", "_", names(animal_data))
     
@@ -899,6 +912,8 @@ server <- function(input, output) {
     if (input$select_exclusion == "Data Without the Subject Animal") {
       #Get updated data
       animal_data <- data_input()
+      #Make sure input$subject_animal is ready
+      req(input$subject_animal)
       #Excludes the subject animal
       animal_data <- filter(animal_data, Name != input$subject_animal)
       #Creates vectors used to slice the data
@@ -964,7 +979,6 @@ server <- function(input, output) {
   
   #Creates Plots 
   output$event_pie_plot <- renderPlot({
-    
     #Get updated data
     animal_data <- data_input()
     #Calls the input
@@ -980,6 +994,12 @@ server <- function(input, output) {
         names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
         summary_only_after <- summary_only_after %>%
           mutate(Percent = round(counts/sum(counts)*100, 1))
+        
+        #Assign colors palettes to behaviors
+        summary_only_after$Behavior <- as.factor(summary_only_after$Behavior)
+        colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+        names(colors2) = levels(summary_only_after$Behavior)
+        colors2 <- colors2[1:length(levels(summary_only_after$Behavior))]
         
         #Creates a pie chart for only after
         ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
@@ -997,7 +1017,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
       } 
       
       #If the last date of the dataset was selected
@@ -1008,6 +1028,11 @@ server <- function(input, output) {
         summary_only_before <- summary_only_before %>%
           mutate(Percent = round(counts/sum(counts)*100, 1))
         
+        #Assign colors palettes to behaviors
+        summary_only_before$Behavior <- as.factor(summary_only_before$Behavior)
+        colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+        names(colors2) = levels(summary_only_before$Behavior)
+        colors2 <- colors2[1:length(levels(summary_only_before$Behavior))]
         
         #Creates a pie chart for only before
         ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
@@ -1025,7 +1050,7 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
       }
       
       #If a date in-between the last and first dates was selected
@@ -1052,6 +1077,12 @@ server <- function(input, output) {
         summary <- rbind(summary_before, summary_after)
         summary$Period <- factor(summary$Period, levels = c("Before", "After"))
         
+        #Assign colors palettes to behaviors
+        summary$Behavior <- as.factor(summary$Behavior)
+        colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+        names(colors2) = levels(summary$Behavior)
+        colors2 <- colors2[1:length(levels(summary$Behavior))]
+        
         #Creates pie charts for both before and after
         ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
           geom_bar(stat="identity", width=1) +
@@ -1068,9 +1099,10 @@ server <- function(input, output) {
                                   plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                   plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                   legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+          scale_fill_manual(values = colors2)
         
-      }}
+      }
+    }
     
     ####If "Data without the subject animal" was selected
     else {
@@ -1123,6 +1155,12 @@ server <- function(input, output) {
           summary_only_after <- summary_only_after %>%
             mutate(Percent = round(counts/sum(counts)*100, 1))
           
+          #Assign colors palettes to behaviors
+          summary_only_after$Behavior <- as.factor(summary_only_after$Behavior)
+          colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+          names(colors2) = levels(summary_only_after$Behavior)
+          colors2 <- colors2[1:length(levels(summary_only_after$Behavior))]
+          
           #Creates a pie chart for only after
           ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
             geom_bar(stat="identity", width=1) +
@@ -1139,8 +1177,8 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        } 
+            scale_fill_manual(values = colors2)
+        }
         
         #If the last date of the dataset was selected 
         else if (input$date == max(animal_data$Date)) {
@@ -1154,6 +1192,12 @@ server <- function(input, output) {
           names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
           summary_only_before <- summary_only_before %>%
             mutate(Percent = round(counts/sum(counts)*100, 1))
+          
+          #Assign colors palettes to behaviors
+          summary_only_before$Behavior <- as.factor(summary_only_before$Behavior)
+          colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+          names(colors2) = levels(summary_only_before$Behavior)
+          colors2 <- colors2[1:length(levels(summary_only_before$Behavior))]
           
           #Creates a pie chart for only before
           ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
@@ -1171,7 +1215,7 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+            scale_fill_manual(values = colors2)
         }
         
         ##If the date in-between the last and first dates was selected
@@ -1199,6 +1243,12 @@ server <- function(input, output) {
           summary <- rbind(summary_before, summary_after)
           summary$Period <- factor(summary$Period, levels = c("Before", "After"))
           
+          #Assign colors palettes to behaviors
+          summary$Behavior <- as.factor(summary$Behavior)
+          colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+          names(colors2) = levels(summary$Behavior)
+          colors2 <- colors2[1:length(levels(summary$Behavior))]
+          
           #Creates pie charts for both before and after
           ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
             geom_bar(stat="identity", width=1) +
@@ -1215,7 +1265,7 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+            scale_fill_manual(values = colors2)
           
         }
         else if (input$date < animal_data$Date[max(max_date_final)]) {
@@ -1241,6 +1291,12 @@ server <- function(input, output) {
           summary <- rbind(summary_before, summary_after)
           summary$Period <- factor(summary$Period, levels = c("Before", "After"))
           
+          #Assign colors palettes to behaviors
+          summary$Behavior <- as.factor(summary$Behavior)
+          colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+          names(colors2) = levels(summary$Behavior)
+          colors2 <- colors2[1:length(levels(summary$Behavior))]
+          
           #Creates pie charts for both before and after
           ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
             geom_bar(stat="identity", width=1) +
@@ -1257,7 +1313,7 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+            scale_fill_manual(values = colors2)
           
         }
         else {
@@ -1283,6 +1339,12 @@ server <- function(input, output) {
           summary <- rbind(summary_before, summary_after)
           summary$Period <- factor(summary$Period, levels = c("Before", "After"))
           
+          #Assign colors palettes to behaviors
+          summary$Behavior <- as.factor(summary$Behavior)
+          colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+          names(colors2) = levels(summary$Behavior)
+          colors2 <- colors2[1:length(levels(summary$Behavior))]
+          
           #Creates pie charts for both before and after
           ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
             geom_bar(stat="identity", width=1) +
@@ -1299,8 +1361,9 @@ server <- function(input, output) {
                                     plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                     plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                     legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        }}
+            scale_fill_manual(values = colors2)
+        }
+      }
       
       #If there's no overlapping period
       else {
@@ -1318,6 +1381,12 @@ server <- function(input, output) {
             summary_only_after <- summary_only_after %>%
               mutate(Percent = round(counts/sum(counts)*100, 1))
             
+            #Assign colors palettes to behaviors
+            summary_only_after$Behavior <- as.factor(summary_only_after$Behavior)
+            colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+            names(colors2) = levels(summary_only_after$Behavior)
+            colors2 <- colors2[1:length(levels(summary_only_after$Behavior))]
+            
             #Creates a pie chart for only after
             ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
               geom_bar(stat="identity", width=1) +
@@ -1334,7 +1403,7 @@ server <- function(input, output) {
                                       plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                       plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                       legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+              scale_fill_manual(values = colors2)
           } 
           
           #If the last date of the dataset was selected
@@ -1345,6 +1414,11 @@ server <- function(input, output) {
             summary_only_before <- summary_only_before %>%
               mutate(Percent = round(counts/sum(counts)*100, 1))
             
+            #Assign colors palettes to behaviors
+            summary_only_before$Behavior <- as.factor(summary_only_before$Behavior)
+            colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+            names(colors2) = levels(summary_only_before$Behavior)
+            colors2 <- colors2[1:length(levels(summary_only_before$Behavior))]
             
             #Creates a pie chart for only before
             ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
@@ -1362,7 +1436,7 @@ server <- function(input, output) {
                                       plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                       plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                       legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+              scale_fill_manual(values = colors2)
           }
           
           #If a date in-between the last and first dates was selected
@@ -1389,6 +1463,12 @@ server <- function(input, output) {
             summary <- rbind(summary_before, summary_after)
             summary$Period <- factor(summary$Period, levels = c("Before", "After"))
             
+            #Assign colors palettes to behaviors
+            summary$Behavior <- as.factor(summary$Behavior)
+            colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+            names(colors2) = levels(summary$Behavior)
+            colors2 <- colors2[1:length(levels(summary$Behavior))]
+            
             #Creates pie charts for both before and after
             ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
               geom_bar(stat="identity", width=1) +
@@ -1405,7 +1485,7 @@ server <- function(input, output) {
                                       plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                                       plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
                                       legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
+              scale_fill_manual(values = colors2)
             
           }}}}
   })
