@@ -665,12 +665,24 @@ server <- function(input, output) {
         })
         
         animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         
         
         animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
+          animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
+        
+        
         
         return(animal_raw_category_table)
         
@@ -699,10 +711,20 @@ server <- function(input, output) {
         output$activity_text <- renderText({""})
         
         animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
         
         return(animal_raw_behavior_table)
         
