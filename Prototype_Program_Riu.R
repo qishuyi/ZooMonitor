@@ -114,9 +114,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  
                  tabPanel("Activities",
                           
-                          titlePanel(h3("Infographics of Selected Activities")),
+                          titlePanel(h3("Infographics of Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = h4("Filter Activities by:"),
+                            radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             actionButton(inputId = "select_all", label = "Select All"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
