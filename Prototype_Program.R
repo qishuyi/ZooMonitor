@@ -785,7 +785,7 @@ server <- function(input, output) {
     } else {
       
       output$info_text <- renderUI(HTML(paste(
-        em("Information appears only if you are filtering by Category")
+        em("Information Table appears only if you are filtering by Category")
       )))
       
       empty_table <- data.frame()
