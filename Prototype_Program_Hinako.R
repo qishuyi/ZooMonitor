@@ -99,7 +99,8 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("exclusionControls")
                             ),
                             mainPanel(
-                              uiOutput("no_plot"),
+                              textOutput("no_plot"),
+                              textOutput("plz_select"),
                               #Removing the warning message that appears for a second 
                               #This is a warning for not having either pie chart of before or after on the min/max date
                               tags$style(type="text/css",
@@ -923,9 +924,8 @@ server <- function(input, output) {
     #Calls the input
     req(input$date)
     req(input$select_exclusion)
-    req(input$subject_animal)
     
-    #If "Use all data" was selected (No subject animal exclusion)
+    #If "All Data" was selected 
     if(input$select_exclusion == "All Data") {
       
       #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
@@ -938,27 +938,22 @@ server <- function(input, output) {
     
     #If "Use data without the subject animal" was selected
     else {
+      #Calls the subject animal(s)
+      req(input$subject_animal)
       
-      #If ZERO animal was selected, then the same plot as the user will see with "All Data" will appear.
-      if (length(input$subject_animal) == 0) {
-  
-        #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
-        before <- subset(animal_data, Date < input$date)
-        #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
-        after <- subset(animal_data, Date > input$date)
+    output$plz_select <- renderText({
+        #If ZERO animal was selected, then a message will appear
+        if (length(input$subject_animal) == 0) {
+          "There is no plot to display. Please select a animal/animals to exclude."}
+        })
         }
-      
+    output$no_plot <- renderText({
       #If ALL animals were selected, then no plot will appear
-      else if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-          output$no_plot <- renderUI({
-            noplot <- character()
-            noplot <- HTML(paste("There is no plot to display. Please select a different animal/different animals to exclude."))
-            return(noplot)
+      if(length(input$subject_animal) == length(unique(animal_data$Name))) {
+        "There is no plot to display. Please select a different animal/different animals to exclude."}
           })
-          }
-      
-      else{
-        
+          
+    if(length(input$subject_animal) > 0 & length(input$subject_animal) <length(unique(animal_data$Name))) {
       #Exclude the selected subject animal(s) first
       animal_remain <- sort(unique(animal_data$Name))
       for (a in animal_remain) {
@@ -1044,7 +1039,6 @@ server <- function(input, output) {
           last_event_date <- append(last_event_date, last_event)}
         before <- slice(before, max(last_event_date):nrow(before))
       }
-    }
   }
     
     #####From here, it applies to every case
