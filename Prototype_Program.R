@@ -10,7 +10,6 @@ library(forcats)
 library(DT)
 library(RColorBrewer)
 library(viridis)
-library(wesanderson)
 library(tools)
 library(janitor)
 library(RColorBrewer) 
@@ -56,7 +55,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               radioButtons("select_general", h4("Show Observations by:"),
-                                           choices = list("Hour of Day", "Day of Week", "Animal")
+                                           choices = list("Day of Week", "Hour of Day", "Animal")
                               )
                             ),
                             mainPanel(
@@ -73,7 +72,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarPanel(
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
-                                         choices = list("Hour of Day", "Day of Week")),
+                                         choices = list("Day of Week", "Hour of Day")),
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
@@ -115,9 +114,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  
                  tabPanel("Activities",
                           
-                          titlePanel(h3("Infographics of Selected Activities")),
+                          titlePanel(h3("Infographics of Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = h4("Filter Activities by:"),
+                            radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             actionButton(inputId = "select_all", label = "Select All"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
@@ -132,7 +131,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
-                              tabPanel("Information Table", tableOutput(outputId = "information_table"),
+                              tabPanel("Category Information", tableOutput(outputId = "information_table"),
                                        uiOutput(outputId = "info_text"))
                               
                               
@@ -287,13 +286,17 @@ server <- function(input, output) {
     #Removing Unnecessary Columns
     animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                           -DateTime, -Grid_Size, -Image_Size,
-                                          -Project_Animals, -Duration)
+                                          -Project_Animals, -Duration,
+                                          -Notes, -Frame_Number)
     
     #Combining potential same behaviors with slightly different names
     animal_data$Behavior <- toTitleCase(animal_data$Behavior)
     
     #Combining potential same categories with slightly
     animal_data$Category <- toTitleCase(animal_data$Category)
+    
+    #Use titlecase for animal names
+    animal_data$Name <- toTitleCase(animal_data$Name)
     
     
     ####################### Addition
@@ -313,51 +316,70 @@ server <- function(input, output) {
   output$general_plot <- renderPlot({
     animal_data <- data_input()
     
-    #Time of Day plot
-    if(input$select_general == "Hour of Day"){
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
-        geom_bar(fill = "steelblue", width = .5) + 
-        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                           limits = c(0,1)) +
-        labs(title = "Barplot of Observations per Hour of Day", 
-             caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
-      
-      
-      
-    } 
     # Day of Week Plot 
-    else if (input$select_general == "Day of Week"){
+    if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Day of Week", 
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
+    
+    #Time of Day plot
+    else if(input$select_general == "Hour of Day"){
+      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+        geom_bar(fill = "steelblue", width = .5) + 
+        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
+        labs(title = "Barplot of Observations per Hour of Day", 
+             subtitle = "The numbers above each bar represent the raw observation count.",
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Hour of Day", y = "Percentage") + 
+        geom_hline(yintercept = 1/length(unique(animal_data$Hour)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
+    } 
+    
     #Animal Plot
     else {
-      a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Animal Name", 
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        geom_hline(yintercept = 1/length(unique(animal_data$Name)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
   })  
@@ -480,15 +502,18 @@ server <- function(input, output) {
       ggplot(data = animal_category) +
         geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Categories per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     } else {
       
@@ -523,15 +548,18 @@ server <- function(input, output) {
       ggplot(data = animal_behavior) +
         geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Behaviors per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
     
@@ -642,12 +670,24 @@ server <- function(input, output) {
         })
         
         animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         
         
         animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
+          animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
+        
+        
         
         return(animal_raw_category_table)
         
@@ -676,10 +716,20 @@ server <- function(input, output) {
         output$activity_text <- renderText({""})
         
         animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
         
         return(animal_raw_behavior_table)
         
@@ -825,7 +875,24 @@ server <- function(input, output) {
     if(animal_name == "All animals") animal_name <- "All Animals"
     
     plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
-    if (input$select_faceted_barplot == "Hour of Day") {
+    if (input$select_faceted_barplot == "Day of Week") {
+      # Day of Week
+      # Change caption of the plot
+      plot_caption <- paste(plot_caption, "Day of Week")
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
+      
+    } else {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
       
@@ -835,17 +902,16 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
-    }else {# Day of Week
-      # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week")
-      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
     }
   }, height = 600)
   
@@ -1012,18 +1078,20 @@ server <- function(input, output) {
           coord_polar("y", start=0) + 
           labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
                subtitle = paste("Raw Counts: Before = 0", ", After = ", sum(summary_only_after$counts)),
-               caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
+               caption = "This plot shows the behavior proportion for only the period after the selected date.") +
           guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
       } 
+      
+      
       
       #If the last date of the dataset was selected
       else if(input$date == max(animal_data$Date)) {
@@ -1045,15 +1113,15 @@ server <- function(input, output) {
           coord_polar("y", start=0) + 
           labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
                subtitle = paste("Raw Counts: Before = ", sum(summary_only_before$counts), ", After = 0"),
-               caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
+               caption = "This plot shows the behavior proportion for only the period before the selected date.") +
           guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
       }
@@ -1094,15 +1162,15 @@ server <- function(input, output) {
           facet_grid(.~ Period) +
           coord_polar("y", start=0) + 
           labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-               subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts)),
-               caption = "The colors of slices will change every time you change the date.") +
+               subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts))) +
           guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
           theme_classic() + theme(axis.line = element_blank(),
                                   axis.text = element_blank(),
                                   axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                  plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                  plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                  plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                  legend.text = element_text(size = 10),
                                   legend.position="bottom") +
           scale_fill_manual(values = colors2)
         
@@ -1172,15 +1240,15 @@ server <- function(input, output) {
             coord_polar("y", start=0) + 
             labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
                  subtitle = paste("Raw Counts: Before = 0", ", After = ", nrow(animal_data)),
-                 caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
+                 caption = "This plot shows the behavior proportion for only the period after the selected date.") +
             guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1210,15 +1278,15 @@ server <- function(input, output) {
             coord_polar("y", start=0) + 
             labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
                  subtitle = paste("Raw Counts: Before = ", nrow(animal_data), ", After = 0"),
-                 caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
+                 caption = "This plot shows the behavior proportion for only the period before the selected date.") +
             guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1260,15 +1328,15 @@ server <- function(input, output) {
             facet_grid(.~ Period) +
             coord_polar("y", start=0) + 
             labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
+                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after))) +
             guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
           
@@ -1308,15 +1376,15 @@ server <- function(input, output) {
             facet_grid(.~ Period) +
             coord_polar("y", start=0) + 
             labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
+                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after))) +
             guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
           
@@ -1356,15 +1424,15 @@ server <- function(input, output) {
             facet_grid(.~ Period) +
             coord_polar("y", start=0) + 
             labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
+                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after))) +
             guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
             theme_classic() + theme(axis.line = element_blank(),
                                     axis.text = element_blank(),
                                     axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                    plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                    plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                    legend.text = element_text(size = 10),
                                     legend.position="bottom") +
             scale_fill_manual(values = colors2)
         }
@@ -1398,15 +1466,15 @@ server <- function(input, output) {
               coord_polar("y", start=0) + 
               labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
                    subtitle = paste("Raw Counts: Before = 0", ", After = ", sum(summary_only_after$counts)),
-                   caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
+                   caption = "This plot shows the behavior proportion for only the period after the selected date.") +
               guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
           } 
@@ -1431,15 +1499,15 @@ server <- function(input, output) {
               coord_polar("y", start=0) + 
               labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
                    subtitle = paste("Raw Counts: Before = ", sum(summary_only_before$counts), ", After = 0"),
-                   caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
+                   caption = "This plot shows the behavior proportion for only the period before the selected date.") +
               guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
           }
@@ -1480,15 +1548,15 @@ server <- function(input, output) {
               facet_grid(.~ Period) +
               coord_polar("y", start=0) + 
               labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                   subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts)),
-                   caption = "The colors of slices will change every time you change the date.") +
+                   subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts))) +
               guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
               theme_classic() + theme(axis.line = element_blank(),
                                       axis.text = element_blank(),
                                       axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
+                                      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                                      plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                                      plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+                                      legend.text = element_text(size = 10),
                                       legend.position="bottom") +
               scale_fill_manual(values = colors2)
             

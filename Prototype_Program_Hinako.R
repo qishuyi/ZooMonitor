@@ -10,7 +10,6 @@ library(forcats)
 library(DT)
 library(RColorBrewer)
 library(viridis)
-library(wesanderson)
 library(tools)
 library(janitor)
 library(RColorBrewer) 
@@ -33,13 +32,16 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to upload a csv file
                               fileInput("file1", h4("Choose a CSV File"),
-                                        multiple = TRUE,
+                                        multiple = FALSE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
                                                    ".csv"))
                             ),
                             # Display the data file
                             mainPanel(
+                              # If there is an error
+                              uiOutput("uploadError"),
+                              
                               dataTableOutput("contents")
                             ))),
                  
@@ -53,7 +55,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             sidebarPanel(
                               # Allow users to choose the x-axis
                               radioButtons("select_general", h4("Show Observations by:"),
-                                           choices = list("Hour of Day", "Day of Week", "Animal")
+                                           choices = list("Day of Week", "Hour of Day", "Animal")
                               )
                             ),
                             mainPanel(
@@ -70,7 +72,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarPanel(
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
-                                         choices = list("Hour of Day", "Day of Week")),
+                                         choices = list("Day of Week", "Hour of Day")),
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
@@ -94,11 +96,11 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
-                              uiOutput("exclusionControls"),
-                              uiOutput("inclusionControls")
+                              uiOutput("exclusionControls")
                             ),
                             mainPanel(
-                              uiOutput("no_plot"),
+                              textOutput("no_plot"),
+                              textOutput("plz_select"),
                               #Removing the warning message that appears for a second 
                               #This is a warning for not having either pie chart of before or after on the min/max date
                               tags$style(type="text/css",
@@ -149,20 +151,30 @@ server <- function(input, output) {
     req(input$file1)
     
     #Loading in Data
-    animal_data <- read_csv(input$file1$datapath,
-                            col_types = cols(.default = col_character(),
-                                             SessionID = col_double(), 
-                                             `Session Start Time` = col_datetime(format = ""),
-                                             `Session End Time` = col_datetime(format = ""),
-                                             DateTime = col_datetime(format = ""),
-                                             Date = col_date(format = ""),
-                                             Time = col_time(format = ""),
-                                             Year = col_double(),
-                                             Month = col_double(),
-                                             Hour = col_double(),
-                                             Duration = col_double(),
-                                             `Frame Number` = col_double()))
-    
+    tryCatch(
+      {
+        animal_data <- read_csv(input$file1$datapath,
+                                col_types = cols(.default = col_character(),
+                                                 SessionID = col_double(), 
+                                                 `Session Start Time` = col_datetime(format = ""),
+                                                 `Session End Time` = col_datetime(format = ""),
+                                                 DateTime = col_datetime(format = ""),
+                                                 Date = col_date(format = ""),
+                                                 Time = col_time(format = ""),
+                                                 Year = col_double(),
+                                                 Month = col_double(),
+                                                 Hour = col_double(),
+                                                 Duration = col_double(),
+                                                 `Frame Number` = col_double()))
+      },
+      warning = function(w) {
+        if (str_detect(w$message, "column names")) {
+          output$uploadError <- renderUI(HTML(paste(
+            em("Data format not compatible")
+          )))  
+        }
+      }
+    )
     #Removing spaces and adding underscore
     names(animal_data) <- gsub(" ", "_", names(animal_data))
     
@@ -295,51 +307,61 @@ server <- function(input, output) {
   output$general_plot <- renderPlot({
     animal_data <- data_input()
     
-    #Time of Day plot
-    if(input$select_general == "Hour of Day"){
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
-        geom_bar(fill = "steelblue", width = .5) + 
-        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                           limits = c(0,1)) +
-        labs(title = "Barplot of Observations per Hour of Day", 
-             caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
-      
-      
-      
-    } 
     # Day of Week Plot 
-    else if (input$select_general == "Day of Week"){
+    if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Day of Week", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/7, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, face = "italic")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
       
     }
+    
+    #Time of Day plot
+    else if(input$select_general == "Hour of Day"){
+      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+        geom_bar(fill = "steelblue", width = .5) + 
+        scale_x_discrete(limits = min(animal_data$Hour) : max(animal_data$Hour)) +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
+        labs(title = "Barplot of Observations per Hour of Day", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
+             caption = "The dashed line represents equally distributed observations.",
+             x = "Hour of Day", y = "Percentage") + 
+        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
+        geom_hline(yintercept = 1/length(unique(animal_data$Hour)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, face = "italic")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
+    } 
+    
     #Animal Plot
     else {
-      a <- length(unique(animal_data$Name))
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Animal Name", 
+             subtitle = "The numbers above each bar represent the raw count of observations.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
         theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
-        geom_hline(yintercept = 1/a, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"))
+        geom_hline(yintercept = 1/length(unique(animal_data$Name)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        theme(plot.title = element_text(size = 12, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, face = "italic")) +
+        geom_text(stat='count', aes(label=..count..), vjust=-1)
       
     }
   })  
@@ -807,7 +829,16 @@ server <- function(input, output) {
     if(animal_name == "All animals") animal_name <- "All Animals"
     
     plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
-    if (input$select_faceted_barplot == "Hour of Day") {
+    if (input$select_faceted_barplot == "Day of Week") {
+      # Day of Week
+      # Change caption of the plot
+      plot_caption <- paste(plot_caption, "Day of Week")
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
+        theme(axis.text.x = element_text(angle = 90, size = 10),
+              plot.title = element_text(size = 12, face = "bold")) + 
+        labs(title = plot_caption, y = "Frequency")
+    } else {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
       
@@ -817,14 +848,6 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
-    }else {# Day of Week
-      # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week")
-      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
-        facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         theme(axis.text.x = element_text(angle = 90, size = 10),
               plot.title = element_text(size = 12, face = "bold")) + 
         labs(title = plot_caption, y = "Frequency")
@@ -882,533 +905,186 @@ server <- function(input, output) {
   
   #Let user choose the subject animal to exclude
   output$exclusionControls <- renderUI({
+    
+    #Show checkbox group with subject animal(s)
     if(input$select_exclusion == "Data Without the Subject Animal") {
       #Get updated data
       animal_data <- data_input()
-      #Radio Button
-      subject_animal <- animal_data$Name
-      names <- sort(unique(animal_data$Name))
-      radioButtons("subject_animal", h4("Select Animal to Exclude"), names)
+      subject_animal <- sort(unique(animal_data$Name))
+      checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
+                         choices = subject_animal)
     }
   })
   
-  #Let user choose the animal(s) to include
-  output$inclusionControls <- renderUI({
-    req(input$select_exclusion)
-    req(input$subject_animal)
-    if (input$select_exclusion == "Data Without the Subject Animal") {
-      #Get updated data
-      animal_data <- data_input()
-      #Excludes the subject animal
-      animal_data <- filter(animal_data, Name != input$subject_animal)
-      #Creates vectors used to slice the data
-      unique_names <- unique(animal_data$Name)
-      min_date <- 0
-      min_date_final <- numeric()
-      max_date <- 0
-      max_date_final <- numeric()
-      #Determines the last day all animals could be observed (counting from the first day)
-      for (i in unique_names) {
-        for (j in 1:nrow(animal_data)) {
-          if (animal_data$Name[j] == i) {
-            min_date <- j}}
-        min_date_final <- append(min_date_final, min_date)}
-      #Determines the first day all animals could be observed (counting until the last day)
-      for (m in unique_names) {
-        for (n in nrow(animal_data):1) {
-          if (animal_data$Name[n] == m) {
-            max_date <- n}}
-        max_date_final <- append(max_date_final, max_date)}
-      if (max(max_date_final) > min(min_date_final)) {
-        #Sets the choices of the checkboxgroupinput
-        names2 <- sort(unique(animal_data$Name))
-        #Creates the options of the checkboxgroupinput
-        checkboxGroupInput("include_animal", h4("Select Animal to Include"),
-                           choices = names2)}}})
-  
-  #If nothing was seleted then returns a text
-  output$no_plot <- renderUI({
-    #Get updated data
-    animal_data <- data_input()
-    req(input$select_exclusion)
-    req(input$subject_animal)
-    req(input$include_animal)
-    if(input$select_exclusion == "Data Without the Subject Animal") {
-      #Excludes the subject animal
-      animal_data <- filter(animal_data, Name != input$subject_animal)
-      #Creates vectors used to slice the data
-      unique_names <- unique(animal_data$Name)
-      min_date <- 0
-      min_date_final <- numeric()
-      max_date <- 0
-      max_date_final <- numeric()
-      #Determines the last day all animals could be observed (counting from the first day)
-      for (i in unique_names) {
-        for (j in 1:nrow(animal_data)) {
-          if (animal_data$Name[j] == i) {
-            min_date <- j}}
-        min_date_final <- append(min_date_final, min_date)}
-      #Determines the first day all animals could be observed (counting until the last day)
-      for (m in unique_names) {
-        for (n in nrow(animal_data):1) {
-          if (animal_data$Name[n] == m) {
-            max_date <- n}}
-        max_date_final <- append(max_date_final, max_date)}
-      if (max(max_date_final) > min(min_date_final)) {
-        if (length(input$include_animal) == 0) {
-          noplot <- character()
-          noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
-                               "is excluded. Please select an animal/animals to include."))
-          return(noplot)}}}
-  })
-  
-  #Creates Plots 
+  ##### Pie Charts
   output$event_pie_plot <- renderPlot({
     
     #Get updated data
     animal_data <- data_input()
     #Calls the input
     req(input$date)
+    req(input$select_exclusion)
     
-    ####If all data was selected (No subject animal exclusion)
+    #If "All Data" was selected 
     if(input$select_exclusion == "All Data") {
       
-      #If the first date of the dataset was selected
-      if(input$date == min(animal_data$Date)) {
-        animal_data <- animal_data %>% group_by(Behavior)
-        summary_only_after <- as.data.frame(summarise(animal_data, n()))
-        names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
-        summary_only_after <- summary_only_after %>%
-          mutate(Percent = round(counts/sum(counts)*100, 1))
-        
-        #Creates a pie chart for only after
-        ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-          geom_bar(stat="identity", width=1) +
-          coord_polar("y", start=0) + 
-          labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
-               subtitle = paste("Raw Counts: Before = 0", ", After = ", sum(summary_only_after$counts)),
-               caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
-          guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-          theme_classic() + theme(axis.line = element_blank(),
-                                  axis.text = element_blank(),
-                                  axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                  legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-      } 
+      #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
+      before <- subset(animal_data, Date < input$date)
+      #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
+      after <- subset(animal_data, Date > input$date)
       
-      #If the last date of the dataset was selected
-      else if(input$date == max(animal_data$Date)) {
-        animal_data <- animal_data %>% group_by(Behavior)
-        summary_only_before <- as.data.frame(summarise(animal_data,n()))
-        names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
-        summary_only_before <- summary_only_before %>%
-          mutate(Percent = round(counts/sum(counts)*100, 1))
-        
-        
-        #Creates a pie chart for only before
-        ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-          geom_bar(stat="identity", width=1) +
-          coord_polar("y", start=0) + 
-          labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
-               subtitle = paste("Raw Counts: Before = ", sum(summary_only_before$counts), ", After = 0"),
-               caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
-          guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-          theme_classic() + theme(axis.line = element_blank(),
-                                  axis.text = element_blank(),
-                                  axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                  legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-      }
-      
-      #If a date in-between the last and first dates was selected
-      else{
-        #Creates a before dataset
-        before <- subset(animal_data, Date < input$date)
-        before <- before %>% group_by(Behavior)
-        summary_before <- as.data.frame(summarise(before, n()))
-        names(summary_before)[names(summary_before) == "n()"] <- "counts"
-        summary_before <- summary_before %>%
-          mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-          mutate(Period = "Before")
-        
-        #Creates an after dataset 
-        after <- subset(animal_data, Date > input$date)
-        after <- after %>% group_by(Behavior)
-        summary_after <- as.data.frame(summarise(after, n()))
-        names(summary_after)[names(summary_after) == "n()"] <- "counts"
-        summary_after <- summary_after %>%
-          mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-          mutate(Period = "After")
-        
-        #Combines two summaries
-        summary <- rbind(summary_before, summary_after)
-        summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-        
-        #Creates pie charts for both before and after
-        ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-          geom_bar(stat="identity", width=1) +
-          facet_grid(.~ Period) +
-          coord_polar("y", start=0) + 
-          labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-               subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts)),
-               caption = "The colors of slices will change every time you change the date.") +
-          guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-          theme_classic() + theme(axis.line = element_blank(),
-                                  axis.text = element_blank(),
-                                  axis.ticks = element_blank(),
-                                  plot.title = element_text(hjust = 0.5, face = "bold"),
-                                  plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                  plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                  legend.position="bottom") +
-          scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        
-      }}
+    }
     
-    ####If "Data without the subject animal" was selected
+    
+    #If "Use data without the subject animal" was selected
     else {
-      
+      #Calls the subject animal(s)
       req(input$subject_animal)
       
-      #Excludes the subject animal
-      animal_data <- filter(animal_data, Name != input$subject_animal)
-      
-      #Creates vectors used to slice the data
-      unique_names <- unique(animal_data$Name)
-      min_date <- 0
-      min_date_final <- numeric()
-      max_date <- 0
-      max_date_final <- numeric()
-      
-      #Determines the last day all animals could be observed (counting from the first day)
-      for (i in unique_names) {
-        for (j in 1:nrow(animal_data)) {
-          if (animal_data$Name[j] == i) {
-            min_date <- j
-          }
+    output$plz_select <- renderText({
+        #If ZERO animal was selected, then a message will appear
+        if (length(input$subject_animal) == 0) {
+          "There is no plot to display. Please select a animal/animals to exclude."}
+        })
         }
-        min_date_final <- append(min_date_final, min_date)  
+    output$no_plot <- renderText({
+      #If ALL animals were selected, then no plot will appear
+      if(length(input$subject_animal) == length(unique(animal_data$Name))) {
+        "There is no plot to display. Please select a different animal/different animals to exclude."}
+          })
+          
+    if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name))) {
+      #Exclude the selected subject animal(s) first
+      animal_remain <- sort(unique(animal_data$Name))
+      for (a in animal_remain) {
+        if (a %in% input$subject_animal) {
+          animal_data <- filter(animal_data, Name != a)}}
+
+      #Creates before and after datasets 
+      before <- subset(animal_data, Date < input$date)
+      after <- subset(animal_data, Date > input$date)
+      
+      #If the selected date was in-between the first and the last day of the data
+      if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
+        
+        #Creates vectors with the animals inside each period
+        before_name <- sort(unique(before$Name))
+        after_name <- sort(unique(after$Name))
+        not_mutual_name <- sort(unique(animal_data$Name))
+        
+        #Finds animals that are NOT in both before and after
+        for(i in before_name) {
+          for(j in after_name) {
+            if(i == j) {
+              not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
+        
+        #Subsets both before and after without the animals we found in the last part
+        for(k in not_mutual_name) {
+          before <- filter(before, Name != k)
+          after <- filter(after, Name != k)}
+        
+        #Find the closest date to the selected date in the past when another event happened
+        before_name <- sort(unique(before$Name))
+        last_event <- 0
+        last_event_date <- numeric()
+        
+        for (i in before_name) {
+          for (j in nrow(before):1) {
+            if (before$Name[j] == i) {
+              last_event <- j}}
+          last_event_date <- append(last_event_date, last_event)}
+        
+        #Find the closest date to the selected date in the futre that another event happened
+        after_name <- sort(unique(after$Name))
+        next_event <- 0
+        next_event_date <- numeric()
+        
+        for (i in after_name) {
+          for (j in 1:nrow(after)) {
+            if (after$Name[j] == i) {
+              next_event <- j}}
+          next_event_date <- append(next_event_date, next_event)}
+        
+        #Slice the before and after subsets
+        before <- slice(before, max(last_event_date):nrow(before))
+        after <- slice(after, 1:min(next_event_date))
       }
       
-      #Determines the first day all animals could be observed (counting until the last day)
-      for (m in unique_names) {
-        for (n in nrow(animal_data):1) {
-          if (animal_data$Name[n] == m) {
-            max_date <- n
-          }
-        }
-        max_date_final <- append(max_date_final, max_date)  
+      else if(input$date == min(animal_data$Date)) {
+        #If the selceted date was the first day of the data
+        after_name <- sort(unique(after$Name))
+        next_event <- 0
+        next_event_date <- numeric()
+        
+        #Slice the after subset before the next event happens
+        for (i in after_name) {
+          for (j in 1:nrow(after)) {
+            if (after$Name[j] == i) {
+              next_event <- j}}
+          next_event_date <- append(next_event_date, next_event)}
+        after <- slice(after, 1:min(next_event_date))
       }
       
-      ####If there is an overlapping period of all the remaining animals
-      if (max(max_date_final) <= min(min_date_final)) {
-        
-        ###If the first date of the dataset was selected
-        if (input$date == min(animal_data$Date)) {
-          
-          #Slices the data from the beginning until the last date that all remaining animals exist
-          animal_data <- slice(animal_data, 1:min(min_date_final))
-          
-          #Creates the summary data for only after
-          animal_data <- animal_data %>% group_by(Behavior)
-          summary_only_after <- as.data.frame(summarise(animal_data, n()))
-          names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
-          summary_only_after <- summary_only_after %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1))
-          
-          #Creates a pie chart for only after
-          ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-            geom_bar(stat="identity", width=1) +
-            coord_polar("y", start=0) + 
-            labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
-                 subtitle = paste("Raw Counts: Before = 0", ", After = ", nrow(animal_data)),
-                 caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
-            guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-            theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                    legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        } 
-        
-        #If the last date of the dataset was selected 
-        else if (input$date == max(animal_data$Date)) {
-          
-          #Slices the data from the beginning until the last date that all remaining animals exist
-          animal_data <- slice(animal_data, max(max_date_final):nrow(animal_data))
-          
-          #Creates the summary data for only before
-          animal_data <- animal_data %>% group_by(Behavior)
-          summary_only_before <- as.data.frame(summarise(animal_data,n()))
-          names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
-          summary_only_before <- summary_only_before %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1))
-          
-          #Creates a pie chart for only before
-          ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-            geom_bar(stat="identity", width=1) +
-            coord_polar("y", start=0) + 
-            labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
-                 subtitle = paste("Raw Counts: Before = ", nrow(animal_data), ", After = 0"),
-                 caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
-            guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-            theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                    legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        }
-        
-        ##If the date in-between the last and first dates was selected
-        else if (input$date >= animal_data$Date[max(max_date_final)] & input$date <= animal_data$Date[min(min_date_final)]) {
-          
-          #Creates a before dataset
-          before <- subset(animal_data, Date < input$date)
-          before <- before %>% group_by(Behavior)
-          summary_before <- as.data.frame(summarise(before, n()))
-          names(summary_before)[names(summary_before) == "n()"] <- "counts"
-          summary_before <- summary_before %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "Before")
-          
-          #Creates an after dataset 
-          after <- subset(animal_data, Date > input$date)
-          after <- after %>% group_by(Behavior)
-          summary_after <- as.data.frame(summarise(after, n()))
-          names(summary_after)[names(summary_after) == "n()"] <- "counts"
-          summary_after <- summary_after %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "After")
-          
-          #Combines two summaries
-          summary <- rbind(summary_before, summary_after)
-          summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-          
-          #Creates pie charts for both before and after
-          ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-            geom_bar(stat="identity", width=1) +
-            facet_grid(.~ Period) +
-            coord_polar("y", start=0) + 
-            labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
-            guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-            theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                    legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-          
-        }
-        else if (input$date < animal_data$Date[max(max_date_final)]) {
-          #Creates a before dataset
-          before <- subset(animal_data, Date < input$date)
-          before <- before %>% group_by(Behavior)
-          summary_before <- as.data.frame(summarise(before, n()))
-          names(summary_before)[names(summary_before) == "n()"] <- "counts"
-          summary_before <- summary_before %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "Before")
-          
-          #Creates an after dataset 
-          after <- subset(animal_data, Date > animal_data$Date[max(max_date_final)])
-          after <- after %>% group_by(Behavior)
-          summary_after <- as.data.frame(summarise(after, n()))
-          names(summary_after)[names(summary_after) == "n()"] <- "counts"
-          summary_after <- summary_after %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "After")
-          
-          #Combines two summaries
-          summary <- rbind(summary_before, summary_after)
-          summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-          
-          #Creates pie charts for both before and after
-          ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-            geom_bar(stat="identity", width=1) +
-            facet_grid(.~ Period) +
-            coord_polar("y", start=0) + 
-            labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
-            guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-            theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                    legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-          
-        }
-        else {
-          #Creates a before dataset
-          before <- subset(animal_data, Date < animal_data$Date[min(min_date_final)])
-          before <- before %>% group_by(Behavior)
-          summary_before <- as.data.frame(summarise(before, n()))
-          names(summary_before)[names(summary_before) == "n()"] <- "counts"
-          summary_before <- summary_before %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "Before")
-          
-          #Creates an after dataset 
-          after <- subset(animal_data, Date > input$date)
-          after <- after %>% group_by(Behavior)
-          summary_after <- as.data.frame(summarise(after, n()))
-          names(summary_after)[names(summary_after) == "n()"] <- "counts"
-          summary_after <- summary_after %>%
-            mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-            mutate(Period = "After")
-          
-          #Combines two summaries
-          summary <- rbind(summary_before, summary_after)
-          summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-          
-          #Creates pie charts for both before and after
-          ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-            geom_bar(stat="identity", width=1) +
-            facet_grid(.~ Period) +
-            coord_polar("y", start=0) + 
-            labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                 subtitle = paste("Raw Counts: Before = ", nrow(before), ", After = ", nrow(after)),
-                 caption = "The colors of slices will change every time you change the date.") +
-            guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-            theme_classic() + theme(axis.line = element_blank(),
-                                    axis.text = element_blank(),
-                                    axis.ticks = element_blank(),
-                                    plot.title = element_text(hjust = 0.5, face = "bold"),
-                                    plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                    plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                    legend.position="bottom") +
-            scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-        }}
-      
-      #If there's no overlapping period
       else {
+        #If the selceted date was the last day of the data
+        before_name <- sort(unique(before$Name))
+        last_event <- 0
+        last_event_date <- numeric()
         
-        #If there's an entry in the include animal
-        if (length(input$include_animal) >= 1) {
-          #Filter the data with the included animal(s)
-          animal_data <- animal_data %>% filter(Name %in% input$include_animal)
-          
-          #If the first date of the dataset was selected
-          if(input$date == min(animal_data$Date)) {
-            animal_data <- animal_data %>% group_by(Behavior)
-            summary_only_after <- as.data.frame(summarise(animal_data, n()))
-            names(summary_only_after)[names(summary_only_after) == "n()"] <- "counts"
-            summary_only_after <- summary_only_after %>%
-              mutate(Percent = round(counts/sum(counts)*100, 1))
-            
-            #Creates a pie chart for only after
-            ggplot(summary_only_after, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-              geom_bar(stat="identity", width=1) +
-              coord_polar("y", start=0) + 
-              labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior After an Event",
-                   subtitle = paste("Raw Counts: Before = 0", ", After = ", sum(summary_only_after$counts)),
-                   caption = "This plot shows the behavior proportion for only the period after the selected date. \n 
-             The colors of slices will change every time you change the date.") +
-              guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-              theme_classic() + theme(axis.line = element_blank(),
-                                      axis.text = element_blank(),
-                                      axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                      legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-          } 
-          
-          #If the last date of the dataset was selected
-          else if(input$date == max(animal_data$Date)) {
-            animal_data <- animal_data %>% group_by(Behavior)
-            summary_only_before <- as.data.frame(summarise(animal_data,n()))
-            names(summary_only_before)[names(summary_only_before) == "n()"] <- "counts"
-            summary_only_before <- summary_only_before %>%
-              mutate(Percent = round(counts/sum(counts)*100, 1))
-            
-            
-            #Creates a pie chart for only before
-            ggplot(summary_only_before, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-              geom_bar(stat="identity", width=1) +
-              coord_polar("y", start=0) + 
-              labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before an Event",
-                   subtitle = paste("Raw Counts: Before = ", sum(summary_only_before$counts), ", After = 0"),
-                   caption = "This plot shows the behavior proportion for only the period before the selected date. \n
-             The colors of slices will change every time you change the date.") +
-              guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-              theme_classic() + theme(axis.line = element_blank(),
-                                      axis.text = element_blank(),
-                                      axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                      legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-          }
-          
-          #If a date in-between the last and first dates was selected
-          else{
-            #Creates a before dataset
-            before <- subset(animal_data, Date < input$date)
-            before <- before %>% group_by(Behavior)
-            summary_before <- as.data.frame(summarise(before, n()))
-            names(summary_before)[names(summary_before) == "n()"] <- "counts"
-            summary_before <- summary_before %>%
-              mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-              mutate(Period = "Before")
-            
-            #Creates an after dataset 
-            after <- subset(animal_data, Date > input$date)
-            after <- after %>% group_by(Behavior)
-            summary_after <- as.data.frame(summarise(after, n()))
-            names(summary_after)[names(summary_after) == "n()"] <- "counts"
-            summary_after <- summary_after %>%
-              mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
-              mutate(Period = "After")
-            
-            #Combines two summaries
-            summary <- rbind(summary_before, summary_after)
-            summary$Period <- factor(summary$Period, levels = c("Before", "After"))
-            
-            #Creates pie charts for both before and after
-            ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
-              geom_bar(stat="identity", width=1) +
-              facet_grid(.~ Period) +
-              coord_polar("y", start=0) + 
-              labs(x = NULL, y = NULL, fill = NULL, title = "Pie Chart of Behavior Before/After an Event", 
-                   subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), ", After = ", sum(summary_after$counts)),
-                   caption = "The colors of slices will change every time you change the date.") +
-              guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
-              theme_classic() + theme(axis.line = element_blank(),
-                                      axis.text = element_blank(),
-                                      axis.ticks = element_blank(),
-                                      plot.title = element_text(hjust = 0.5, face = "bold"),
-                                      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
-                                      plot.caption = element_text(size = 12, hjust = 0.5, face = "italic"),
-                                      legend.position="bottom") +
-              scale_fill_manual(values = wes_palette("Darjeeling1", type = "continuous", length(unique(animal_data$Behavior)))[sample(1:length(unique(animal_data$Behavior)))])
-            
-          }}}}
+        #Slice the before subset after the last event happened
+        for (i in before_name) {
+          for (j in nrow(before):1) {
+            if (before$Name[j] == i) {
+              last_event <- j}}
+          last_event_date <- append(last_event_date, last_event)}
+        before <- slice(before, max(last_event_date):nrow(before))
+      }
+  }
+    
+    #####From here, it applies to every case
+    #Creates summary data set for before
+    before <- before %>% group_by(Behavior)
+    summary_before <- as.data.frame(summarise(before, n()))
+    names(summary_before)[names(summary_before) == "n()"] <- "counts"
+    summary_before <- summary_before %>%
+      mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
+      mutate(Period = "Before")
+    
+    #Creates summary data set for after
+    after <- after %>% group_by(Behavior)
+    summary_after <- as.data.frame(summarise(after, n()))
+    names(summary_after)[names(summary_after) == "n()"] <- "counts"
+    summary_after <- summary_after %>%
+      mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
+      mutate(Period = "After")
+    
+    #Combines two summaries
+    summary <- rbind(summary_before, summary_after)
+    summary$Period <- factor(summary$Period, levels = c("Before", "After"))
+    
+    #Defining color palette
+    summary$Behavior <- as.factor(summary$Behavior)
+    colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+    names(colors2) = levels(summary$Behavior)
+    colors2 <- colors2[1:length(levels(summary$Behavior))]
+    
+    #Creates a pie chart for only after
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+      geom_bar(stat="identity", width=1) +
+      coord_polar("y", start=0) + 
+      facet_grid(.~ Period) +
+      labs(x = NULL, y = NULL, fill = NULL, title = "Pie Charts of Behavior Before/After an Event",
+           subtitle = paste("Raw Counts: Before = ", sum(summary_before$counts), " After = ", sum(summary_after$counts))) +
+      guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
+      theme_classic() + theme(axis.line = element_blank(),
+                              axis.text = element_blank(),
+                              axis.ticks = element_blank(),
+                              plot.title = element_text(hjust = 0.5, face = "bold"),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                              legend.position="bottom") +
+      scale_fill_manual(values = colors2)
   })
+  
 }
 
 # Run the application 
