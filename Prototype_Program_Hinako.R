@@ -924,8 +924,7 @@ server <- function(input, output) {
     req(input$date)
     req(input$select_exclusion)
     
-    #If "Use all data" was selected,
-    #then we do nothing but create before and after subsets
+    #If "Use all data" was selected (No subject animal exclusion)
     if(input$select_exclusion == "All Data") {
       
       #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
@@ -934,26 +933,26 @@ server <- function(input, output) {
       after <- subset(animal_data, Date > input$date)
       
     }
-    else { #If "Use data without the subject animal" was selected
+    
+    
+    #If "Use data without the subject animal" was selected
+    else {
       
       #Calls the choice of the subject animal
       req(input$subject_animal)
       
-      #Exclude the selected subject animal(s)
+      #Exclude the selected subject animal(s) first
       animal_remain <- sort(unique(animal_data$Name))
       for (a in animal_remain) {
         if (a %in% input$subject_animal) {
-          animal_data <- filter(animal_data, Name != a)
-        }
-      }
+          animal_data <- filter(animal_data, Name != a)}}
       
-      #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
+      #Creates before and after datasets 
       before <- subset(animal_data, Date < input$date)
-      #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
       after <- subset(animal_data, Date > input$date)
       
-      #If the selected date in-between the first and the last day of the data
-      #(if it was either the first day or the last day, then we omit the following procedure)
+      
+      #If the selected date was in-between the first and the last day of the data
       if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
         
         #Creates vectors with the animals inside each period
@@ -961,33 +960,76 @@ server <- function(input, output) {
         after_name <- sort(unique(after$Name))
         not_mutual_name <- sort(unique(animal_data$Name))
         
-        #Finds animals that are not in both before and after
+        #Finds animals that are NOT in both before and after
         for(i in before_name) {
           for(j in after_name) {
             if(i == j) {
-              not_mutual_name <- not_mutual_name[not_mutual_name != i]
-            }
-          }
-        }
+              not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
         
-        #Subsets both before and after by the animals that are in both periods
+        #Subsets both before and after without the animals we found in the last part
         for(k in not_mutual_name) {
           before <- filter(before, Name != k)
-          after <- filter(after, Name != k)
-        }
+          after <- filter(after, Name != k)}
         
-        #No animal that is in both periods
-        output$no_plot <- renderUI({
-          if(nrow(before) == 0 & nrow(after) == 0) {
-            noplot <- character()
-            noplot <- HTML(paste("There is no plot to display. Please select a different animal/different animals to exclude."))
-            return(noplot)}})
+        #Find the closest date to the selected date in the past when another event happened
+        before_name <- sort(unique(before$Name))
+        last_event <- 0
+        last_event_date <- numeric()
+        
+        for (i in before_name) {
+          for (j in nrow(before):1) {
+            if (before$Name[j] == i) {
+              last_event <- j}}
+          last_event_date <- append(last_event_date, last_event)}
+        
+        #Find the closest date to the selected date in the futre that another event happened
+        after_name <- sort(unique(after$Name))
+        next_event <- 0
+        next_event_date <- numeric()
+        
+        for (i in after_name) {
+          for (j in 1:nrow(after)) {
+            if (after$Name[j] == i) {
+              next_event <- j}}
+          next_event_date <- append(next_event_date, next_event)}
+        
+        #Slice the before and after subsets
+        before <- slice(before, max(last_event_date):nrow(before))
+        after <- slice(after, 1:min(next_event_date))
+      }
+      
+      else if(input$date == min(animal_data$Date)) {
+        #If the selceted date was the first day of the data
+        after_name <- sort(unique(after$Name))
+        next_event <- 0
+        next_event_date <- numeric()
+        
+        #Slice the after subset before the next event happens
+        for (i in after_name) {
+          for (j in 1:nrow(after)) {
+            if (after$Name[j] == i) {
+              next_event <- j}}
+          next_event_date <- append(next_event_date, next_event)}
+        after <- slice(after, 1:min(next_event_date))
+      }
+      
+      else {
+        #If the selceted date was the last day of the data
+        before_name <- sort(unique(before$Name))
+        last_event <- 0
+        last_event_date <- numeric()
+        
+        #Slice the before subset after the last event happened
+        for (i in before_name) {
+          for (j in nrow(before):1) {
+            if (before$Name[j] == i) {
+              last_event <- j}}
+          last_event_date <- append(last_event_date, last_event)}
+        before <- slice(before, max(last_event_date):nrow(before))
       }
     }
     
-    
-    #####From here, everything applies to all cases
-    
+    #####From here, it applies to every case
     #Creates summary data set for before
     before <- before %>% group_by(Behavior)
     summary_before <- as.data.frame(summarise(before, n()))
@@ -1030,6 +1072,7 @@ server <- function(input, output) {
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
   })
+  
 }
 
 # Run the application 
