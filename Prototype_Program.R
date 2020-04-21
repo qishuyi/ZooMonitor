@@ -173,6 +173,11 @@ server <- function(input, output) {
           output$uploadError <- renderUI(HTML(paste(
             em("Data format not compatible")
           )))  
+          showModal(modalDialog(
+            title = "Incompatible Dataset",
+            "The format of the dataset is not compatible with this APP, please try again!",
+            easyClose = TRUE
+          ))
         }
       }
     )
