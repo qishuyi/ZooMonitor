@@ -174,7 +174,7 @@ server <- function(input, output) {
           )))  
           showModal(modalDialog(
             title = "Incompatible Dataset",
-            "The format of the dataset is not compatible with this APP, please try again!",
+            "The format of the dataset is not compatible with the program, please try again!",
             easyClose = TRUE
           ))
         }
