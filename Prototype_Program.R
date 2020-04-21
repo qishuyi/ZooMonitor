@@ -497,7 +497,7 @@ server <- function(input, output) {
       ggplot(data = animal_category) +
         geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Categories per Animal",
-             caption = "Percentages are based on each animal's total number of observations.",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
@@ -543,7 +543,7 @@ server <- function(input, output) {
       ggplot(data = animal_behavior) +
         geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Behaviors per Animal",
-             caption = "Percentages are based on each animal's total number of observations.",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
