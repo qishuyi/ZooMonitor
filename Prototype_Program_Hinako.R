@@ -953,7 +953,7 @@ server <- function(input, output) {
         "There is no plot to display. Please select a different animal/different animals to exclude."}
           })
           
-    if(length(input$subject_animal) > 0 & length(input$subject_animal) <length(unique(animal_data$Name))) {
+    if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name))) {
       #Exclude the selected subject animal(s) first
       animal_remain <- sort(unique(animal_data$Name))
       for (a in animal_remain) {
