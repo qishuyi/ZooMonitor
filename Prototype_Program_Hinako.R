@@ -935,25 +935,17 @@ server <- function(input, output) {
       
     }
     
-    
     #If "Use data without the subject animal" was selected
-    else {
+    if(input$select_exclusion == "Data Without the Subject Animal") {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
-    output$plz_select <- renderText({
-        #If ZERO animal was selected, then a message will appear
-        if (length(input$subject_animal) == 0) {
-          "There is no plot to display. Please select a animal/animals to exclude."}
-        })
-        }
-    output$no_plot <- renderText({
-      #If ALL animals were selected, then no plot will appear
-      if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-        "There is no plot to display. Please select a different animal/different animals to exclude."}
-          })
+      if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
+      if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
           
-    if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name))) {
+    if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
+       input$select_exclusion == "Data Without the Subject Animal") {
+      
       #Exclude the selected subject animal(s) first
       animal_remain <- sort(unique(animal_data$Name))
       for (a in animal_remain) {
@@ -1039,6 +1031,7 @@ server <- function(input, output) {
           last_event_date <- append(last_event_date, last_event)}
         before <- slice(before, max(last_event_date):nrow(before))
       }
+    }
   }
     
     #####From here, it applies to every case
@@ -1083,6 +1076,18 @@ server <- function(input, output) {
                               plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
+  })
+  
+  output$plz_select <- renderText({
+    #If ZERO animal was selected, then a message will appear
+    if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
+      "There is no plot to display. Please select a animal/animals to exclude."}
+  })
+  
+  output$no_plot <- renderText({
+    #If ALL animals were selected, then no plot will appear
+    if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
+      "There is no plot to display. Please select a different animal/different animals to exclude."}
   })
   
 }
