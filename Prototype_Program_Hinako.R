@@ -99,7 +99,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
-                              uiOutput("exclusionControls")
+                              uiOutput("exclusionControls"),
+                              actionButton(inputId = "select_allP", label = "Select All"),
+                              actionButton(inputId = "deselect_allP", label = "Deselect All")
                             ),
                             mainPanel(
                               uiOutput("plz_select"),
@@ -1028,18 +1030,35 @@ server <- function(input, output) {
               max = max(animal_data$Date))
   })
   
-  #Let user choose the subject animal to exclude
-  output$exclusionControls <- renderUI({
-    
-    #Show checkbox group with subject animal(s)
-    if(input$select_exclusion == "Data Without the Subject Animal") {
-      #Get updated data
-      animal_data <- data_input()
-      subject_animal <- sort(unique(animal_data$Name))
-      checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
-                         choices = subject_animal)
-    }
-  })
+  #Let user choose the subject animal to exclude (with the select/deselect all buttons)
+  observeEvent(c(input$select_exclusion, input$deselect_allP, input$file1), {
+    req(input$select_exclusion)
+    output$exclusionControls <- renderUI({
+      
+      #Show checkbox group with subject animal(s)
+      if(input$select_exclusion == "Data Without the Subject Animal") {
+        #Get updated data
+        animal_data <- data_input()
+        subject_animal <- sort(unique(animal_data$Name))
+        checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
+                           choices = subject_animal)
+      }
+    })})
+  
+  observeEvent(input$select_allP, {
+    req(input$select_exclusion)
+    output$exclusionControls <- renderUI({
+      
+      #Show checkbox group with subject animal(s)
+      if(input$select_exclusion == "Data Without the Subject Animal") {
+        #Get updated data
+        animal_data <- data_input()
+        subject_animal <- sort(unique(animal_data$Name))
+        checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
+                           choices = subject_animal,
+                           selected = subject_animal)
+      }
+    })})
   
   ##### Pie Charts
   output$event_pie_plot <- renderPlot({ .events() })
