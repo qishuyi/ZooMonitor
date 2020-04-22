@@ -96,12 +96,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
-                              uiOutput("exclusionControls"),
-                              checkboxInput("endpoints", "Choose Date Range Yourself", value = FALSE),
-                              uiOutput("dateControlsBefore"),
-                              uiOutput("dateControlsAfter")
+                              uiOutput("exclusionControls")
                             ),
                             mainPanel(
+                              
                               textOutput("plz_select"),
                               textOutput("no_plot"),
                               #Removing the warning message that appears for a second 
@@ -918,36 +916,6 @@ server <- function(input, output) {
                          choices = subject_animal)
     }
   })
-  
-  #If the user chose to select their own date range
-  output$dateControlsBefore <- renderUI({
-  
-    if(input$endpoints == TRUE) {
-      
-      #Get updated data
-      animal_data <- data_input()
-      dateBefore <- animal_data$Date
-      
-      #Date input
-      dateInput("dateBefore", h5("Select the First Date of the Period Before the Event"),
-                value = min(animal_data$Date),
-                min = min(animal_data$Date),
-                max = input$date)}})
-  
-  output$dateControlsAfter <- renderUI({
-   
-    if(input$endpoints == TRUE) {
-      
-      #Get updated data
-      animal_data <- data_input()
-      dateAfter <- animal_data$Date
-      
-      #Date input
-      dateInput("dateAfter", h5("Select the Last Date of the Period After the Event"),
-                                                       value = input$date,
-                                                       min = input$date,
-                                                       max = max(animal_data$Date))}})
-    
   
   ##### Pie Charts
   output$event_pie_plot <- renderPlot({
