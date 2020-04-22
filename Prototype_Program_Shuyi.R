@@ -14,6 +14,7 @@ library(tools)
 library(janitor)
 library(RColorBrewer) 
 library(shinythemes)
+library(gridExtra)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -39,9 +40,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             ),
                             # Display the data file
                             mainPanel(
-                              # If there is an error
-                              uiOutput("uploadError"),
-                              
                               dataTableOutput("contents")
                             ))),
                  
@@ -53,9 +51,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Add a download button
-                              downloadButton("save_general", "Download Graph"),
-                              
                               # Allow users to choose the x-axis
                               radioButtons("select_general", h4("Show Observations by:"),
                                            choices = list("Day of Week", "Hour of Day", "Animal")
@@ -64,7 +59,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general")
+                              textOutput("selected_general"),
+                              
+                              # Add a download button
+                              uiOutput("save_general")
                             ))),
                  
                  
@@ -83,7 +81,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             uiOutput("no_data_barplot"),
                             
                             # Create the faceted barplot for frequency of behaviors
-                            plotOutput("faceted_barplot")
+                            plotOutput("faceted_barplot", height = 600),
+                            
+                            # Add a download button
+                            uiOutput("save_daily")
                           )),
                  
                  ############################### Pie Chart ###############################
@@ -110,7 +111,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot")
+                              plotOutput("event_pie_plot"),
+                              
+                              # Provide download link
+                              uiOutput("save_piechart")
                             ))),
                  
                  ############################### Activity ###############################
@@ -130,7 +134,8 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           mainPanel(
                             tabsetPanel(
                               
-                              tabPanel("Visual", plotOutput(outputId = "activity_visual")),
+                              tabPanel("Visual", plotOutput(outputId = "activity_visual"),
+                                       uiOutput("save_activities")),
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
@@ -172,9 +177,6 @@ server <- function(input, output) {
       },
       warning = function(w) {
         if (str_detect(w$message, "column names")) {
-          output$uploadError <- renderUI(HTML(paste(
-            em("Data format not compatible")
-          )))  
           showModal(modalDialog(
             title = "Incompatible Dataset",
             "The format of the dataset is not compatible with this APP, please try again!",
@@ -183,6 +185,7 @@ server <- function(input, output) {
         }
       }
     )
+    
     #Removing spaces and adding underscore
     names(animal_data) <- gsub(" ", "_", names(animal_data))
     
@@ -389,7 +392,12 @@ server <- function(input, output) {
     }
   })  
   
-  output$histDownload <- downloadHandler(
+  output$save_general <- renderUI({
+    req(.observations())
+    downloadLink("download_general", "Download Graph")
+  })
+  
+  output$download_general <- downloadHandler(
     filename = function() {
       paste("observation.jpg")
     }, 
@@ -478,7 +486,9 @@ server <- function(input, output) {
   #Creates Infographics based on Chosen Categories/Behaviors
   
   #Reactive Category Visual
-  output$activity_visual <- renderPlot({
+  output$activity_visual <- renderPlot({ .activities_visual() })
+  
+  .activities_visual <- reactive({
     
     #Get updated data
     animal_data <- data_input()
@@ -487,7 +497,6 @@ server <- function(input, output) {
     
     
     if(input$filter_type == "Category"){
-      
       #Data frame to create visualization
       animal_data$Category <- as.factor(animal_data$Category)
       animal_category <- animal_data %>% 
@@ -583,9 +592,28 @@ server <- function(input, output) {
     
   })
   
+  output$save_activities <- renderUI({
+    req(.activities_visual())
+    downloadLink("download_activities_graph", "Download Graph")
+  })
+  
+  #Specify download link
+  output$download_activities_graph <- downloadHandler(
+    filename = function() {
+      paste("activities.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.activities_visual())
+      dev.off()
+    }
+  )
+  
   
   #Reactive Category/Behavior Table
-  output$activity_table <- renderTable({
+  output$activity_table <- renderTable({ .activities_summary() })
+  
+  .activities_summary <- reactive({
     
     #Get updated data
     animal_data <- data_input()
@@ -867,7 +895,9 @@ server <- function(input, output) {
   })
   
   #Create the faceted barplots
-  output$faceted_barplot <- renderPlot({
+  output$faceted_barplot <- renderPlot({ .daily_weekly() }, height = 600)
+  
+  .daily_weekly <- reactive({
     # Get updated data
     animal_data <- data_input()
     
@@ -889,6 +919,11 @@ server <- function(input, output) {
     
     # Choose x-axis of the barplots
     if(animal_name == "All animals") animal_name <- "All Animals"
+    
+    # If there is data to generate a valid plot, show the download link
+    output$save_daily <- renderUI({
+      downloadLink("download_daily", "Download Graph")
+    })
     
     plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
     if (input$select_faceted_barplot == "Day of Week") {
@@ -929,7 +964,18 @@ server <- function(input, output) {
               axis.text.y = element_text(size = 10))
       
     }
-  }, height = 600)
+  })
+  
+  output$download_daily <- downloadHandler(
+    filename = function() {
+      paste("daily-weekly.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 600)
+      plot(.daily_weekly())
+      dev.off()
+    }
+  )
   
   output$no_data_barplot <- renderUI({
     # Get updated data
@@ -951,6 +997,9 @@ server <- function(input, output) {
     
     # Indicate if there are no data available for the animal and date range selected
     if (nrow(animal_data) == 0) {
+      # If there is data to generate a valid plot, show the download link
+      output$save_daily <- renderUI({ })
+      
       error_msg <- character()
       if (start_date > end_date) {
         error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
@@ -1061,11 +1110,17 @@ server <- function(input, output) {
           noplot <- character()
           noplot <- HTML(paste("There is no data when", em(input$subject_animal), 
                                "is excluded. Please select an animal/animals to include."))
+          
+          # If there is no data to generate a valid plot, do not show the download link
+          output$save_piechart <- renderUI({ })
+          
           return(noplot)}}}
   })
   
   #Creates Plots 
-  output$event_pie_plot <- renderPlot({
+  output$event_pie_plot <- renderPlot({ .events() })
+    
+  .events <- reactive ({
     #Get updated data
     animal_data <- data_input()
     #Calls the input
@@ -1578,6 +1633,23 @@ server <- function(input, output) {
             
           }}}}
   })
+  
+  #If there is no data to generate a valid plot, do not show the download link
+  output$save_piechart <- renderUI({
+    req(.events())
+    downloadLink("download_piechart", "Download Graph")
+  })
+  
+  output$download_piechart <- downloadHandler(
+    filename = function() {
+      paste("events.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.events())
+      dev.off()
+    }
+  )
 }
 
 # Run the application 
