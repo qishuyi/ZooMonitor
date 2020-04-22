@@ -359,7 +359,7 @@ server <- function(input, output) {
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
-        geom_hline(yintercept = 1/11, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
