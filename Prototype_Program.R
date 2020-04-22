@@ -1039,7 +1039,9 @@ server <- function(input, output) {
   })
   
   ##### Pie Charts
-  output$event_pie_plot <- renderPlot({
+  output$event_pie_plot <- renderPlot({ .events() })
+  
+  .events <- reactive({
     
     #Get updated data
     animal_data <- data_input()
