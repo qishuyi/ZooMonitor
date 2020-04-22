@@ -99,7 +99,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
-                              uiOutput("exclusionControls")
+                              uiOutput("exclusionControls"),
+                              checkboxInput("endpoints", HTML(paste(em("Select if you want to choose customized periods"))), value = FALSE),
+                              uiOutput("BeforeControls"),
+                              uiOutput("AfterControls")
                             ),
                             mainPanel(
                               uiOutput("plz_select"),
@@ -1038,6 +1041,36 @@ server <- function(input, output) {
     }
   })
   
+  #If the user wants to select date ranges themselves, then set before date range
+  output$BeforeControls <- renderUI({
+    
+    if(input$endpoints == TRUE) {
+    #Get updated data
+    animal_data <- data_input()
+    dateBefore <- animal_data$Date
+    
+    #Date input
+    dateInput("dateBefore", h5("First Day of the Before Period"),
+              value = input$date -1,
+              max = input$date -1)}
+    
+  })
+  
+  #If the user wants to select date ranges themselves, then set after date range
+  output$AfterControls <- renderUI({
+    
+    if(input$endpoints == TRUE) {
+    #Get updated data
+    animal_data <- data_input()
+    dateAfter <- animal_data$Date
+    
+    #Date input
+    dateInput("dateAfter", h5("Last Day of the After Period"),
+              value = input$date +1,
+              min = input$date +1)}
+    
+  })
+  
   ##### Pie Charts
   output$event_pie_plot <- renderPlot({
     
@@ -1048,12 +1081,22 @@ server <- function(input, output) {
     req(input$select_exclusion)
     
     #If "All Data" was selected 
-    if(input$select_exclusion == "All Data") {
+    if(input$select_exclusion == "All Data" & input$endpoints == FALSE) {
       
       #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
       before <- subset(animal_data, Date < input$date)
       #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
       after <- subset(animal_data, Date > input$date)
+      
+    }
+    
+    #If "All Data" was selected when the user selected the date range
+    if(input$select_exclusion == "All Data" & input$endpoints == TRUE) {
+      
+      #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
+      before <- subset(animal_data, Date >= input$dateBefore & Date < input$date)
+      #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
+      after <- subset(animal_data, Date <= input$dateAfter & Date > input$date)
       
     }
     
