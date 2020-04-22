@@ -99,8 +99,8 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("exclusionControls")
                             ),
                             mainPanel(
-                              textOutput("no_plot"),
                               textOutput("plz_select"),
+                              textOutput("no_plot"),
                               #Removing the warning message that appears for a second 
                               #This is a warning for not having either pie chart of before or after on the min/max date
                               tags$style(type="text/css",
@@ -940,10 +940,12 @@ server <- function(input, output) {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
+      #No plot will be shown if zero or all subject animals were selected
       if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
       if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
-          
-    if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
+      
+      #If one or more and less than all subject animals were selected
+      if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
        input$select_exclusion == "Data Without the Subject Animal") {
       
       #Exclude the selected subject animal(s) first
