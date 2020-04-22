@@ -7,7 +7,7 @@ library(lubridate)
 library(tools)
 
 #Loading in Data
-animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/report_study_1579790635.csv", 
+animal_data <- read_csv("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/Original%20Three/report_study_1579790635.csv", 
                            col_types = cols(.default = col_character(),
                                             SessionID = col_double(), 
                                             `Session Start Time` = col_datetime(format = ""),
