@@ -1088,8 +1088,11 @@ server <- function(input, output) {
   })
   
   output$no_plot <- renderText({
+    # Get updated data
+    animal_data <- data_input()
+    
     #If ALL animals were selected, then no plot will appear
-    if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
+    if(length(input$subject_animal) == length(unique(animal_data$Name))) {
       "There is no plot to display. Please select a different animal/different animals to exclude."}
   })
   
