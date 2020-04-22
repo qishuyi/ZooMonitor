@@ -1116,13 +1116,13 @@ server <- function(input, output) {
         error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
       }
       #Hide spinner
-      hide_spinner(spin_id = "facetedbarplots_busy")
+      hide_spinner(spin_id = "facetedbarplot_busy")
       
       return(error_msg)
     }
     
     #Hide spinner
-    hide_spinner(spin_id = "facetedbarplots_busy")
+    hide_spinner(spin_id = "facetedbarplot_busy")
     
   })
   
