@@ -39,9 +39,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             ),
                             # Display the data file
                             mainPanel(
-                              # If there is an error
-                              uiOutput("uploadError"),
-                              
                               dataTableOutput("contents")
                             ))),
                  
@@ -61,7 +58,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general")
+                              textOutput("selected_general"),
+                              
+                              # Add a download button
+                              uiOutput("save_general")
                             ))),
                  
                  
@@ -80,7 +80,10 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             uiOutput("no_data_barplot"),
                             
                             # Create the faceted barplot for frequency of behaviors
-                            plotOutput("faceted_barplot")
+                            plotOutput("faceted_barplot", height = 600),
+                            
+                            # Add a download button
+                            uiOutput("save_daily")
                           )),
                  
                  ############################### Pie Chart ###############################
@@ -99,25 +102,27 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("exclusionControls")
                             ),
                             mainPanel(
-                              
-                              textOutput("plz_select"),
-                              textOutput("no_plot"),
+                              uiOutput("plz_select"),
+                              uiOutput("no_plot"),
                               #Removing the warning message that appears for a second 
                               #This is a warning for not having either pie chart of before or after on the min/max date
                               tags$style(type="text/css",
                                          ".shiny-output-error { visibility: hidden; }",
                                          ".shiny-output-error:before { visibility: hidden; }"),
                               # Show the plot of general obervations
-                              plotOutput("event_pie_plot")
+                              plotOutput("event_pie_plot"),
+                              
+                              # Provide download link
+                              uiOutput("save_piechart")
                             ))),
                  
                  ############################### Activity ###############################
                  
                  tabPanel("Activities",
                           
-                          titlePanel(h3("Infographics of Selected Activities")),
+                          titlePanel(h3("Infographics of Activities")),
                           sidebarPanel(
-                            radioButtons(inputId = "filter_type", label = h4("Filter Activities by:"),
+                            radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             actionButton(inputId = "select_all", label = "Select All"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
@@ -128,11 +133,12 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           mainPanel(
                             tabsetPanel(
                               
-                              tabPanel("Visual", plotOutput(outputId = "activity_visual")),
+                              tabPanel("Visual", plotOutput(outputId = "activity_visual"),
+                                       uiOutput("save_activities")),
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
-                              tabPanel("Information Table", tableOutput(outputId = "information_table"),
+                              tabPanel("Category Information", tableOutput(outputId = "information_table"),
                                        uiOutput(outputId = "info_text"))
                               
                               
@@ -170,9 +176,11 @@ server <- function(input, output) {
       },
       warning = function(w) {
         if (str_detect(w$message, "column names")) {
-          output$uploadError <- renderUI(HTML(paste(
-            em("Data format not compatible")
-          )))  
+          showModal(modalDialog(
+            title = "Incompatible Dataset",
+            "The format of the dataset is not compatible with the program, please try again!",
+            easyClose = TRUE
+          ))
         }
       }
     )
@@ -282,13 +290,17 @@ server <- function(input, output) {
     #Removing Unnecessary Columns
     animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                           -DateTime, -Grid_Size, -Image_Size,
-                                          -Project_Animals, -Duration)
+                                          -Project_Animals, -Duration,
+                                          -Notes, -Frame_Number)
     
     #Combining potential same behaviors with slightly different names
     animal_data$Behavior <- toTitleCase(animal_data$Behavior)
     
     #Combining potential same categories with slightly
     animal_data$Category <- toTitleCase(animal_data$Category)
+    
+    #Use titlecase for animal names
+    animal_data$Name <- toTitleCase(animal_data$Name)
     
     
     ####################### Addition
@@ -305,7 +317,9 @@ server <- function(input, output) {
   
   ############################### General Observations ###############################
   ##Bar plot of observation distribution
-  output$general_plot <- renderPlot({
+  output$general_plot <- renderPlot({ .observations() })
+  
+  .observations <- reactive({
     animal_data <- data_input()
     
     # Day of Week Plot 
@@ -316,15 +330,18 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Day of Week", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Day of Week", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Day_of_Week)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
-              plot.caption = element_text(size = 12, face = "italic")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
     
@@ -336,15 +353,18 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Hour)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
-              plot.caption = element_text(size = 12, face = "italic")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
     } 
     
     #Animal Plot
@@ -354,18 +374,37 @@ server <- function(input, output) {
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Animal Name", 
-             subtitle = "The numbers above each bar represent the raw count of observations.",
+             subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Animal Name", y = "Percentage") + 
-        theme(plot.caption = element_text(size = 12, hjust = 0.5, face = "italic")) +
         geom_hline(yintercept = 1/length(unique(animal_data$Name)), color = "darkmagenta", alpha = .45, linetype = "longdash") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
+        geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
-              plot.caption = element_text(size = 12, face = "italic")) +
-        geom_text(stat='count', aes(label=..count..), vjust=-1)
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
   })  
+  
+  output$save_general <- renderUI({
+    req(.observations())
+    downloadLink("download_general", "Download Graph")
+  })
+  
+  output$download_general <- downloadHandler(
+    filename = function() {
+      paste("observation.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.observations())
+      dev.off()
+    }
+  )
   
   ############################### Activity ###############################
   
@@ -445,7 +484,10 @@ server <- function(input, output) {
   #Creates Infographics based on Chosen Categories/Behaviors
   
   #Reactive Category Visual
-  output$activity_visual <- renderPlot({
+  
+  output$activity_visual <- renderPlot({ .activities_visual() })
+  
+  .activities_visual <- reactive({
     
     #Get updated data
     animal_data <- data_input()
@@ -485,15 +527,18 @@ server <- function(input, output) {
       ggplot(data = animal_category) +
         geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Categories per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     } else {
       
@@ -528,21 +573,41 @@ server <- function(input, output) {
       ggplot(data = animal_behavior) +
         geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Behaviors per Animal",
-             subtitle = "Percentages based on each animal's total number of observations",
+             caption = "Percentages are relative to each animal's total number of observations.",
              x = "Animal Name", y = "Percentage") +
-        theme(plot.title = element_text(size = 12, face = "bold"),
-              plot.subtitle = element_text(size = 9, face = "italic"),
-              legend.title = element_text(size = 10),
-              legend.text = element_text(size = 8)) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
-        scale_fill_manual(values = colors)
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
       
     }
     
     
     
   })
+  
+  output$save_activities <- renderUI({
+    req(.activities_visual())
+    downloadLink("download_activities_graph", "Download Graph")
+  })
+  
+  #Specify download link
+  output$download_activities_graph <- downloadHandler(
+    filename = function() {
+      paste("activities.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.activities_visual())
+      dev.off()
+    }
+  )
   
   
   #Reactive Category/Behavior Table
@@ -647,12 +712,24 @@ server <- function(input, output) {
         })
         
         animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         
         
         animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
+          animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
+        
+        
         
         return(animal_raw_category_table)
         
@@ -681,10 +758,20 @@ server <- function(input, output) {
         output$activity_text <- renderText({""})
         
         animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
-          select(Name, Category, Behavior, Date, Time) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
           mutate(Time = str_sub(Time, 1,5))
         
         animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+        
+        if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
+          
+        } else {
+          
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
+          
+        }
+        
         
         return(animal_raw_behavior_table)
         
@@ -806,7 +893,9 @@ server <- function(input, output) {
   })
   
   #Create the faceted barplots
-  output$faceted_barplot <- renderPlot({
+  output$faceted_barplot <- renderPlot({ .daily_weekly() }, height = 600)
+  
+  .daily_weekly <- reactive({
     # Get updated data
     animal_data <- data_input()
     
@@ -836,9 +925,17 @@ server <- function(input, output) {
       plot_caption <- paste(plot_caption, "Day of Week")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
+      
     } else {
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Hour of Day")
@@ -849,11 +946,35 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        theme(axis.text.x = element_text(angle = 90, size = 10),
-              plot.title = element_text(size = 12, face = "bold")) + 
-        labs(title = plot_caption, y = "Frequency")
+        labs(title = plot_caption, y = "Frequency") +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10),
+              axis.text.x = element_text(size = 10, angle = 90),
+              axis.text.y = element_text(size = 10))
+      
     }
-  }, height = 600)
+  })
+  
+  # If there is data to generate a valid plot, show the download link
+  output$save_daily <- renderUI({
+    req(.daily_weekly())
+    downloadLink("download_daily", "Download Graph")
+  })
+  
+  output$download_daily <- downloadHandler(
+    filename = function() {
+      paste("daily-weekly.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 600)
+      plot(.daily_weekly())
+      dev.off()
+    }
+  )
   
   output$no_data_barplot <- renderUI({
     # Get updated data
@@ -947,95 +1068,95 @@ server <- function(input, output) {
       
       #If one or more and less than all subject animals were selected
       if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
-       input$select_exclusion == "Data Without the Subject Animal") {
-      
-      #Exclude the selected subject animal(s) first
-      animal_remain <- sort(unique(animal_data$Name))
-      for (a in animal_remain) {
-        if (a %in% input$subject_animal) {
-          animal_data <- filter(animal_data, Name != a)}}
-
-      #Creates before and after datasets 
-      before <- subset(animal_data, Date < input$date)
-      after <- subset(animal_data, Date > input$date)
-      
-      #If the selected date was in-between the first and the last day of the data
-      if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
+         input$select_exclusion == "Data Without the Subject Animal") {
         
-        #Creates vectors with the animals inside each period
-        before_name <- sort(unique(before$Name))
-        after_name <- sort(unique(after$Name))
-        not_mutual_name <- sort(unique(animal_data$Name))
+        #Exclude the selected subject animal(s) first
+        animal_remain <- sort(unique(animal_data$Name))
+        for (a in animal_remain) {
+          if (a %in% input$subject_animal) {
+            animal_data <- filter(animal_data, Name != a)}}
         
-        #Finds animals that are NOT in both before and after
-        for(i in before_name) {
-          for(j in after_name) {
-            if(i == j) {
-              not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
+        #Creates before and after datasets 
+        before <- subset(animal_data, Date < input$date)
+        after <- subset(animal_data, Date > input$date)
         
-        #Subsets both before and after without the animals we found in the last part
-        for(k in not_mutual_name) {
-          before <- filter(before, Name != k)
-          after <- filter(after, Name != k)}
+        #If the selected date was in-between the first and the last day of the data
+        if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
+          
+          #Creates vectors with the animals inside each period
+          before_name <- sort(unique(before$Name))
+          after_name <- sort(unique(after$Name))
+          not_mutual_name <- sort(unique(animal_data$Name))
+          
+          #Finds animals that are NOT in both before and after
+          for(i in before_name) {
+            for(j in after_name) {
+              if(i == j) {
+                not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
+          
+          #Subsets both before and after without the animals we found in the last part
+          for(k in not_mutual_name) {
+            before <- filter(before, Name != k)
+            after <- filter(after, Name != k)}
+          
+          #Find the closest date to the selected date in the past when another event happened
+          before_name <- sort(unique(before$Name))
+          last_event <- 0
+          last_event_date <- numeric()
+          
+          for (i in before_name) {
+            for (j in nrow(before):1) {
+              if (before$Name[j] == i) {
+                last_event <- j}}
+            last_event_date <- append(last_event_date, last_event)}
+          
+          #Find the closest date to the selected date in the futre that another event happened
+          after_name <- sort(unique(after$Name))
+          next_event <- 0
+          next_event_date <- numeric()
+          
+          for (i in after_name) {
+            for (j in 1:nrow(after)) {
+              if (after$Name[j] == i) {
+                next_event <- j}}
+            next_event_date <- append(next_event_date, next_event)}
+          
+          #Slice the before and after subsets
+          before <- slice(before, max(last_event_date):nrow(before))
+          after <- slice(after, 1:min(next_event_date))
+        }
         
-        #Find the closest date to the selected date in the past when another event happened
-        before_name <- sort(unique(before$Name))
-        last_event <- 0
-        last_event_date <- numeric()
+        else if(input$date == min(animal_data$Date)) {
+          #If the selceted date was the first day of the data
+          after_name <- sort(unique(after$Name))
+          next_event <- 0
+          next_event_date <- numeric()
+          
+          #Slice the after subset before the next event happens
+          for (i in after_name) {
+            for (j in 1:nrow(after)) {
+              if (after$Name[j] == i) {
+                next_event <- j}}
+            next_event_date <- append(next_event_date, next_event)}
+          after <- slice(after, 1:min(next_event_date))
+        }
         
-        for (i in before_name) {
-          for (j in nrow(before):1) {
-            if (before$Name[j] == i) {
-              last_event <- j}}
-          last_event_date <- append(last_event_date, last_event)}
-        
-        #Find the closest date to the selected date in the futre that another event happened
-        after_name <- sort(unique(after$Name))
-        next_event <- 0
-        next_event_date <- numeric()
-        
-        for (i in after_name) {
-          for (j in 1:nrow(after)) {
-            if (after$Name[j] == i) {
-              next_event <- j}}
-          next_event_date <- append(next_event_date, next_event)}
-        
-        #Slice the before and after subsets
-        before <- slice(before, max(last_event_date):nrow(before))
-        after <- slice(after, 1:min(next_event_date))
-      }
-      
-      else if(input$date == min(animal_data$Date)) {
-        #If the selceted date was the first day of the data
-        after_name <- sort(unique(after$Name))
-        next_event <- 0
-        next_event_date <- numeric()
-        
-        #Slice the after subset before the next event happens
-        for (i in after_name) {
-          for (j in 1:nrow(after)) {
-            if (after$Name[j] == i) {
-              next_event <- j}}
-          next_event_date <- append(next_event_date, next_event)}
-        after <- slice(after, 1:min(next_event_date))
-      }
-      
-      else {
-        #If the selceted date was the last day of the data
-        before_name <- sort(unique(before$Name))
-        last_event <- 0
-        last_event_date <- numeric()
-        
-        #Slice the before subset after the last event happened
-        for (i in before_name) {
-          for (j in nrow(before):1) {
-            if (before$Name[j] == i) {
-              last_event <- j}}
-          last_event_date <- append(last_event_date, last_event)}
-        before <- slice(before, max(last_event_date):nrow(before))
+        else {
+          #If the selceted date was the last day of the data
+          before_name <- sort(unique(before$Name))
+          last_event <- 0
+          last_event_date <- numeric()
+          
+          #Slice the before subset after the last event happened
+          for (i in before_name) {
+            for (j in nrow(before):1) {
+              if (before$Name[j] == i) {
+                last_event <- j}}
+            last_event_date <- append(last_event_date, last_event)}
+          before <- slice(before, max(last_event_date):nrow(before))
+        }
       }
     }
-  }
     
     #####From here, it applies to every case
     #Creates summary data set for before
@@ -1096,6 +1217,22 @@ server <- function(input, output) {
       "There is no plot to display. Please select a different animal/different animals to exclude."}
   })
   
+  #If there is no data to generate a valid plot, do not show the download link
+  output$save_piechart <- renderUI({
+    req(.events())
+    downloadLink("download_piechart", "Download Graph")
+  })
+  
+  output$download_piechart <- downloadHandler(
+    filename = function() {
+      paste("events.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.events())
+      dev.off()
+    }
+  )
 }
 
 # Run the application 
