@@ -1218,8 +1218,9 @@ server <- function(input, output) {
       theme_classic() + theme(axis.line = element_blank(),
                               axis.text = element_blank(),
                               axis.ticks = element_blank(),
-                              plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                              plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                              legend.text = element_text(size = 10),
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
   })
