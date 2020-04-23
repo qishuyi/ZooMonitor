@@ -66,12 +66,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               textOutput("selected_general"),
                               
                               # Add a download button
-                              uiOutput("save_general"),
-                              
-                              # Add busy spinner for data upload
-                              use_busy_spinner(spin = "fading-circle",
-                                               position = "bottom-right",
-                                               spin_id = "observations_busy")
+                              uiOutput("save_general")
                             ))),
                  
                  
@@ -93,12 +88,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             plotOutput("faceted_barplot", height = 600),
                             
                             # Add a download button
-                            uiOutput("save_daily"),
-                            
-                            # Add busy spinner for data upload
-                            use_busy_spinner(spin = "fading-circle",
-                                             position = "bottom-right",
-                                             spin_id = "facetedbarplot_busy")
+                            uiOutput("save_daily")
                           )),
                  
                  ############################### Pie Chart ###############################
@@ -130,12 +120,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               plotOutput("event_pie_plot"),
                               
                               # Provide download link
-                              uiOutput("save_piechart"),
-                              
-                              # Add busy spinner for data upload
-                              use_busy_spinner(spin = "fading-circle",
-                                               position = "bottom-right",
-                                               spin_id = "piechart_busy")
+                              uiOutput("save_piechart")
                             ))),
                  
                  ############################### Activity ###############################
@@ -165,11 +150,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               
                               
                               
-                            ),
-                            # Add busy spinner for data upload
-                            use_busy_spinner(spin = "fading-circle",
-                                             position = "bottom-right",
-                                             spin_id = "activities_busy")
+                            )
                             )
                           )
                  
@@ -356,12 +337,9 @@ server <- function(input, output) {
   .observations <- reactive({
     animal_data <- data_input()
     
-    # Show spinner after data is loaded and while the graph is processing
-    show_spinner(spin_id = "observations_busy")
-    
     # Day of Week Plot 
     if (input$select_general == "Day of Week"){
-      ret <- ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
+      ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
@@ -385,7 +363,7 @@ server <- function(input, output) {
     #Time of Day plot
     else if(input$select_general == "Hour of Day"){
       hour_breaks <- c(7:17)
-      ret <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
@@ -409,7 +387,7 @@ server <- function(input, output) {
     
     #Animal Plot
     else {
-      ret <- ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
+      ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
@@ -428,11 +406,6 @@ server <- function(input, output) {
               legend.text = element_text(size = 10))
       
     }
-    
-    #Hide spinner
-    hide_spinner(spin_id = "observations_busy")
-    
-    return(ret)
   })  
   
   output$save_general <- renderUI({
@@ -470,29 +443,21 @@ server <- function(input, output) {
       
       req(input$filter_type)
       
-      #Show spinner after data and filter inputs are received and while the "select all" functionality is processing
-      show_spinner(spin_id = "activities_busy")
-      
       if(input$filter_type == "Category"){
         
         category <- sort(unique(animal_data$Category))
-        ret <- checkboxGroupInput(inputId = "category_input", 
+        checkboxGroupInput(inputId = "category_input", 
                            label= h4("Select Categories"),
                            choices = category)
       } else {
         
         behavior_options <- sort(unique(animal_data$Behavior))
-        ret <- checkboxGroupInput(inputId = "behavior_input",
+        checkboxGroupInput(inputId = "behavior_input",
                            label = h4("Select Behaviors"),
                            choices = behavior_options)
         
         
       }
-      
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
-      
-      return(ret)
       
       
     })
@@ -508,31 +473,22 @@ server <- function(input, output) {
       
       animal_data <- data_input()
       
-      #Show spinner after data and filter inputs are received and while the "select all" functionality is processing
-      show_spinner(spin_id = "activities_busy")
-      
       if(input$filter_type == "Category"){
         
         
         category <- sort(unique(animal_data$Category))
-        ret <- checkboxGroupInput(inputId = "category_input", 
+        checkboxGroupInput(inputId = "category_input", 
                            label= h4("Select Categories"),
                            choices = category, 
                            selected = category)
       } else { 
         
         behavior_options <- sort(unique(animal_data$Behavior))
-        ret <- checkboxGroupInput(inputId = "behavior_input",
+        checkboxGroupInput(inputId = "behavior_input",
                            label = h4("Select Behaviors"),
                            choices = behavior_options,
                            selected = behavior_options)
       }
-      
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
-      
-      return(ret)
-      
     })
   })
   
@@ -551,10 +507,7 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     req(input$filter_type)
-    
-    #Show spinner after data and filter inputs are recieved and while the graph is processing
-    show_spinner(spin_id = "activities_busy")
-    
+
     if(input$filter_type == "Category"){
       
       #Data frame to create visualization
@@ -584,7 +537,7 @@ server <- function(input, output) {
       colors <- colors[1:length(levels(animal_category$Category))]
       
       #Creating the visualization
-      ret <- ggplot(data = animal_category) +
+      ggplot(data = animal_category) +
         geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Categories per Animal",
              caption = "Percentages are relative to each animal's total number of observations.",
@@ -630,7 +583,7 @@ server <- function(input, output) {
       colors <- colors[1:length(levels(animal_behavior$Behavior))]
       
       #Creating the visualization
-      ret <- ggplot(data = animal_behavior) +
+      ggplot(data = animal_behavior) +
         geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
         labs(title = "Barplot of Selected Behaviors per Animal",
              caption = "Percentages are relative to each animal's total number of observations.",
@@ -647,13 +600,6 @@ server <- function(input, output) {
               legend.text = element_text(size = 10))
       
     }
-    
-    #Hide spinner
-    hide_spinner(spin_id = "activities_busy")
-    
-    return(ret)
-    
-    
   })
   
   output$save_activities <- renderUI({
@@ -681,9 +627,6 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     req(input$filter_type)
-    
-    #Show spinner after data and filter inputs are received and while the table is processing
-    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -715,9 +658,6 @@ server <- function(input, output) {
         animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
         
       }
-      
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       
       return(animal_category_table)
       
@@ -752,9 +692,6 @@ server <- function(input, output) {
         animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
       }
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
-      
       return(animal_behavior_table)
       
     }
@@ -769,9 +706,6 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     req(input$filter_type)
-    
-    #Show spinning sign after data and filter inputs are received and while the table is loading
-    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -856,8 +790,6 @@ server <- function(input, output) {
         
       }
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       return(animal_raw_behavior_table)
       
     } 
@@ -923,9 +855,6 @@ server <- function(input, output) {
       info_data <- data.frame(info_matrix)
       info_data <- info_data %>% row_to_names(row_number = 1)
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
-      
       return(info_data)
       
       
@@ -936,9 +865,6 @@ server <- function(input, output) {
       )))
       
       empty_table <- data.frame()
-      
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       
       return(empty_table)
       
@@ -955,39 +881,24 @@ server <- function(input, output) {
   output$nameControls4 <- renderUI({
     #Get updated data
     animal_data <- data_input()
-    
-    #Show spinner after data is received
-    show_spinner(spin_id = "facetedbarplot_busy")
-    
+
     prefix <- c('All animals')
     names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
-    ret <- radioButtons('names4', h4("Select Animal"), names)
+    radioButtons('names4', h4("Select Animal"), names)
     
-    #Hide spinner
-    hide_spinner(spin_id = "facetedbarplot_busy")
-    
-    return(ret)
   })
   #Let user select a date range
   output$dateControls4 <- renderUI({
     #Get updated data
     animal_data <- data_input()
     
-    #Show spinner after data is received
-    show_spinner(spin_id = "facetedbarplot_busy")
-    
     date <- animal_data$Date
-    ret <- dateRangeInput("daterange4", h4("Select Date Range"),
+    dateRangeInput("daterange4", h4("Select Date Range"),
                    start = min(animal_data$Date),
                    end = max(animal_data$Date),
                    min = min(animal_data$Date),
                    max = max(animal_data$Date))
-    
-    #Hide spinner
-    hide_spinner(spin_id = "facetedbarplot_busy")
-    
-    return(ret)
   })
   
   #Create the faceted barplots
@@ -999,10 +910,7 @@ server <- function(input, output) {
     
     # Wait until the program loads up
     req(input$daterange4)
-    
-    #Show spinner after data and filter inputs are received and while the plots are processing
-    show_spinner(spin_id = "facetedbarplot_busy")
-    
+
     # Choose the date range of the data we want to work with
     start_date <- input$daterange4[1]
     end_date <- input$daterange4[2]
@@ -1024,7 +932,7 @@ server <- function(input, output) {
       # Day of Week
       # Change caption of the plot
       plot_caption <- paste(plot_caption, "Day of Week")
-      ret <- ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+      ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         labs(title = plot_caption, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
@@ -1045,7 +953,7 @@ server <- function(input, output) {
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
       animal_data_hour$Hour <- sapply(animal_data_hour$Hour, function(x) as.factor(sprintf("%d:00", x)))
       
-      ret <- ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
+      ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
         labs(title = plot_caption, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
@@ -1058,11 +966,6 @@ server <- function(input, output) {
               axis.text.y = element_text(size = 10))
       
     }
-    
-    #Hide spinner
-    hide_spinner(spin_id = "facetedbarplot_busy")
-    
-    return(ret)
   })
   
   # If there is data to generate a valid plot, show the download link
@@ -1089,9 +992,6 @@ server <- function(input, output) {
     # Wait until the program loads up
     req(input$daterange4)
     
-    #Show spinner after data and filter inputs are received and while the plots are processing
-    show_spinner(spin_id = "facetedbarplot_busy")
-    
     # Choose the date range of the data we want to work with
     start_date <- input$daterange4[1]
     end_date <- input$daterange4[2]
@@ -1115,15 +1015,9 @@ server <- function(input, output) {
                                 "in your selected date range:", start_date, "to", end_date))
         error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
       }
-      #Hide spinner
-      hide_spinner(spin_id = "facetedbarplot_busy")
       
       return(error_msg)
     }
-    
-    #Hide spinner
-    hide_spinner(spin_id = "facetedbarplot_busy")
-    
   })
   
   ############################### Pie Charts ###############################
@@ -1134,28 +1028,17 @@ server <- function(input, output) {
     animal_data <- data_input()
     date <- animal_data$Date
     
-    #Show spinner after data and filter inputs are received and while the UI is loading
-    show_spinner(spin_id = "piechart_busy")
-    
     #Date input
-    ret <- dateInput("date", h4("Select Event Date"),
+    dateInput("date", h4("Select Event Date"),
               value = min(animal_data$Date),
               min = min(animal_data$Date),
               max = max(animal_data$Date))
-    
-    #Hide spinner
-    hide_spinner(spin_id = "piechart_busy")
-    
-    return(ret)
   })
   
   #Let user choose the subject animal to exclude (with the select/deselect all buttons)
   observeEvent(c(input$select_exclusion, input$deselect_allP, input$file1), {
     req(input$select_exclusion)
     output$exclusionControls <- renderUI({
-      #Show spinner while the UI is loading
-      show_spinner(spin_id = "piechart_busy")
-      
       #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
@@ -1166,17 +1049,11 @@ server <- function(input, output) {
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal)
       }
-      
-      #Hide spinner
-      hide_spinner(spin_id = "piechart_busy")
     })})
   
   observeEvent(input$select_allP, {
     req(input$select_exclusion)
     output$exclusionControls <- renderUI({
-      #Show spinner while the UI is loading
-      show_spinner(spin_id = "piechart_busy")
-      
       #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
@@ -1188,8 +1065,6 @@ server <- function(input, output) {
                            choices = subject_animal,
                            selected = subject_animal)
       }
-      #Hide spinner
-      hide_spinner(spin_id = "piechart_busy")
     })})
   
   ##### Pie Charts
@@ -1202,9 +1077,6 @@ server <- function(input, output) {
     #Calls the input
     req(input$date)
     req(input$select_exclusion)
-    
-    #Show spinner after data and filter inputs are received and while the plot is loading
-    show_spinner("piechart_busy")
     
     #If "All Data" was selected 
     if(input$select_exclusion == "All Data") {
@@ -1345,7 +1217,7 @@ server <- function(input, output) {
     colors2 <- colors2[1:length(levels(summary$Behavior))]
     
     #Creates a pie chart for only after
-    ret <- ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
+    ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
       geom_bar(stat="identity", width=1) +
       coord_polar("y", start=0) + 
       facet_grid(.~ Period) +
@@ -1359,46 +1231,23 @@ server <- function(input, output) {
                               plot.subtitle = element_text(hjust = 0.5, face = "italic"),
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
-    
-    #Hide spinner
-    hide_spinner("piechart_busy")
-    
-    return(ret)
   })
   
   output$plz_select <- renderText({
-    #Show spinner after data and filter inputs are received and while the text is loading
-    show_spinner("piechart_busy")
-    
     #If ZERO animal was selected, then a message will appear
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
-      #Hide spinner
-      hide_spinner("piechart_busy")
-      
-      return ("There is no plot to display. Please select a animal/animals to exclude.")
+      "There is no plot to display. Please select a animal/animals to exclude."
     }
-    
-    #Hide spinner
-    hide_spinner("piechart_busy")
   })
   
   output$no_plot <- renderText({
     # Get updated data
     animal_data <- data_input()
     
-    #Show spinner after data and filter inputs are received and while the text is loading
-    show_spinner("piechart_busy")
-    
     #If ALL animals were selected, then no plot will appear
     if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-      #Hide spinner
-      hide_spinner("piechart_busy")
-      
-      return("There is no plot to display. Please select a different animal/different animals to exclude.")
+      "There is no plot to display. Please select a different animal/different animals to exclude."
     }
-    
-    #Hide spinner
-    hide_spinner("piechart_busy")
 
   })
   
