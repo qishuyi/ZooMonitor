@@ -748,8 +748,6 @@ server <- function(input, output) {
         
       }
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       return(animal_raw_category_table)
       
     } else {
@@ -804,9 +802,6 @@ server <- function(input, output) {
     
     
     req(input$filter_type)
-    
-    #Show spinner after data and filter inputs are received and while the table is loading
-    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -1044,8 +1039,6 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal)
       }
@@ -1059,8 +1052,6 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal,
                            selected = subject_animal)
