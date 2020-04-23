@@ -1246,7 +1246,7 @@ server <- function(input, output) {
     
     #If ALL animals were selected, then no plot will appear
     if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-      "There is no plot to display. Please select a different animal/different animals to exclude."
+      "There is no plot to display. Please select a different animal/animals to exclude."
     }
 
   })
