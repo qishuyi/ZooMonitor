@@ -7,11 +7,9 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
-library(DT)
-library(RColorBrewer)
-library(viridis)
 library(tools)
 library(janitor)
+library(DT)
 library(RColorBrewer) 
 library(shinythemes)
 library(shinybusy)
@@ -363,7 +361,8 @@ server <- function(input, output) {
     #Time of Day plot
     else if(input$select_general == "Hour of Day"){
       hour_breaks <- c(7:17)
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+      df <- data.frame(x1 = 8.75, x2 = 16.25, y1 = 1/8, y2 = 1/8)
+      a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
@@ -373,8 +372,7 @@ server <- function(input, output) {
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+             x = "Hour of Day", y = "Percentage") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
@@ -383,6 +381,8 @@ server <- function(input, output) {
               axis.text = element_text(size = 10),
               legend.title = element_blank(),
               legend.text = element_text(size = 10))
+      a + geom_segment(data = df, aes(x = x1, xend = x2, y = y1, yend = y2),
+                       linetype = 2, alpha = .45, colour = "darkmagenta")
     } 
     
     #Animal Plot
@@ -748,8 +748,6 @@ server <- function(input, output) {
         
       }
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       return(animal_raw_category_table)
       
     } else {
@@ -804,9 +802,6 @@ server <- function(input, output) {
     
     
     req(input$filter_type)
-    
-    #Show spinner after data and filter inputs are received and while the table is loading
-    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -1044,8 +1039,6 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal)
       }
@@ -1059,8 +1052,6 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal,
                            selected = subject_animal)
@@ -1245,7 +1236,7 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     #If ALL animals were selected, then no plot will appear
-    if(length(input$subject_animal) == length(unique(animal_data$Name))) {
+    if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
       "There is no plot to display. Please select a different animal/animals to exclude."
     }
 
