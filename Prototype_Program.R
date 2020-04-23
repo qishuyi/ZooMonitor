@@ -437,7 +437,7 @@ server <- function(input, output) {
   
   output$save_general <- renderUI({
     req(.observations())
-    downloadLink("download_general", "Download Graph")
+    downloadLink("download_general", "Download Visual")
   })
   
   output$download_general <- downloadHandler(
@@ -658,7 +658,7 @@ server <- function(input, output) {
   
   output$save_activities <- renderUI({
     req(.activities_visual())
-    downloadLink("download_activities_graph", "Download Graph")
+    downloadLink("download_activities_graph", "Download Visual")
   })
   
   #Specify download link
@@ -1068,7 +1068,7 @@ server <- function(input, output) {
   # If there is data to generate a valid plot, show the download link
   output$save_daily <- renderUI({
     req(.daily_weekly())
-    downloadLink("download_daily", "Download Graph")
+    downloadLink("download_daily", "Download Visual")
   })
   
   output$download_daily <- downloadHandler(
@@ -1405,7 +1405,7 @@ server <- function(input, output) {
   #If there is no data to generate a valid plot, do not show the download link
   output$save_piechart <- renderUI({
     req(.events())
-    downloadLink("download_piechart", "Download Graph")
+    downloadLink("download_piechart", "Download Visual")
   })
   
   output$download_piechart <- downloadHandler(
