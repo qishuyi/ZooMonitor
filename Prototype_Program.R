@@ -1236,7 +1236,7 @@ server <- function(input, output) {
   output$plz_select <- renderText({
     #If ZERO animal was selected, then a message will appear
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
-      "There is no plot to display. Please select a animal/animals to exclude."
+      "There is no plot to display. Please select an animal/animals to exclude."
     }
   })
   
