@@ -361,7 +361,8 @@ server <- function(input, output) {
     #Time of Day plot
     else if(input$select_general == "Hour of Day"){
       hour_breaks <- c(7:17)
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+      df <- data.frame(x1 = 8.75, x2 = 16.25, y1 = 1/8, y2 = 1/8)
+      a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
@@ -372,8 +373,6 @@ server <- function(input, output) {
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") +
-        geom_segment(aes(x = 8.5, xend = 16.5, y = 1/8, yend = 1/8),
-                     linetype = 2, colour = "darkmagenta", alpha = 0.5) +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
@@ -382,6 +381,8 @@ server <- function(input, output) {
               axis.text = element_text(size = 10),
               legend.title = element_blank(),
               legend.text = element_text(size = 10))
+      a + geom_segment(data = df, aes(x = x1, xend = x2, y = y1, yend = y2),
+                       linetype = 2, alpha = .45, colour = "darkmagenta")
     } 
     
     #Animal Plot
