@@ -7,13 +7,12 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
-library(DT)
-library(RColorBrewer)
-library(viridis)
 library(tools)
 library(janitor)
+library(DT)
 library(RColorBrewer) 
 library(shinythemes)
+library(shinybusy)
 
 ### Note: 
 ### Currently, if no data file is uploaded, the APP will be using the generalized cleaning script by default,
@@ -39,7 +38,11 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             ),
                             # Display the data file
                             mainPanel(
-                              dataTableOutput("contents")
+                              dataTableOutput("contents"),
+                              # Add busy spinner for data upload
+                              use_busy_spinner(spin = "fading-circle",
+                                               position = "bottom-right",
+                                               spin_id = "upload_busy")
                             ))),
                  
                  ############################### General Observations ###############################
@@ -145,7 +148,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               
                               
                               
-                            )))
+                            )
+                          )
+                 )
                  
                  
 )
@@ -186,6 +191,10 @@ server <- function(input, output) {
         }
       }
     )
+    
+    #If dataset format is compatible, show spinner while the data is processing
+    show_spinner(spin_id = "upload_busy")
+    
     #Removing spaces and adding underscore
     names(animal_data) <- gsub(" ", "_", names(animal_data))
     
@@ -309,6 +318,8 @@ server <- function(input, output) {
     #Adding Day of Week
     animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
     
+    hide_spinner(spin_id = "upload_busy")
+    
     return(animal_data)
   })
   
@@ -360,8 +371,9 @@ server <- function(input, output) {
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        geom_segment(aes(x = 9, y = 1/8, xend = 16, yend = 1/8), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+             x = "Hour of Day", y = "Percentage") +
+        geom_segment(aes(x = 8.5, xend = 16.5, y = 1/8, yend = 1/8),
+                     linetype = 2, colour = "darkmagenta", alpha = 0.5) +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
@@ -397,7 +409,7 @@ server <- function(input, output) {
   
   output$save_general <- renderUI({
     req(.observations())
-    downloadLink("download_general", "Download Graph")
+    downloadLink("download_general", "Download Visual")
   })
   
   output$download_general <- downloadHandler(
@@ -430,7 +442,6 @@ server <- function(input, output) {
       
       req(input$filter_type)
       
-      
       if(input$filter_type == "Category"){
         
         category <- sort(unique(animal_data$Category))
@@ -461,7 +472,6 @@ server <- function(input, output) {
       
       animal_data <- data_input()
       
-      
       if(input$filter_type == "Category"){
         
         
@@ -478,8 +488,6 @@ server <- function(input, output) {
                            choices = behavior_options,
                            selected = behavior_options)
       }
-      
-      
     })
   })
   
@@ -498,7 +506,6 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     req(input$filter_type)
-    
     
     if(input$filter_type == "Category"){
       
@@ -592,14 +599,11 @@ server <- function(input, output) {
               legend.text = element_text(size = 10))
       
     }
-    
-    
-    
   })
   
   output$save_activities <- renderUI({
     req(.activities_visual())
-    downloadLink("download_activities_graph", "Download Graph")
+    downloadLink("download_activities_graph", "Download Visual")
   })
   
   #Specify download link
@@ -652,9 +656,9 @@ server <- function(input, output) {
         
         animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
         
-        return(animal_category_table)
-        
       }
+      
+      return(animal_category_table)
       
     } else {
       
@@ -685,9 +689,9 @@ server <- function(input, output) {
         
         
         animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
-        
-        return(animal_behavior_table)
       }
+      
+      return(animal_behavior_table)
       
     }
     
@@ -733,11 +737,6 @@ server <- function(input, output) {
           
         }
         
-        
-        
-        
-        return(animal_raw_category_table)
-        
       } else {
         
         output$activity_text <- renderUI(HTML(paste(
@@ -745,9 +744,12 @@ server <- function(input, output) {
         )))
         
         animal_raw_category_table <- data.frame()
-        return(animal_raw_category_table)
         
       }
+      
+      #Hide spinner
+      hide_spinner(spin_id = "activities_busy")
+      return(animal_raw_category_table)
       
     } else {
       
@@ -777,9 +779,6 @@ server <- function(input, output) {
           
         }
         
-        
-        return(animal_raw_behavior_table)
-        
       } else {
         
         output$activity_text <- renderUI(HTML(paste(
@@ -787,10 +786,10 @@ server <- function(input, output) {
         )))
         
         animal_raw_behavior_table <- data.frame()
-        return(animal_raw_behavior_table)
         
       }
       
+      return(animal_raw_behavior_table)
       
     } 
     
@@ -805,6 +804,8 @@ server <- function(input, output) {
     
     req(input$filter_type)
     
+    #Show spinner after data and filter inputs are received and while the table is loading
+    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -863,6 +864,7 @@ server <- function(input, output) {
       )))
       
       empty_table <- data.frame()
+      
       return(empty_table)
       
       
@@ -883,6 +885,7 @@ server <- function(input, output) {
     names <- sort(unique(animal_data$Name))
     names <- c(prefix, names)
     radioButtons('names4', h4("Select Animal"), names)
+    
   })
   #Let user select a date range
   output$dateControls4 <- renderUI({
@@ -967,7 +970,7 @@ server <- function(input, output) {
   # If there is data to generate a valid plot, show the download link
   output$save_daily <- renderUI({
     req(.daily_weekly())
-    downloadLink("download_daily", "Download Graph")
+    downloadLink("download_daily", "Download Visual")
   })
   
   output$download_daily <- downloadHandler(
@@ -1011,6 +1014,7 @@ server <- function(input, output) {
                                 "in your selected date range:", start_date, "to", end_date))
         error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
       }
+      
       return(error_msg)
     }
   })
@@ -1034,12 +1038,13 @@ server <- function(input, output) {
   observeEvent(c(input$select_exclusion, input$deselect_allP, input$file1), {
     req(input$select_exclusion)
     output$exclusionControls <- renderUI({
-      
       #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
+        #Hide spinner
+        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal)
       }
@@ -1048,12 +1053,13 @@ server <- function(input, output) {
   observeEvent(input$select_allP, {
     req(input$select_exclusion)
     output$exclusionControls <- renderUI({
-      
       #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
+        #Hide spinner
+        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal,
                            selected = subject_animal)
@@ -1118,11 +1124,10 @@ server <- function(input, output) {
               if(i == j) {
                 not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
           
-          #Creates vectors with the animals inside each period
-          before_name <- sort(unique(before$Name))
-          after_name <- sort(unique(after$Name))
-          not_mutual_name <- sort(unique(animal_data$Name))
-
+          #Subsets both before and after without the animals we found in the last part
+          for(k in not_mutual_name) {
+            before <- filter(before, Name != k)
+            after <- filter(after, Name != k)}
           
           #Find the closest date to the selected date in the past when another event happened
           before_name <- sort(unique(before$Name))
@@ -1145,13 +1150,10 @@ server <- function(input, output) {
               if (after$Name[j] == i) {
                 next_event <- j}}
             next_event_date <- append(next_event_date, next_event)}
-         
-          
           
           #Slice the before and after subsets
           before <- slice(before, max(last_event_date):nrow(before))
           after <- slice(after, 1:min(next_event_date))
-          
         }
         
         else if(input$date == min(animal_data$Date)) {
@@ -1233,7 +1235,8 @@ server <- function(input, output) {
   output$plz_select <- renderText({
     #If ZERO animal was selected, then a message will appear
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
-      "There is no plot to display. Please select a animal/animals to exclude."}
+      "There is no plot to display. Please select an animal/animals to exclude."
+    }
   })
   
   output$no_plot <- renderText({
@@ -1242,13 +1245,15 @@ server <- function(input, output) {
     
     #If ALL animals were selected, then no plot will appear
     if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-      "There is no plot to display. Please select a different animal/different animals to exclude."}
+      "There is no plot to display. Please select a different animal/animals to exclude."
+    }
+    
   })
   
   #If there is no data to generate a valid plot, do not show the download link
   output$save_piechart <- renderUI({
     req(.events())
-    downloadLink("download_piechart", "Download Graph")
+    downloadLink("download_piechart", "Download Visual")
   })
   
   output$download_piechart <- downloadHandler(

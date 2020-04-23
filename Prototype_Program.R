@@ -7,11 +7,9 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
-library(DT)
-library(RColorBrewer)
-library(viridis)
 library(tools)
 library(janitor)
+library(DT)
 library(RColorBrewer) 
 library(shinythemes)
 library(shinybusy)
@@ -373,8 +371,9 @@ server <- function(input, output) {
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+             x = "Hour of Day", y = "Percentage") +
+      geom_segment(aes(x = 8.5, xend = 16.5, y = 1/8, yend = 1/8),
+                   linetype = 2, colour = "darkmagenta", alpha = 0.5) +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
