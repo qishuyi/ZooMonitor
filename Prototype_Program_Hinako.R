@@ -361,7 +361,7 @@ server <- function(input, output) {
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
              x = "Hour of Day", y = "Percentage") + 
-        geom_segment(aes(x = 9, y = 1/8, xend = 16, yend = 1/8), color = "darkmagenta", alpha = .45, linetype = "longdash") +
+        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
@@ -1118,11 +1118,10 @@ server <- function(input, output) {
               if(i == j) {
                 not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
           
-          #Creates vectors with the animals inside each period
-          before_name <- sort(unique(before$Name))
-          after_name <- sort(unique(after$Name))
-          not_mutual_name <- sort(unique(animal_data$Name))
-
+          #Subsets both before and after without the animals we found in the last part
+          for(k in not_mutual_name) {
+            before <- filter(before, Name != k)
+            after <- filter(after, Name != k)}
           
           #Find the closest date to the selected date in the past when another event happened
           before_name <- sort(unique(before$Name))
@@ -1145,13 +1144,10 @@ server <- function(input, output) {
               if (after$Name[j] == i) {
                 next_event <- j}}
             next_event_date <- append(next_event_date, next_event)}
-         
-          
           
           #Slice the before and after subsets
           before <- slice(before, max(last_event_date):nrow(before))
           after <- slice(after, 1:min(next_event_date))
-          
         }
         
         else if(input$date == min(animal_data$Date)) {
