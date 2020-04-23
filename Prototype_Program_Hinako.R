@@ -372,12 +372,7 @@ server <- function(input, output) {
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
              caption = "The dashed line represents equally distributed observations.",
-<<<<<<< HEAD
-             x = "Hour of Day", y = "Percentage") + 
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
-=======
              x = "Hour of Day", y = "Percentage") +
->>>>>>> 09e4814207c474ce1b45caca61ab45801b4b2d3e
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
