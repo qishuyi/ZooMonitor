@@ -1131,6 +1131,8 @@ server <- function(input, output) {
               if(i == j) {
                 not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
           
+          if(length(not_mutual_name) == length(unique(animal_data$Name))) return()
+          
           #Subsets both before and after without the animals we found in the last part
           for(k in not_mutual_name) {
             before <- filter(before, Name != k)
