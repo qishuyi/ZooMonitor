@@ -371,7 +371,7 @@ server <- function(input, output) {
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
-             caption = "The dashed line represents equally distributed observations.\nThe time outside 9am to 4pm rarely has observations.",
+             caption = "The dashed line represents equally distributed observations.\nHours outside 9am to 4pm rarely have observations.",
              x = "Hour of Day", y = "Percentage") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
