@@ -76,6 +76,8 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             uiOutput("dateControls4"),
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
                                          choices = list("Day of Week", "Hour of Day")),
+                            actionButton(inputId = "select_all_faceted", label = "Select All"),
+                            actionButton(inputId = "deselect_all_faceted", label = "Deselect All"),
                             uiOutput("nameControls4")
                           ),
                           mainPanel(
@@ -872,20 +874,40 @@ server <- function(input, output) {
   
   
   ############################### Faceted Barplots ###############################
-  #Let user select an animal name
-  output$nameControls4 <- renderUI({
-    #Get updated data
-    animal_data <- data_input()
-
-    prefix <- c('All animals')
-    names <- sort(unique(animal_data$Name))
-    names <- c(prefix, names)
-    radioButtons('names4', h4("Select Animal"), names)
+  # Let user select names of the animals to include in the faceted barplots
+  # When a new data file is uploaded, or when the 'deselect all' button is clicked, all checkboxes will be unchecked
+  observeEvent(c(input$deselect_all_faceted, input$file1), {
     
+    output$nameControls4 <- renderUI({  
+      
+      animal_data <- data_input()
+      
+      names <- sort(unique(animal_data$Name))
+      checkboxGroupInput(inputId = "names4", 
+                         label= h4("Select Animals"),
+                         choices = names, 
+                         selected = c()) #selected is an empty column
+    })
   })
-  #Let user select a date range
+  
+  # Select all animal names
+  observeEvent(input$select_all_faceted, {
+    
+    output$nameControls4 <- renderUI({  
+      
+      animal_data <- data_input()
+      
+      names <- sort(unique(animal_data$Name))
+      checkboxGroupInput(inputId = "names4", 
+                         label= h4("Select Animals"),
+                         choices = names, 
+                         selected = names)
+    })
+  })
+  
+  # Let user select a date range
   output$dateControls4 <- renderUI({
-    #Get updated data
+    # Get updated data
     animal_data <- data_input()
     
     date <- animal_data$Date
@@ -896,7 +918,7 @@ server <- function(input, output) {
                    max = max(animal_data$Date))
   })
   
-  #Create the faceted barplots
+  # Create the faceted barplots
   output$faceted_barplot <- renderPlot({ .daily_weekly() }, height = 600)
   
   .daily_weekly <- reactive({
@@ -905,7 +927,7 @@ server <- function(input, output) {
     
     # Wait until the program loads up
     req(input$daterange4)
-
+    
     # Choose the date range of the data we want to work with
     start_date <- input$daterange4[1]
     end_date <- input$daterange4[2]
@@ -913,20 +935,47 @@ server <- function(input, output) {
     
     # Choose the animal(s) whose behaviors we will display
     animal_name <- input$names4
-    if (animal_name != "All animals") {
-      animal_data <- animal_data %>% filter(Name == animal_name)
+    animal_data <- animal_data %>% filter(Name %in% animal_name)   
+    
+    if (nrow(animal_data) == 0) {
+      # If filtered dataset is empty, we display an appropriate error message and do not continue to the plot creation
+      output$no_data_barplot <- renderUI ({
+        error_msg <- character()
+        if (is.null(animal_name)) {
+          error_msg <- HTML(paste(em("Please select animals from the list")))
+        }else if (start_date > end_date) {
+          error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
+                                  ") must be no later than end date (", end_date, ").", sep = ""))
+          error_msg <- HTML(paste(em(error_msg)))
+        }else {
+          error_msg <- HTML(paste("There is no data for", animal_name, 
+                                  "in your selected date range:", start_date, "to", end_date))
+          error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
+        }
+        
+        return(error_msg)
+      })
+      
+      return()
     }
     
-    if (nrow(animal_data) == 0) return()
+    # If the dataset is not empty, clear the error messages and continue to plot creation
+    output$no_data_barplot <- renderUI ({ })
     
-    # Choose x-axis of the barplots
-    if(animal_name == "All animals") animal_name <- "All Animals"
+    # Concatenate all animal names to include in the plot caption
+    name_in_caption <- ""
+    for (i in 1:length(animal_name)) {
+      name_in_caption <- paste(name_in_caption, animal_name[i], sep = "")
+      if (i != length(animal_name)) name_in_caption <- paste(name_in_caption, ", ", sep = "")
+    }
     
-    plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
+    # Create the plot caption
+    plot_caption <- "Barplots of Behavior per"
     if (input$select_faceted_barplot == "Day of Week") {
       # Day of Week
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week")
+      plot_caption <- paste(plot_caption, "Day of Week\n")
+      plot_caption <- paste(plot_caption, "(", name_in_caption, ")", sep = "")
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         labs(title = plot_caption, y = "Frequency") +
@@ -942,7 +991,8 @@ server <- function(input, output) {
       
     } else {
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Hour of Day")
+      plot_caption <- paste(plot_caption, "Hour of Day\n")
+      plot_caption <- paste(plot_caption, "(", name_in_caption, ")", sep = "")
       
       # Change hour format (e.g., from 9 to "9:00")
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
@@ -979,41 +1029,6 @@ server <- function(input, output) {
       dev.off()
     }
   )
-  
-  output$no_data_barplot <- renderUI({
-    # Get updated data
-    animal_data <- data_input()
-    
-    # Wait until the program loads up
-    req(input$daterange4)
-    
-    # Choose the date range of the data we want to work with
-    start_date <- input$daterange4[1]
-    end_date <- input$daterange4[2]
-    animal_data <- animal_data %>% filter(Date >= start_date & Date <= end_date)
-    
-    # Choose the animal(s) whose behaviors we will display
-    animal_name <- input$names4
-    if (animal_name != "All animals") {
-      animal_data <- animal_data %>% filter(Name == animal_name)
-    }
-    
-    # Indicate if there are no data available for the animal and date range selected
-    if (nrow(animal_data) == 0) {
-      error_msg <- character()
-      if (start_date > end_date) {
-        error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
-                                ") must be no later than end date (", end_date, ").", sep = ""))
-        error_msg <- HTML(paste(em(error_msg)))
-      }else {
-        error_msg <- HTML(paste("There is no data for", animal_name, 
-                                "in your selected date range:", start_date, "to", end_date))
-        error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
-      }
-      
-      return(error_msg)
-    }
-  })
   
   ############################### Pie Charts ###############################
   #Let users choose the event date
