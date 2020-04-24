@@ -371,7 +371,7 @@ server <- function(input, output) {
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
-             caption = "The dashed line represents equally distributed observations.",
+             caption = "The dashed line represents equally distributed observations.\nHours outside 9am to 4pm rarely have observations.",
              x = "Hour of Day", y = "Percentage") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
@@ -1218,8 +1218,9 @@ server <- function(input, output) {
       theme_classic() + theme(axis.line = element_blank(),
                               axis.text = element_blank(),
                               axis.ticks = element_blank(),
-                              plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                              plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                              legend.text = element_text(size = 10),
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
   })
@@ -1236,7 +1237,7 @@ server <- function(input, output) {
     animal_data <- data_input()
     
     #If ALL animals were selected, then no plot will appear
-    if(length(input$subject_animal) == length(unique(animal_data$Name))) {
+    if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
       "There is no plot to display. Please select a different animal/animals to exclude."
     }
     
