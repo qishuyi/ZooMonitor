@@ -53,7 +53,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to choose the x-axis
+                              # Allow users to choose the x-axis of the bar plot
                               radioButtons("select_general", h4("Show Observations by:"),
                                            choices = list("Day of Week", "Hour of Day", "Animal")
                               )
@@ -61,7 +61,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general"),
                               
                               # Add a download button
                               uiOutput("save_general")
@@ -99,26 +98,23 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to choose the x-axis
+                              # Allow users to choose the event date
                               uiOutput("dateControls"),
+                              # Allow users to choose the entire data set or without the subject animal(s)
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
+                              # Allow users to choose the subject animal(s)
                               uiOutput("exclusionControls"),
-                              actionButton(inputId = "select_allP", label = "Select All"),
-                              actionButton(inputId = "deselect_allP", label = "Deselect All")
+                              uiOutput("select_all_Pie"),
+                              uiOutput("deselect_all_Pie")
                             ),
                             mainPanel(
+                              # Texts shown when zero or all subject animals were selected
                               uiOutput("plz_select"),
                               uiOutput("no_plot"),
-                              #Removing the warning message that appears for a second 
-                              #This is a warning for not having either pie chart of before or after on the min/max date
-                              tags$style(type="text/css",
-                                         ".shiny-output-error { visibility: hidden; }",
-                                         ".shiny-output-error:before { visibility: hidden; }"),
-                              # Show the plot of general obervations
+                              # Pie Chart(s)
                               plotOutput("event_pie_plot"),
-                              
                               # Provide download link
                               uiOutput("save_piechart")
                             ))),
@@ -335,9 +331,11 @@ server <- function(input, output) {
   output$general_plot <- renderPlot({ .observations() })
   
   .observations <- reactive({
+    
+    #Get updated data
     animal_data <- data_input()
     
-    # Day of Week Plot 
+    ###Day of Week Plot 
     if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
@@ -360,10 +358,15 @@ server <- function(input, output) {
       
     }
     
-    #Time of Day plot
+    ###Time of Day plot
     else if(input$select_general == "Hour of Day"){
+      
+      #Fix the x-axis
       hour_breaks <- c(7:17)
+      #Used to draw a dashed segment line
       df <- data.frame(x1 = 8.75, x2 = 16.25, y1 = 1/8, y2 = 1/8)
+      
+      #Plot with animal_data
       a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_continuous(breaks = hour_breaks,
@@ -383,11 +386,13 @@ server <- function(input, output) {
               axis.text = element_text(size = 10),
               legend.title = element_blank(),
               legend.text = element_text(size = 10))
+      
+      #Add a dashed segment line
       a + geom_segment(data = df, aes(x = x1, xend = x2, y = y1, yend = y2),
                        linetype = 2, alpha = .45, colour = "darkmagenta")
     } 
     
-    #Animal Plot
+    ###Animal Plot
     else {
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
@@ -1045,11 +1050,25 @@ server <- function(input, output) {
               max = max(animal_data$Date))
   })
   
-  #Let user choose the subject animal to exclude (with the select/deselect all buttons)
-  observeEvent(c(input$select_exclusion, input$deselect_allP, input$file1), {
+  #Show Deselect All button when "Data Without the Subject Animal" is selected
+  output$deselect_all_Pie <- renderUI({
+    if(input$select_exclusion == "Data Without the Subject Animal") {
+    actionButton("deselect_all_Pie", "Deselect All")}
+  })
+  
+  #Show Select All button when "Data Without the Subject Animal" is selected 
+  output$select_all_Pie <- renderUI({
+    if(input$select_exclusion == "Data Without the Subject Animal") {
+      actionButton("select_all_Pie", "Select All")}
+  })
+  
+  
+  #Let users choose the subject animal(s) to exclude (with the deselect all button)
+  observeEvent(c(input$select_exclusion, input$deselect_all_Pie, input$file1), {
     req(input$select_exclusion)
+    
+    #Show checkbox group with animal name(s) when "Data Without the Subject Animal" is selected
     output$exclusionControls <- renderUI({
-      #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
@@ -1059,10 +1078,12 @@ server <- function(input, output) {
       }
     })})
   
-  observeEvent(input$select_allP, {
+  #Let users choose the subject animal(s) to exclude (with the select all button)
+  observeEvent(input$select_all_Pie, {
     req(input$select_exclusion)
+    
+    #Show checkbox group with animal name(s) when "Data Without the Subject Animal" is selected 
     output$exclusionControls <- renderUI({
-      #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
@@ -1073,67 +1094,68 @@ server <- function(input, output) {
       }
     })})
   
-  ##### Pie Charts
+  ######### Pie Chart Plots
   output$event_pie_plot <- renderPlot({ .events() })
   
   .events <- reactive({
     
     #Get updated data
     animal_data <- data_input()
-    #Calls the input
+    #Calls inputs
     req(input$date)
     req(input$select_exclusion)
     
-    #If "All Data" was selected 
+    #####If "All Data" was selected 
     if(input$select_exclusion == "All Data") {
       
-      #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
+      #Create a before dataset (it will be an empty data set when the first date of the data was selected)
       before <- subset(animal_data, Date < input$date)
-      #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
+      #Create an after dataset (it will an empty data set when the last date of the data was selected)
       after <- subset(animal_data, Date > input$date)
-      
     }
     
-    #If "Use data without the subject animal" was selected
+    #####If "Data Without the Subject Animal" was selected
     if(input$select_exclusion == "Data Without the Subject Animal") {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
-      #No plot will be shown if zero or all subject animals were selected
+      ####No plot if ZERO or ALL subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
       if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
       
-      #If one or more and less than all subject animals were selected
+      ####If one or more and less than all subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
          input$select_exclusion == "Data Without the Subject Animal") {
         
-        #Exclude the selected subject animal(s) first
+        #Exclude the selected subject animal(s)
         animal_remain <- sort(unique(animal_data$Name))
         for (a in animal_remain) {
           if (a %in% input$subject_animal) {
             animal_data <- filter(animal_data, Name != a)}}
         
-        #Creates before and after datasets 
+        #Create before and after datasets 
         before <- subset(animal_data, Date < input$date)
         after <- subset(animal_data, Date > input$date)
         
-        #If the selected date was in-between the first and the last day of the data
+        ###If the selected date was in-between the first and the last day of the data
         if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
           
-          #Creates vectors with the animals inside each period
+          #Create vectors of the animals inside each period ("befor_name" and "after_name")
+          #Create a vector of all animals in the original data (eventually this will contain animals that are not in both periods)
           before_name <- sort(unique(before$Name))
           after_name <- sort(unique(after$Name))
           not_mutual_name <- sort(unique(animal_data$Name))
           
-          #Finds animals that are NOT in both before and after
+          #Find animals that are NOT in both before and after and keep them in the "not_mutual_name" vector
           for(i in before_name) {
             for(j in after_name) {
               if(i == j) {
                 not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
           
+          #No plot if all the animals in the original data were NOT in both periods
           if(length(not_mutual_name) == length(unique(animal_data$Name))) return()
           
-          #Subsets both before and after without the animals we found in the last part
+          #Filter both before and after without the animals we found in the last part
           for(k in not_mutual_name) {
             before <- filter(before, Name != k)
             after <- filter(after, Name != k)}
@@ -1160,18 +1182,21 @@ server <- function(input, output) {
                 next_event <- j}}
             next_event_date <- append(next_event_date, next_event)}
           
-          #Slice the before and after subsets
+          #Slice the before subset by the preceding event date and the selected date 
           before <- slice(before, max(last_event_date):nrow(before))
+          #Slice the after subset by the selected date and the next event date
           after <- slice(after, 1:min(next_event_date))
         }
         
+        ###If the selceted date was the first day of the data
         else if(input$date == min(animal_data$Date)) {
-          #If the selceted date was the first day of the data
+          
+          #Create a vector with the animal names in the original data
           after_name <- sort(unique(after$Name))
           next_event <- 0
           next_event_date <- numeric()
           
-          #Slice the after subset before the next event happens
+          #Slice the after subset by after the selected date (the first day of the data) and the next event date
           for (i in after_name) {
             for (j in 1:nrow(after)) {
               if (after$Name[j] == i) {
@@ -1180,13 +1205,15 @@ server <- function(input, output) {
           after <- slice(after, 1:min(next_event_date))
         }
         
+        ###If the selceted date was the last day of the data
         else {
-          #If the selceted date was the last day of the data
+          
+          #Create a vector with the animal names in the original data
           before_name <- sort(unique(before$Name))
           last_event <- 0
           last_event_date <- numeric()
           
-          #Slice the before subset after the last event happened
+          #Slice the before subset by the last event date and the selected date (the last day of the data)
           for (i in before_name) {
             for (j in nrow(before):1) {
               if (before$Name[j] == i) {
@@ -1197,8 +1224,9 @@ server <- function(input, output) {
       }
     }
     
-    #####From here, it applies to every case
-    #Creates summary data set for before
+    ######All processes from here apply to any case
+    
+    #Create summary data set for before
     before <- before %>% group_by(Behavior)
     summary_before <- as.data.frame(summarise(before, n()))
     names(summary_before)[names(summary_before) == "n()"] <- "counts"
@@ -1206,7 +1234,7 @@ server <- function(input, output) {
       mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
       mutate(Period = "Before")
     
-    #Creates summary data set for after
+    #Create summary data set for after
     after <- after %>% group_by(Behavior)
     summary_after <- as.data.frame(summarise(after, n()))
     names(summary_after)[names(summary_after) == "n()"] <- "counts"
@@ -1214,17 +1242,17 @@ server <- function(input, output) {
       mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
       mutate(Period = "After")
     
-    #Combines two summaries
+    #Combine before and after summary data sets 
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
-    #Defining color palette
+    #Define the color palette
     summary$Behavior <- as.factor(summary$Behavior)
     colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
     names(colors2) = levels(summary$Behavior)
     colors2 <- colors2[1:length(levels(summary$Behavior))]
     
-    #Creates a pie chart for only after
+    #Create pie chart(s)
     ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
       geom_bar(stat="identity", width=1) +
       coord_polar("y", start=0) + 
@@ -1242,23 +1270,21 @@ server <- function(input, output) {
       scale_fill_manual(values = colors2)
   })
   
+  #A text shown when ZERO animal was selected
   output$plz_select <- renderText({
-    #If ZERO animal was selected, then a message will appear
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
-      "There is no plot to display. Please select an animal/animals to exclude."
+      "There is no plot to display. Please select at least one animal from the list."
     }
-  })
+})
   
+  #A text shown when ALL animals were selected
   output$no_plot <- renderText({
-    # Get updated data
+    #Get updated data
     animal_data <- data_input()
-    
-    #If ALL animals were selected, then no plot will appear
     if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
-      "There is no plot to display. Please select a different animal/animals to exclude."
+      "There is no plot to display. Please unselect at least one animal from the list."
     }
-    
-  })
+})
   
   #If there is no data to generate a valid plot, do not show the download link
   output$save_piechart <- renderUI({
