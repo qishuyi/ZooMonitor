@@ -405,7 +405,7 @@ server <- function(input, output) {
       
       #Add a dashed segment line
       a + geom_segment(data = df, aes(x = x1, xend = x2, y = y1, yend = y2),
-                       linetype = 2, alpha = .45, colour = "darkmagenta")
+                       linetype = "longdash", alpha = .45, colour = "darkmagenta")
     } 
     
     ###Animal Plot
