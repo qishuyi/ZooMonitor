@@ -995,7 +995,7 @@ server <- function(input, output) {
     
     # Create the plot title and subtitle
     plot_title <- "Barplots of Behavior per"
-    plot_subtitle <- paste(start_date, "~", end_date, " (", name_in_subtitle, ")", sep = "")
+    plot_subtitle <- paste(start_date, " ~ ", end_date, " (", name_in_subtitle, ")", sep = "")
     
     if (input$select_faceted_barplot == "Day of Week") {
       # Day of Week
