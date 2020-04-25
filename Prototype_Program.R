@@ -29,7 +29,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to upload a csv file
+                              # Allow users to upload a csv file (users cannot upload multiple files)
                               fileInput("file1", h4("Choose a CSV File"),
                                         multiple = FALSE,
                                         accept = c("text/csv",
@@ -71,14 +71,21 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  tabPanel("Daily/Weekly",
                           
                           titlePanel(h3("Frequency of Behaviors")),
+                          
                           sidebarPanel(
+                            # Add date range
                             uiOutput("dateControls4"),
+                            
+                            # Allow users to show behaviors by day of week or hour of day
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
                                          choices = list("Day of Week", "Hour of Day")),
+                            
+                            # Provide a list of checkboxes for animal names and 'Select All' and 'Deselect All' buttons
                             actionButton(inputId = "select_all_faceted", label = "Select All"),
                             actionButton(inputId = "deselect_all_faceted", label = "Deselect All"),
                             uiOutput("nameControls4")
                           ),
+                          
                           mainPanel(
                             # If there are no available data, show helptext
                             uiOutput("no_data_barplot"),
@@ -187,6 +194,7 @@ server <- function(input, output) {
           # If a warning occured, set has_warning to TRUE
           assign("has_warning", TRUE, env=globalenv())
           
+          # And show a pop-up window asking for another dataset with the correct format
           showModal(modalDialog(
             title = "Incompatible Dataset",
             "The format of the dataset is not compatible with the program, please try again!",
@@ -196,23 +204,23 @@ server <- function(input, output) {
       }
     )
     
+    # If dataset format is compatible, proceed to data cleaning and show a spinner while the data is processing.
     if (!get("has_warning", env=globalenv())) {
-      #If dataset format is compatible, show spinner while the data is processing
+      # Show spinner
       show_spinner(spin_id = "upload_busy")
       
-      #Removing spaces and adding underscore
+      # Removing spaces and adding underscore
       names(animal_data) <- gsub(" ", "_", names(animal_data))
       
-      
-      #Renaming Columns
+      # Renaming Columns
       animal_data <- animal_data %>% rename(Name = Focal_Name)
       
       
-      #Creating a Duplicate Channel Type Column if All_Occurrence_Value exists as a column
-      #If All_Occurrence Value exists as a column, also adds "Occurrence_Duplicate" into the IC_Name_Vector
-      #If All_Occurrence Value exists as a column, also adds "All_Occurrence_Value" into the IC_Value_Vector
+      # Creating a Duplicate Channel Type Column if All_Occurrence_Value exists as a column
+      # If All_Occurrence Value exists as a column, also adds "Occurrence_Duplicate" into the IC_Name_Vector
+      # If All_Occurrence Value exists as a column, also adds "All_Occurrence_Value" into the IC_Value_Vector
       
-      #Creating vectors used to unite to create a "Category" and "Activity" Column
+      # Creating vectors used to unite to create a "Category" and "Activity" Column
       IC_Name_Vector <- character()
       IC_Value_Vector <- character()
       
@@ -226,7 +234,7 @@ server <- function(input, output) {
         
       }
       
-      #Uniting all IC Names + Duplicated All Occurrence columns to a single column named Category    
+      # Uniting all IC Names + Duplicated All Occurrence columns to a single column named Category    
       
       for(i in names(animal_data)){
         
@@ -239,7 +247,7 @@ server <- function(input, output) {
       animal_data <- animal_data %>% unite("Category", IC_Name_Vector , remove = T)                                                                 
       
       
-      #Uniting all IC Value + Occurrence Value columns to a single column named Activity   
+      # Uniting all IC Value + Occurrence Value columns to a single column named Activity   
       
       for(j in names(animal_data)){
         
@@ -251,11 +259,11 @@ server <- function(input, output) {
       
       animal_data <- animal_data %>% unite("Behavior", IC_Value_Vector, remove = T)
       
-      #Social Modifier Editing
+      # Social Modifier Editing
       
-      #Do nothing if there is no social modifier column
-      #If there is only one social modifier column, rename the column to Social_Modifier
-      #If there are more than one social modifier column, unite it into a single column 
+      # Do nothing if there is no social modifier column
+      # If there is only one social modifier column, rename the column to Social_Modifier
+      # If there are more than one social modifier column, unite it into a single column 
       
       Social_Modifier_Vector <- character()
       
@@ -279,19 +287,19 @@ server <- function(input, output) {
       }
       
       
-      #Filtering out rows without behavioral observations
+      # Filtering out rows without behavioral observations
       animal_data <- animal_data %>% filter(!str_detect(animal_data$Behavior, "^NA(_NA)*$")) 
       
       
-      #Fixing NA labels for Category Column
+      # Fixing NA labels for Category Column
       animal_data <- animal_data %>% mutate(Category = gsub("NA_", "", Category)) %>%  
         mutate(Category = gsub("_NA", "", Category)) 
       
-      #Fixing NA labels for Behavior Column
+      # Fixing NA labels for Behavior Column
       animal_data <- animal_data %>% mutate(Behavior = gsub("NA_", "", Behavior)) %>%  
         mutate(Behavior = gsub("_NA", "", Behavior)) 
       
-      #Fixing NA labels for Social Modifier Column
+      # Fixing NA labels for Social Modifier Column
       animal_data <- animal_data %>% mutate(Social_Modifier = gsub("NA_", "", Social_Modifier)) %>%
         mutate(Social_Modifier = gsub("_NA", "", Social_Modifier)) 
       
@@ -299,28 +307,28 @@ server <- function(input, output) {
         animal_data$Social_Modifier[animal_data$Social_Modifier == "NA"] <- NA
       }
       
-      #Splitting rows with multiple behavioral observations                                
+      # Splitting rows with multiple behavioral observations                                
       animal_data <- separate_rows(animal_data, Category, Behavior, sep  = "_")
       
       
-      #Removing Unnecessary Columns
+      # Removing Unnecessary Columns
       animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
                                             -DateTime, -Grid_Size, -Image_Size,
                                             -Project_Animals, -Duration,
                                             -Notes, -Frame_Number)
       
-      #Combining potential same behaviors with slightly different names
+      # Combining potential same behaviors with slightly different names
       animal_data$Behavior <- toTitleCase(animal_data$Behavior)
       
-      #Combining potential same categories with slightly
+      # Combining potential same categories with slightly
       animal_data$Category <- toTitleCase(animal_data$Category)
       
-      #Use titlecase for animal names
+      # Use titlecase for animal names
       animal_data$Name <- toTitleCase(animal_data$Name)
       
       
       ####################### Addition
-      #Adding Day of Week
+      # Adding Day of Week
       animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
       
       hide_spinner(spin_id = "upload_busy")
@@ -423,11 +431,13 @@ server <- function(input, output) {
     }
   })  
   
+  # Add download link to UI
   output$save_general <- renderUI({
     req(.observations())
     downloadLink("download_general", "Download Visual")
   })
   
+  # Specify download link
   output$download_general <- downloadHandler(
     filename = function() {
       paste("observation.jpg")
@@ -617,6 +627,7 @@ server <- function(input, output) {
     }
   })
   
+  # Add download link to UI
   output$save_activities <- renderUI({
     req(.activities_visual())
     downloadLink("download_activities_graph", "Download Visual")
@@ -1005,6 +1016,7 @@ server <- function(input, output) {
       
       
     } else {
+      # Hour of Day
       # Change caption of the plot
       plot_title <- paste(plot_title, "Hour of Day")
       
@@ -1033,6 +1045,7 @@ server <- function(input, output) {
     downloadLink("download_daily", "Download Visual")
   })
   
+  # Specify download link
   output$download_daily <- downloadHandler(
     filename = function() {
       paste("daily-weekly.jpg")
@@ -1301,6 +1314,7 @@ server <- function(input, output) {
     downloadLink("download_piechart", "Download Visual")
   })
   
+  #Specify download link
   output$download_piechart <- downloadHandler(
     filename = function() {
       paste("events.jpg")
