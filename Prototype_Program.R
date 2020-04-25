@@ -976,24 +976,24 @@ server <- function(input, output) {
     output$no_data_barplot <- renderUI ({ })
     
     # Concatenate all animal names to include in the plot caption
-    name_in_caption <- ""
+    name_in_subtitle <- ""
     for (i in 1:length(animal_name)) {
-      name_in_caption <- paste(name_in_caption, animal_name[i], sep = "")
-      if (i != length(animal_name)) name_in_caption <- paste(name_in_caption, ", ", sep = "")
+      name_in_subtitle <- paste(name_in_subtitle, animal_name[i], sep = "")
+      if (i != length(animal_name)) name_in_subtitle <- paste(name_in_subtitle, ", ", sep = "")
     }
     
-    # Create the plot caption
-    plot_caption <- "Barplots of Behavior per"
+    # Create the plot title and subtitle
+    plot_title <- "Barplots of Behavior per"
+    plot_subtitle <- paste(start_date, "~", end_date, " (", name_in_subtitle, ")", sep = "")
+    
     if (input$select_faceted_barplot == "Day of Week") {
       # Day of Week
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week:\n")
-      plot_caption <- paste(plot_caption, start_date, "~", end_date, sep = "")
-      plot_caption <- paste(plot_caption, " (", name_in_caption, ")", sep = "")
+      plot_title <- paste(plot_title, "Day of Week")
       
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
-        labs(title = plot_caption, y = "Frequency") +
+        labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
@@ -1006,9 +1006,7 @@ server <- function(input, output) {
       
     } else {
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Hour of Day:\n")
-      plot_caption <- paste(plot_caption, start_date, "~", end_date, sep = "")
-      plot_caption <- paste(plot_caption, " (", name_in_caption, ")", sep = "")
+      plot_title <- paste(plot_title, "Hour of Day")
       
       # Change hour format (e.g., from 9 to "9:00")
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
@@ -1016,7 +1014,7 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        labs(title = plot_caption, y = "Frequency") +
+        labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
