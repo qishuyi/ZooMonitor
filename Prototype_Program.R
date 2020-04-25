@@ -987,8 +987,10 @@ server <- function(input, output) {
     if (input$select_faceted_barplot == "Day of Week") {
       # Day of Week
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week\n")
-      plot_caption <- paste(plot_caption, "(", name_in_caption, ")", sep = "")
+      plot_caption <- paste(plot_caption, "Day of Week: ")
+      plot_caption <- paste(plot_caption, start_date, "~", end_date, sep = "")
+      plot_caption <- paste(plot_caption, "\n(", name_in_caption, ")", sep = "")
+      
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         labs(title = plot_caption, y = "Frequency") +
@@ -1004,8 +1006,9 @@ server <- function(input, output) {
       
     } else {
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Hour of Day\n")
-      plot_caption <- paste(plot_caption, "(", name_in_caption, ")", sep = "")
+      plot_caption <- paste(plot_caption, "Hour of Day: ")
+      plot_caption <- paste(plot_caption, start_date, "~", end_date, sep = "")
+      plot_caption <- paste(plot_caption, "\n(", name_in_caption, ")", sep = "")
       
       # Change hour format (e.g., from 9 to "9:00")
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
