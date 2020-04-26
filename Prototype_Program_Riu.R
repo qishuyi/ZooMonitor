@@ -7,11 +7,9 @@ library(lubridate)
 library(shiny)
 library(ggplot2)
 library(forcats)
-library(DT)
-library(RColorBrewer)
-library(viridis)
 library(tools)
 library(janitor)
+library(DT)
 library(RColorBrewer) 
 library(shinythemes)
 library(shinybusy)
@@ -31,7 +29,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to upload a csv file
+                              # Allow users to upload a csv file (users cannot upload multiple files)
                               fileInput("file1", h4("Choose a CSV File"),
                                         multiple = FALSE,
                                         accept = c("text/csv",
@@ -55,7 +53,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to choose the x-axis
+                              # Allow users to choose the x-axis of the bar plot
                               radioButtons("select_general", h4("Show Observations by:"),
                                            choices = list("Day of Week", "Hour of Day", "Animal")
                               )
@@ -63,7 +61,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             mainPanel(
                               # Show the plot of general obervations
                               plotOutput("general_plot"),
-                              textOutput("selected_general"),
                               
                               # Add a download button
                               uiOutput("save_general")
@@ -74,12 +71,21 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  tabPanel("Daily/Weekly",
                           
                           titlePanel(h3("Frequency of Behaviors")),
+                          
                           sidebarPanel(
+                            # Add date range
                             uiOutput("dateControls4"),
+                            
+                            # Allow users to show behaviors by day of week or hour of day
                             radioButtons("select_faceted_barplot", h4("Show Behavior by:"),
                                          choices = list("Day of Week", "Hour of Day")),
+                            
+                            # Provide a list of checkboxes for animal names and 'Select All' and 'Deselect All' buttons
+                            actionButton(inputId = "select_all_faceted", label = "Select All"),
+                            actionButton(inputId = "deselect_all_faceted", label = "Deselect All"),
                             uiOutput("nameControls4")
                           ),
+                          
                           mainPanel(
                             # If there are no available data, show helptext
                             uiOutput("no_data_barplot"),
@@ -99,26 +105,23 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           sidebarLayout(
                             # Add filters to take user inputs
                             sidebarPanel(
-                              # Allow users to choose the x-axis
+                              # Allow users to choose the event date
                               uiOutput("dateControls"),
+                              # Allow users to choose the entire data set or without the subject animal(s)
                               radioButtons("select_exclusion", h4("Use:"),
                                            choices = list("All Data", "Data Without the Subject Animal")),
                               helpText(HTML("Subject animal is the individual that caused the event. <br/> e.g., death, birth, joining etc.")),
+                              # Allow users to choose the subject animal(s)
                               uiOutput("exclusionControls"),
-                              actionButton(inputId = "select_allP", label = "Select All"),
-                              actionButton(inputId = "deselect_allP", label = "Deselect All")
+                              uiOutput("select_all_Pie"),
+                              uiOutput("deselect_all_Pie")
                             ),
                             mainPanel(
+                              # Texts shown when zero or all subject animals were selected
                               uiOutput("plz_select"),
                               uiOutput("no_plot"),
-                              #Removing the warning message that appears for a second 
-                              #This is a warning for not having either pie chart of before or after on the min/max date
-                              tags$style(type="text/css",
-                                         ".shiny-output-error { visibility: hidden; }",
-                                         ".shiny-output-error:before { visibility: hidden; }"),
-                              # Show the plot of general obervations
+                              # Pie Chart(s)
                               plotOutput("event_pie_plot"),
-                              
                               # Provide download link
                               uiOutput("save_piechart")
                             ))),
@@ -166,6 +169,9 @@ server <- function(input, output) {
     # If input$file1 is unavailable, req will throw an exception.
     req(input$file1)
     
+    # A value to keep track of whether calling read_csv on the uploaded data generated a warning or not.
+    assign("has_warning", FALSE, env=globalenv())
+    
     #Loading in Data
     tryCatch(
       {
@@ -185,6 +191,10 @@ server <- function(input, output) {
       },
       warning = function(w) {
         if (str_detect(w$message, "column names")) {
+          # If a warning occured, set has_warning to TRUE
+          assign("has_warning", TRUE, env=globalenv())
+          
+          # And show a pop-up window asking for another dataset with the correct format
           showModal(modalDialog(
             title = "Incompatible Dataset",
             "The format of the dataset is not compatible with the program, please try again!",
@@ -194,135 +204,137 @@ server <- function(input, output) {
       }
     )
     
-    #If dataset format is compatible, show spinner while the data is processing
-    show_spinner(spin_id = "upload_busy")
-    
-    #Removing spaces and adding underscore
-    names(animal_data) <- gsub(" ", "_", names(animal_data))
-    
-    
-    #Renaming Columns
-    animal_data <- animal_data %>% rename(Name = Focal_Name)
-    
-    
-    #Creating a Duplicate Channel Type Column if All_Occurrence_Value exists as a column
-    #If All_Occurrence Value exists as a column, also adds "Occurrence_Duplicate" into the IC_Name_Vector
-    #If All_Occurrence Value exists as a column, also adds "All_Occurrence_Value" into the IC_Value_Vector
-    
-    #Creating vectors used to unite to create a "Category" and "Activity" Column
-    IC_Name_Vector <- character()
-    IC_Value_Vector <- character()
-    
-    if("All_Occurrence_Value" %in% names(animal_data)){
-      animal_data$Channel_Type[animal_data$Channel_Type == "Interval"] <- NA
-      IC_Name_Vector <- append(IC_Name_Vector, "Channel_Type")
-      IC_Value_Vector <- append(IC_Value_Vector, "All_Occurrence_Value")
+    # If dataset format is compatible, proceed to data cleaning and show a spinner while the data is processing.
+    if (!get("has_warning", env=globalenv())) {
+      # Show spinner
+      show_spinner(spin_id = "upload_busy")
       
-    } else{
-      animal_data <- animal_data %>% select(-Channel_Type)
+      # Removing spaces and adding underscore
+      names(animal_data) <- gsub(" ", "_", names(animal_data))
       
-    }
-    
-    #Uniting all IC Names + Duplicated All Occurrence columns to a single column named Category    
-    
-    for(i in names(animal_data)){
+      # Renaming Columns
+      animal_data <- animal_data %>% rename(Name = Focal_Name)
       
-      if(str_detect(i, "^Interval_Channel.+Name$")){ 
+      
+      # Creating a Duplicate Channel Type Column if All_Occurrence_Value exists as a column
+      # If All_Occurrence Value exists as a column, also adds "Occurrence_Duplicate" into the IC_Name_Vector
+      # If All_Occurrence Value exists as a column, also adds "All_Occurrence_Value" into the IC_Value_Vector
+      
+      # Creating vectors used to unite to create a "Category" and "Activity" Column
+      IC_Name_Vector <- character()
+      IC_Value_Vector <- character()
+      
+      if("All_Occurrence_Value" %in% names(animal_data)){
+        animal_data$Channel_Type[animal_data$Channel_Type == "Interval"] <- NA
+        IC_Name_Vector <- append(IC_Name_Vector, "Channel_Type")
+        IC_Value_Vector <- append(IC_Value_Vector, "All_Occurrence_Value")
         
-        IC_Name_Vector <- append(IC_Name_Vector, i)
-      }
-    }
-    
-    animal_data <- animal_data %>% unite("Category", IC_Name_Vector , remove = T)                                                                 
-    
-    
-    #Uniting all IC Value + Occurrence Value columns to a single column named Activity   
-    
-    for(j in names(animal_data)){
-      
-      if(str_detect(j, "^Interval_Channel.+Value$")){ 
+      } else{
+        animal_data <- animal_data %>% select(-Channel_Type)
         
-        IC_Value_Vector <- append(IC_Value_Vector, j)
-      }
-    }
-    
-    animal_data <- animal_data %>% unite("Behavior", IC_Value_Vector, remove = T)
-    
-    #Social Modifier Editing
-    
-    #Do nothing if there is no social modifier column
-    #If there is only one social modifier column, rename the column to Social_Modifier
-    #If there are more than one social modifier column, unite it into a single column 
-    
-    Social_Modifier_Vector <- character()
-    
-    for(k in names(animal_data)){
-      
-      if(str_detect(k, "Social_Modifier$")){
-        
-        Social_Modifier_Vector <- append(Social_Modifier_Vector, k)
       }
       
-    }
-    
-    
-    if(length(Social_Modifier_Vector) == 1){
-      animal_data <- animal_data %>% rename(Social_Modifier = Social_Modifier_Vector[1])
+      # Uniting all IC Names + Duplicated All Occurrence columns to a single column named Category    
       
-    } else if(length(Social_Modifier_Vector) > 1){
-      animal_data <- animal_data %>% unite("Social_Modifier", Social_Modifier_Vector, remove = TRUE)
-    } else {
-      animal_data$Social_Modifier <- NA
+      for(i in names(animal_data)){
+        
+        if(str_detect(i, "^Interval_Channel.+Name$")){ 
+          
+          IC_Name_Vector <- append(IC_Name_Vector, i)
+        }
+      }
+      
+      animal_data <- animal_data %>% unite("Category", IC_Name_Vector , remove = T)                                                                 
+      
+      
+      # Uniting all IC Value + Occurrence Value columns to a single column named Activity   
+      
+      for(j in names(animal_data)){
+        
+        if(str_detect(j, "^Interval_Channel.+Value$")){ 
+          
+          IC_Value_Vector <- append(IC_Value_Vector, j)
+        }
+      }
+      
+      animal_data <- animal_data %>% unite("Behavior", IC_Value_Vector, remove = T)
+      
+      # Social Modifier Editing
+      
+      # Do nothing if there is no social modifier column
+      # If there is only one social modifier column, rename the column to Social_Modifier
+      # If there are more than one social modifier column, unite it into a single column 
+      
+      Social_Modifier_Vector <- character()
+      
+      for(k in names(animal_data)){
+        
+        if(str_detect(k, "Social_Modifier$")){
+          
+          Social_Modifier_Vector <- append(Social_Modifier_Vector, k)
+        }
+        
+      }
+      
+      
+      if(length(Social_Modifier_Vector) == 1){
+        animal_data <- animal_data %>% rename(Social_Modifier = Social_Modifier_Vector[1])
+        
+      } else if(length(Social_Modifier_Vector) > 1){
+        animal_data <- animal_data %>% unite("Social_Modifier", Social_Modifier_Vector, remove = TRUE)
+      } else {
+        animal_data$Social_Modifier <- NA
+      }
+      
+      
+      # Filtering out rows without behavioral observations
+      animal_data <- animal_data %>% filter(!str_detect(animal_data$Behavior, "^NA(_NA)*$")) 
+      
+      
+      # Fixing NA labels for Category Column
+      animal_data <- animal_data %>% mutate(Category = gsub("NA_", "", Category)) %>%  
+        mutate(Category = gsub("_NA", "", Category)) 
+      
+      # Fixing NA labels for Behavior Column
+      animal_data <- animal_data %>% mutate(Behavior = gsub("NA_", "", Behavior)) %>%  
+        mutate(Behavior = gsub("_NA", "", Behavior)) 
+      
+      # Fixing NA labels for Social Modifier Column
+      animal_data <- animal_data %>% mutate(Social_Modifier = gsub("NA_", "", Social_Modifier)) %>%
+        mutate(Social_Modifier = gsub("_NA", "", Social_Modifier)) 
+      
+      if(length(Social_Modifier_Vector) > 1){
+        animal_data$Social_Modifier[animal_data$Social_Modifier == "NA"] <- NA
+      }
+      
+      # Splitting rows with multiple behavioral observations                                
+      animal_data <- separate_rows(animal_data, Category, Behavior, sep  = "_")
+      
+      
+      # Removing Unnecessary Columns
+      animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
+                                            -DateTime, -Grid_Size, -Image_Size,
+                                            -Project_Animals, -Duration,
+                                            -Notes, -Frame_Number)
+      
+      # Combining potential same behaviors with slightly different names
+      animal_data$Behavior <- toTitleCase(animal_data$Behavior)
+      
+      # Combining potential same categories with slightly
+      animal_data$Category <- toTitleCase(animal_data$Category)
+      
+      # Use titlecase for animal names
+      animal_data$Name <- toTitleCase(animal_data$Name)
+      
+      
+      ####################### Addition
+      # Adding Day of Week
+      animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
+      
+      hide_spinner(spin_id = "upload_busy")
+      
+      return(animal_data) 
     }
-    
-    
-    #Filtering out rows without behavioral observations
-    animal_data <- animal_data %>% filter(!str_detect(animal_data$Behavior, "^NA(_NA)*$")) 
-    
-    
-    #Fixing NA labels for Category Column
-    animal_data <- animal_data %>% mutate(Category = gsub("NA_", "", Category)) %>%  
-      mutate(Category = gsub("_NA", "", Category)) 
-    
-    #Fixing NA labels for Behavior Column
-    animal_data <- animal_data %>% mutate(Behavior = gsub("NA_", "", Behavior)) %>%  
-      mutate(Behavior = gsub("_NA", "", Behavior)) 
-    
-    #Fixing NA labels for Social Modifier Column
-    animal_data <- animal_data %>% mutate(Social_Modifier = gsub("NA_", "", Social_Modifier)) %>%
-      mutate(Social_Modifier = gsub("_NA", "", Social_Modifier)) 
-    
-    if(length(Social_Modifier_Vector) > 1){
-      animal_data$Social_Modifier[animal_data$Social_Modifier == "NA"] <- NA
-    }
-    
-    #Splitting rows with multiple behavioral observations                                
-    animal_data <- separate_rows(animal_data, Category, Behavior, sep  = "_")
-    
-    
-    #Removing Unnecessary Columns
-    animal_data <- animal_data %>% select(-Configuration_Name, -Observer,-DeviceID,
-                                          -DateTime, -Grid_Size, -Image_Size,
-                                          -Project_Animals, -Duration,
-                                          -Notes, -Frame_Number)
-    
-    #Combining potential same behaviors with slightly different names
-    animal_data$Behavior <- toTitleCase(animal_data$Behavior)
-    
-    #Combining potential same categories with slightly
-    animal_data$Category <- toTitleCase(animal_data$Category)
-    
-    #Use titlecase for animal names
-    animal_data$Name <- toTitleCase(animal_data$Name)
-    
-    
-    ####################### Addition
-    #Adding Day of Week
-    animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
-    
-    hide_spinner(spin_id = "upload_busy")
-    
-    return(animal_data)
   })
   
   ############################### Upload Data ###############################
@@ -335,9 +347,11 @@ server <- function(input, output) {
   output$general_plot <- renderPlot({ .observations() })
   
   .observations <- reactive({
+    
+    #Get updated data
     animal_data <- data_input()
     
-    # Day of Week Plot 
+    ###Day of Week Plot 
     if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
@@ -360,10 +374,16 @@ server <- function(input, output) {
       
     }
     
-    #Time of Day plot
+    ###Time of Day plot
     else if(input$select_general == "Hour of Day"){
+      
+      #Fix the x-axis
       hour_breaks <- c(7:17)
-      ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
+      #Used to draw a dashed segment line
+      df <- data.frame(x1 = 8.75, x2 = 16.25, y1 = 1/8, y2 = 1/8)
+      
+      #Plot with animal_data
+      a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
@@ -372,9 +392,8 @@ server <- function(input, output) {
                            limits = c(0,1)) +
         labs(title = "Barplot of Observations per Hour of Day", 
              subtitle = "The numbers above each bar represent the raw observation count.",
-             caption = "The dashed line represents equally distributed observations.",
-             x = "Hour of Day", y = "Percentage") + 
-        geom_hline(yintercept = 1/8, color = "darkmagenta", alpha = .45, linetype = "longdash") +
+             caption = "The dashed line represents equally distributed observations.\nHours outside 9am to 4pm rarely have observations.",
+             x = "Hour of Day", y = "Percentage") +
         geom_text(stat='count', aes(label=..count..), vjust= - 0.5, fontface = "italic") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
@@ -383,9 +402,13 @@ server <- function(input, output) {
               axis.text = element_text(size = 10),
               legend.title = element_blank(),
               legend.text = element_text(size = 10))
+      
+      #Add a dashed segment line
+      a + geom_segment(data = df, aes(x = x1, xend = x2, y = y1, yend = y2),
+                       linetype = "longdash", alpha = .45, colour = "darkmagenta")
     } 
     
-    #Animal Plot
+    ###Animal Plot
     else {
       ggplot(data = animal_data, aes(x = Name, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "aquamarine3", width = .5) +
@@ -408,11 +431,13 @@ server <- function(input, output) {
     }
   })  
   
+  # Add download link to UI
   output$save_general <- renderUI({
     req(.observations())
     downloadLink("download_general", "Download Visual")
   })
   
+  # Specify download link
   output$download_general <- downloadHandler(
     filename = function() {
       paste("observation.jpg")
@@ -602,6 +627,7 @@ server <- function(input, output) {
     }
   })
   
+  # Add download link to UI
   output$save_activities <- renderUI({
     req(.activities_visual())
     downloadLink("download_activities_graph", "Download Visual")
@@ -748,8 +774,6 @@ server <- function(input, output) {
         
       }
       
-      #Hide spinner
-      hide_spinner(spin_id = "activities_busy")
       return(animal_raw_category_table)
       
     } else {
@@ -804,9 +828,6 @@ server <- function(input, output) {
     
     
     req(input$filter_type)
-    
-    #Show spinner after data and filter inputs are received and while the table is loading
-    show_spinner(spin_id = "activities_busy")
     
     if(input$filter_type == "Category"){
       
@@ -877,20 +898,40 @@ server <- function(input, output) {
   
   
   ############################### Faceted Barplots ###############################
-  #Let user select an animal name
-  output$nameControls4 <- renderUI({
-    #Get updated data
-    animal_data <- data_input()
+  # Let user select names of the animals to include in the faceted barplots
+  # When a new data file is uploaded, or when the 'deselect all' button is clicked, all checkboxes will be unchecked
+  observeEvent(c(input$deselect_all_faceted, input$file1), {
     
-    prefix <- c('All animals')
-    names <- sort(unique(animal_data$Name))
-    names <- c(prefix, names)
-    radioButtons('names4', h4("Select Animal"), names)
-    
+    output$nameControls4 <- renderUI({  
+      
+      animal_data <- data_input()
+      
+      names <- sort(unique(animal_data$Name))
+      checkboxGroupInput(inputId = "names4", 
+                         label= h4("Select Animals"),
+                         choices = names, 
+                         selected = c()) #selected is an empty column
+    })
   })
-  #Let user select a date range
+  
+  # Select all animal names
+  observeEvent(input$select_all_faceted, {
+    
+    output$nameControls4 <- renderUI({  
+      
+      animal_data <- data_input()
+      
+      names <- sort(unique(animal_data$Name))
+      checkboxGroupInput(inputId = "names4", 
+                         label= h4("Select Animals"),
+                         choices = names, 
+                         selected = names)
+    })
+  })
+  
+  # Let user select a date range
   output$dateControls4 <- renderUI({
-    #Get updated data
+    # Get updated data
     animal_data <- data_input()
     
     date <- animal_data$Date
@@ -901,7 +942,7 @@ server <- function(input, output) {
                    max = max(animal_data$Date))
   })
   
-  #Create the faceted barplots
+  # Create the faceted barplots
   output$faceted_barplot <- renderPlot({ .daily_weekly() }, height = 600)
   
   .daily_weekly <- reactive({
@@ -918,23 +959,52 @@ server <- function(input, output) {
     
     # Choose the animal(s) whose behaviors we will display
     animal_name <- input$names4
-    if (animal_name != "All animals") {
-      animal_data <- animal_data %>% filter(Name == animal_name)
+    animal_data <- animal_data %>% filter(Name %in% animal_name)   
+    
+    if (nrow(animal_data) == 0) {
+      # If filtered dataset is empty, we display an appropriate error message and do not continue to the plot creation
+      output$no_data_barplot <- renderUI ({
+        error_msg <- character()
+        if (is.null(animal_name)) {
+          error_msg <- HTML(paste(em("Please select animals from the list")))
+        }else if (start_date > end_date) {
+          error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
+                                  ") must be no later than end date (", end_date, ").", sep = ""))
+          error_msg <- HTML(paste(em(error_msg)))
+        }else {
+          error_msg <- HTML(paste("There is no data for", animal_name, 
+                                  "in your selected date range:", start_date, "to", end_date))
+          error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
+        }
+        
+        return(error_msg)
+      })
+      
+      return()
     }
     
-    if (nrow(animal_data) == 0) return()
+    # If the dataset is not empty, clear the error messages and continue to plot creation
+    output$no_data_barplot <- renderUI ({ })
     
-    # Choose x-axis of the barplots
-    if(animal_name == "All animals") animal_name <- "All Animals"
+    # Concatenate all animal names to include in the plot caption
+    name_in_subtitle <- ""
+    for (i in 1:length(animal_name)) {
+      name_in_subtitle <- paste(name_in_subtitle, animal_name[i], sep = "")
+      if (i != length(animal_name)) name_in_subtitle <- paste(name_in_subtitle, ", ", sep = "")
+    }
     
-    plot_caption <- paste(animal_name, ": Barplots of Behavior per", sep = "")
+    # Create the plot title and subtitle
+    plot_title <- "Barplots of Behavior per"
+    plot_subtitle <- paste(start_date, " ~ ", end_date, " (", name_in_subtitle, ")", sep = "")
+    
     if (input$select_faceted_barplot == "Day of Week") {
       # Day of Week
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Day of Week")
+      plot_title <- paste(plot_title, "Day of Week")
+      
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
-        labs(title = plot_caption, y = "Frequency") +
+        labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
@@ -946,8 +1016,9 @@ server <- function(input, output) {
       
       
     } else {
+      # Hour of Day
       # Change caption of the plot
-      plot_caption <- paste(plot_caption, "Hour of Day")
+      plot_title <- paste(plot_title, "Hour of Day")
       
       # Change hour format (e.g., from 9 to "9:00")
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
@@ -955,7 +1026,7 @@ server <- function(input, output) {
       
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
-        labs(title = plot_caption, y = "Frequency") +
+        labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
         theme(plot.title = element_text(size = 14, face = "bold"),
               plot.subtitle = element_text(size = 12, face = "italic"),
               plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
@@ -974,6 +1045,7 @@ server <- function(input, output) {
     downloadLink("download_daily", "Download Visual")
   })
   
+  # Specify download link
   output$download_daily <- downloadHandler(
     filename = function() {
       paste("daily-weekly.jpg")
@@ -984,41 +1056,6 @@ server <- function(input, output) {
       dev.off()
     }
   )
-  
-  output$no_data_barplot <- renderUI({
-    # Get updated data
-    animal_data <- data_input()
-    
-    # Wait until the program loads up
-    req(input$daterange4)
-    
-    # Choose the date range of the data we want to work with
-    start_date <- input$daterange4[1]
-    end_date <- input$daterange4[2]
-    animal_data <- animal_data %>% filter(Date >= start_date & Date <= end_date)
-    
-    # Choose the animal(s) whose behaviors we will display
-    animal_name <- input$names4
-    if (animal_name != "All animals") {
-      animal_data <- animal_data %>% filter(Name == animal_name)
-    }
-    
-    # Indicate if there are no data available for the animal and date range selected
-    if (nrow(animal_data) == 0) {
-      error_msg <- character()
-      if (start_date > end_date) {
-        error_msg <- HTML(paste("Invalid date range: start date (", start_date, 
-                                ") must be no later than end date (", end_date, ").", sep = ""))
-        error_msg <- HTML(paste(em(error_msg)))
-      }else {
-        error_msg <- HTML(paste("There is no data for", animal_name, 
-                                "in your selected date range:", start_date, "to", end_date))
-        error_msg <- HTML(paste(em(error_msg), ".", sep = ""))
-      }
-      
-      return(error_msg)
-    }
-  })
   
   ############################### Pie Charts ###############################
   #Let users choose the event date
@@ -1035,97 +1072,112 @@ server <- function(input, output) {
               max = max(animal_data$Date))
   })
   
-  #Let user choose the subject animal to exclude (with the select/deselect all buttons)
-  observeEvent(c(input$select_exclusion, input$deselect_allP, input$file1), {
+  #Show Deselect All button when "Data Without the Subject Animal" is selected
+  output$deselect_all_Pie <- renderUI({
+    if(input$select_exclusion == "Data Without the Subject Animal") {
+      actionButton("deselect_all_Pie", "Deselect All")}
+  })
+  
+  #Show Select All button when "Data Without the Subject Animal" is selected 
+  output$select_all_Pie <- renderUI({
+    if(input$select_exclusion == "Data Without the Subject Animal") {
+      actionButton("select_all_Pie", "Select All")}
+  })
+  
+  
+  #Let users choose the subject animal(s) to exclude (with the deselect all button)
+  observeEvent(c(input$select_exclusion, input$deselect_all_Pie, input$file1), {
     req(input$select_exclusion)
+    
+    #Show checkbox group with animal name(s) when "Data Without the Subject Animal" is selected
     output$exclusionControls <- renderUI({
-      #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal)
       }
     })})
   
-  observeEvent(input$select_allP, {
+  #Let users choose the subject animal(s) to exclude (with the select all button)
+  observeEvent(input$select_all_Pie, {
     req(input$select_exclusion)
+    
+    #Show checkbox group with animal name(s) when "Data Without the Subject Animal" is selected 
     output$exclusionControls <- renderUI({
-      #Show checkbox group with subject animal(s)
       if(input$select_exclusion == "Data Without the Subject Animal") {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        #Hide spinner
-        hide_spinner(spin_id = "piechart_busy")
         checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
                            choices = subject_animal,
                            selected = subject_animal)
       }
     })})
   
-  ##### Pie Charts
+  ######### Pie Chart Plots
   output$event_pie_plot <- renderPlot({ .events() })
   
   .events <- reactive({
     
     #Get updated data
     animal_data <- data_input()
-    #Calls the input
+    #Calls inputs
     req(input$date)
     req(input$select_exclusion)
     
-    #If "All Data" was selected 
+    #####If "All Data" was selected 
     if(input$select_exclusion == "All Data") {
       
-      #Creates a before dataset (it will contain 0 observation when the first date of the data was selected)
+      #Create a before dataset (it will be an empty data set when the first date of the data was selected)
       before <- subset(animal_data, Date < input$date)
-      #Creates an after dataset (it will contain 0 observation when the last date of the data was selected)
+      #Create an after dataset (it will an empty data set when the last date of the data was selected)
       after <- subset(animal_data, Date > input$date)
-      
     }
     
-    #If "Use data without the subject animal" was selected
+    #####If "Data Without the Subject Animal" was selected
     if(input$select_exclusion == "Data Without the Subject Animal") {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
-      #No plot will be shown if zero or all subject animals were selected
+      ####No plot if ZERO or ALL subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
       if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
       
-      #If one or more and less than all subject animals were selected
+      ####If one or more and less than all subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
          input$select_exclusion == "Data Without the Subject Animal") {
         
-        #Exclude the selected subject animal(s) first
+        #Exclude the selected subject animal(s)
         animal_remain <- sort(unique(animal_data$Name))
         for (a in animal_remain) {
           if (a %in% input$subject_animal) {
             animal_data <- filter(animal_data, Name != a)}}
         
-        #Creates before and after datasets 
+        #Create before and after datasets 
         before <- subset(animal_data, Date < input$date)
         after <- subset(animal_data, Date > input$date)
         
-        #If the selected date was in-between the first and the last day of the data
+        ###If the selected date was in-between the first and the last day of the data
         if(input$date > min(animal_data$Date) & input$date < max(animal_data$Date)) {
           
-          #Creates vectors with the animals inside each period
+          #Create vectors of the animals inside each period ("befor_name" and "after_name")
+          #Create a vector of all animals in the original data (eventually this will contain animals that are not in both periods)
           before_name <- sort(unique(before$Name))
           after_name <- sort(unique(after$Name))
           not_mutual_name <- sort(unique(animal_data$Name))
           
-          #Finds animals that are NOT in both before and after
+          #Find animals that are NOT in both before and after and keep them in the "not_mutual_name" vector
           for(i in before_name) {
             for(j in after_name) {
               if(i == j) {
                 not_mutual_name <- not_mutual_name[not_mutual_name != i]}}}
           
-          #Subsets both before and after without the animals we found in the last part
+          #No plot if all the animals in the original data were NOT in both periods
+          if(length(not_mutual_name) == length(unique(animal_data$Name))) return()
+          
+          #Filter both before and after without the animals we found in the last part
           for(k in not_mutual_name) {
             before <- filter(before, Name != k)
             after <- filter(after, Name != k)}
@@ -1152,18 +1204,21 @@ server <- function(input, output) {
                 next_event <- j}}
             next_event_date <- append(next_event_date, next_event)}
           
-          #Slice the before and after subsets
+          #Slice the before subset by the preceding event date and the selected date 
           before <- slice(before, max(last_event_date):nrow(before))
+          #Slice the after subset by the selected date and the next event date
           after <- slice(after, 1:min(next_event_date))
         }
         
+        ###If the selceted date was the first day of the data
         else if(input$date == min(animal_data$Date)) {
-          #If the selceted date was the first day of the data
+          
+          #Create a vector with the animal names in the original data
           after_name <- sort(unique(after$Name))
           next_event <- 0
           next_event_date <- numeric()
           
-          #Slice the after subset before the next event happens
+          #Slice the after subset by after the selected date (the first day of the data) and the next event date
           for (i in after_name) {
             for (j in 1:nrow(after)) {
               if (after$Name[j] == i) {
@@ -1172,13 +1227,15 @@ server <- function(input, output) {
           after <- slice(after, 1:min(next_event_date))
         }
         
+        ###If the selceted date was the last day of the data
         else {
-          #If the selceted date was the last day of the data
+          
+          #Create a vector with the animal names in the original data
           before_name <- sort(unique(before$Name))
           last_event <- 0
           last_event_date <- numeric()
           
-          #Slice the before subset after the last event happened
+          #Slice the before subset by the last event date and the selected date (the last day of the data)
           for (i in before_name) {
             for (j in nrow(before):1) {
               if (before$Name[j] == i) {
@@ -1189,8 +1246,9 @@ server <- function(input, output) {
       }
     }
     
-    #####From here, it applies to every case
-    #Creates summary data set for before
+    ######All processes from here apply to any case
+    
+    #Create summary data set for before
     before <- before %>% group_by(Behavior)
     summary_before <- as.data.frame(summarise(before, n()))
     names(summary_before)[names(summary_before) == "n()"] <- "counts"
@@ -1198,7 +1256,7 @@ server <- function(input, output) {
       mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
       mutate(Period = "Before")
     
-    #Creates summary data set for after
+    #Create summary data set for after
     after <- after %>% group_by(Behavior)
     summary_after <- as.data.frame(summarise(after, n()))
     names(summary_after)[names(summary_after) == "n()"] <- "counts"
@@ -1206,17 +1264,17 @@ server <- function(input, output) {
       mutate(Percent = round(counts/sum(counts)*100, 1)) %>%
       mutate(Period = "After")
     
-    #Combines two summaries
+    #Combine before and after summary data sets 
     summary <- rbind(summary_before, summary_after)
     summary$Period <- factor(summary$Period, levels = c("Before", "After"))
     
-    #Defining color palette
+    #Define the color palette
     summary$Behavior <- as.factor(summary$Behavior)
     colors2 <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
     names(colors2) = levels(summary$Behavior)
     colors2 <- colors2[1:length(levels(summary$Behavior))]
     
-    #Creates a pie chart for only after
+    #Create pie chart(s)
     ggplot(summary, aes(x="", y=Percent, fill=fct_reorder(Behavior, desc(Percent)))) + 
       geom_bar(stat="identity", width=1) +
       coord_polar("y", start=0) + 
@@ -1227,28 +1285,27 @@ server <- function(input, output) {
       theme_classic() + theme(axis.line = element_blank(),
                               axis.text = element_blank(),
                               axis.ticks = element_blank(),
-                              plot.title = element_text(hjust = 0.5, face = "bold"),
-                              plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+                              plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+                              plot.subtitle = element_text(hjust = 0.5, face = "italic", size = 12),
+                              legend.text = element_text(size = 10),
                               legend.position="bottom") +
       scale_fill_manual(values = colors2)
   })
   
+  #A text shown when ZERO animal was selected
   output$plz_select <- renderText({
-    #If ZERO animal was selected, then a message will appear
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
-      "There is no plot to display. Please select a animal/animals to exclude."
+      "There is no plot to display. Please select at least one animal from the list."
     }
   })
   
+  #A text shown when ALL animals were selected
   output$no_plot <- renderText({
-    # Get updated data
+    #Get updated data
     animal_data <- data_input()
-    
-    #If ALL animals were selected, then no plot will appear
-    if(length(input$subject_animal) == length(unique(animal_data$Name))) {
-      "There is no plot to display. Please select a different animal/different animals to exclude."
+    if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
+      "There is no plot to display. Please unselect at least one animal from the list."
     }
-    
   })
   
   #If there is no data to generate a valid plot, do not show the download link
@@ -1257,6 +1314,7 @@ server <- function(input, output) {
     downloadLink("download_piechart", "Download Visual")
   })
   
+  #Specify download link
   output$download_piechart <- downloadHandler(
     filename = function() {
       paste("events.jpg")
