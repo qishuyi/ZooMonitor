@@ -1095,7 +1095,7 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
+        checkboxGroupInput("subject_animal", h4("Select Animals to Exclude"), 
                            choices = subject_animal)
       }
     })})
@@ -1110,7 +1110,7 @@ server <- function(input, output) {
         #Get updated data
         animal_data <- data_input()
         subject_animal <- sort(unique(animal_data$Name))
-        checkboxGroupInput("subject_animal", h4("Select Animal to Exclude"), 
+        checkboxGroupInput("subject_animal", h4("Select Animals to Exclude"), 
                            choices = subject_animal,
                            selected = subject_animal)
       }
