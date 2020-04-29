@@ -177,7 +177,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  
 )
 
-#################### Server ####################
+################# Server #################
 
 
 # Define server logic
@@ -355,13 +355,14 @@ server <- function(input, output) {
     }
   })
   
-  ############################### Upload Data ###############################
+  ############################### Upload Data ########################################
   output$contents <- renderDT({
     data_input()
   })
   
   ############################### General Observations ###############################
-  ##Bar plot of observation distribution
+  
+  ####Bar plot of observation distribution
   output$general_plot <- renderPlot({ .observations() })
   
   .observations <- reactive({
@@ -373,6 +374,7 @@ server <- function(input, output) {
     if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
+        #Fix x-axis
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
@@ -403,6 +405,7 @@ server <- function(input, output) {
       #Plot with animal_data
       a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
+        #Fix x-axis
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
                            limits = c(7,17)) +
@@ -1149,8 +1152,9 @@ server <- function(input, output) {
     }
   )
   
-  ############################### Pie Charts ###############################
-  #Let users choose the event date
+  ############################### Pie Charts ##################################
+  
+  ##Let users choose the event date
   output$dateControls <- renderUI({
     
     #Get updated data
@@ -1164,20 +1168,19 @@ server <- function(input, output) {
               max = max(animal_data$Date))
   })
   
-  #Show Deselect All button when "Data Without the Subject Animal" is selected
+  #Show Deselect All button only when "Data Without the Subject Animal" is selected
   output$deselect_all_Pie <- renderUI({
     if(input$select_exclusion == "Data Without the Subject Animal") {
       actionButton("deselect_all_Pie", "Deselect All")}
   })
   
-  #Show Select All button when "Data Without the Subject Animal" is selected 
+  #Show Select All button only when "Data Without the Subject Animal" is selected 
   output$select_all_Pie <- renderUI({
     if(input$select_exclusion == "Data Without the Subject Animal") {
       actionButton("select_all_Pie", "Select All")}
   })
   
-  
-  #Let users choose the subject animal(s) to exclude (with the deselect all button)
+  ##Let users choose the subject animal(s) to exclude (with the deselect all button)
   observeEvent(c(input$select_exclusion, input$deselect_all_Pie, input$file1), {
     req(input$select_exclusion)
     
@@ -1192,7 +1195,7 @@ server <- function(input, output) {
       }
     })})
   
-  #Let users choose the subject animal(s) to exclude (with the select all button)
+  ##Let users choose the subject animal(s) to exclude (with the select all button)
   observeEvent(input$select_all_Pie, {
     req(input$select_exclusion)
     
@@ -1208,7 +1211,8 @@ server <- function(input, output) {
       }
     })})
   
-  ######### Pie Chart Plots
+  #########Pie Chart Plots#########
+  
   output$event_pie_plot <- renderPlot({ .events() })
   
   .events <- reactive({
@@ -1233,11 +1237,11 @@ server <- function(input, output) {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
-      ####No plot if ZERO or ALL subject animals were selected when "Data Without the Subject Animal" selected
+      ####No plot if ZERO OR ALL subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
       if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
       
-      ####If one or more and less than all subject animals were selected when "Data Without the Subject Animal" selected
+      ####If mutiple (but less than all) subject animals were selected WITH "Data Without the Subject Animal" selected
       if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
          input$select_exclusion == "Data Without the Subject Animal") {
         
