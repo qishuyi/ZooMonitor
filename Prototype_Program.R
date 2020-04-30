@@ -1213,7 +1213,7 @@ server <- function(input, output) {
   
   #########Pie Chart Plots#########
   
-  output$event_pie_plot <- renderPlot({ .events() }, width = 800, height = 550)
+  output$event_pie_plot <- renderPlot({ .events() })
   
   .events <- reactive({
     
