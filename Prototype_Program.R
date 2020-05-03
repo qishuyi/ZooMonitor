@@ -148,11 +148,21 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  tabPanel("Activities",
                           
                           titlePanel(h3("Infographics of Activities")),
+                          
+                          #Filters
                           sidebarPanel(
+                           
+                             #Filter by Category or Behavior
                             radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
+                            
+                            #Select All Button
                             actionButton(inputId = "select_all", label = "Select All"),
+                            
+                            #Deselct All Button
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
+                            
+                            #Checkboxes
                             uiOutput("select_activity")
                             
                             
@@ -160,11 +170,18 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           mainPanel(
                             tabsetPanel(
                               
+                              #Visual Sub Tab
                               tabPanel("Visual", plotOutput(outputId = "activity_visual"),
                                        uiOutput("save_activities")),
+                              
+                              #Summary Table Sub Tab
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
+                              
+                              #Raw Table Sub Tab
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
+                              
+                              #Category Information Sub Tab
                               tabPanel("Category Information", tableOutput(outputId = "information_table"),
                                        uiOutput(outputId = "info_text"))
                               
