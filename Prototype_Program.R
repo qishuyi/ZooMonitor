@@ -83,7 +83,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             ))),
                  
                  
-                 ############################### Faceted Barplot ###############################
+                 ############################### Daily/Weekly ###############################
                  tabPanel("Daily/Weekly",
                           
                           titlePanel(h3("Frequency of Behaviors")),
@@ -141,7 +141,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                               uiOutput("save_piechart")
                             ))),
                  
-                 ############################### Activity ###############################
+                 ############################### Activities ###############################
                  
                  tabPanel("Activities",
                           
@@ -485,504 +485,7 @@ server <- function(input, output) {
     }
   )
   
-  ############################### Activity ###############################
-  
-  #Creating Reactive Input for the Activity Tab
-  
-    #Making sure that everything is deselected when the filter input changes
-    #Making sure that everything is deselected when a new data set is uploaded
-    #Incorporating the Deselect All Functionality
-  
-  observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
-    
-    output$select_activity <- renderUI({
-      
-      #Get updated data
-      animal_data <- data_input()
-      
-      #Require filter type input
-      req(input$filter_type)
-      
-      #When the filter option is Category
-      if(input$filter_type == "Category"){
-        
-        #Create checkboxes for Categories
-        category <- sort(unique(animal_data$Category))
-        checkboxGroupInput(inputId = "category_input", 
-                           label= h4("Select Categories"),
-                           choices = category)
-        
-      #When the filter option is Behavior  
-      } else {
-        
-        #Create checkboxes for Behaviors
-        behavior_options <- sort(unique(animal_data$Behavior))
-        checkboxGroupInput(inputId = "behavior_input",
-                           label = h4("Select Behaviors"),
-                           choices = behavior_options)
-      }
-    })
-  })
-  
-  
-  #Select All Functionality
-  observeEvent(input$select_all, {
-    
-    output$select_activity <- renderUI({  
-      
-      #Get updated data
-      animal_data <- data_input()
-      
-      #When the filter option is Category
-      if(input$filter_type == "Category"){
-        
-        
-        #Ensure that all Category checkboxes are selected
-        category <- sort(unique(animal_data$Category))
-        checkboxGroupInput(inputId = "category_input", 
-                           label= h4("Select Categories"),
-                           choices = category, 
-                           selected = category)
-        
-      #When the filter option is Behavior  
-      } else { 
-        
-        #Ensure that all Behavior checkboxes are selected
-        behavior_options <- sort(unique(animal_data$Behavior))
-        checkboxGroupInput(inputId = "behavior_input",
-                           label = h4("Select Behaviors"),
-                           choices = behavior_options,
-                           selected = behavior_options)
-      }
-    })
-  })
-  
-  
-  ######## Visual Sub Tab ########
-  output$activity_visual <- renderPlot({ .activities_visual() })
-  
-  .activities_visual <- reactive({
-    
-    #Get updated data
-    animal_data <- data_input()
-    
-    #Require filter type input
-    req(input$filter_type)
-    
-    #When the filter option is Category
-    if(input$filter_type == "Category"){
-      
-      #Data frame to create visualization
-      animal_data$Category <- as.factor(animal_data$Category)
-      animal_category <- animal_data %>% 
-        group_by(Name, Category, .drop = FALSE) %>%
-        summarize(Count = n()) %>%
-        filter(Category %in% input$category_input) %>%
-        arrange(Name)
-      
-      #Counts total observations per animal
-      animal_count <- numeric()
-      for(i in sort(unique(animal_data$Name))){
-        count <- sum(animal_data$Name == i)
-        animal_count <- append(animal_count, count)
-      }
-      
-      #Adding percentages column to the "visualization" data frame 
-      animal_category <- animal_category %>% 
-        cbind(Percentage = animal_category$Count/ rep(animal_count,
-                                                      times = rep(length(input$category_input), length(animal_count))))
-      
-      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      #regardless of the order in which we select them.
-      colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
-      names(colors) = levels(animal_category$Category)
-      colors <- colors[1:length(levels(animal_category$Category))]
-      
-      
-      #Creating the visualization
-      ggplot(data = animal_category) +
-        geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
-        labs(title = "Barplot of Selected Categories per Animal",
-             caption = "Percentages are relative to each animal's total number of observations.",
-             x = "Animal Name", y = "Percentage") +
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                           limits = c(0,1)) +
-        scale_fill_manual(values = colors) +
-        theme(plot.title = element_text(size = 14, face = "bold"),
-              plot.subtitle = element_text(size = 12, face = "italic"),
-              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
-              axis.title = element_text(size = 12, face = "bold"),
-              axis.text = element_text(size = 10),
-              legend.title = element_blank(),
-              legend.text = element_text(size = 10))
-      
-      
-    #When the filter option is Behavior  
-    } else {
-      
-      #Data frame to create visualization
-      animal_data$Behavior <- as.factor(animal_data$Behavior)
-      animal_behavior <- animal_data %>% 
-        group_by(Name, Behavior, .drop = FALSE) %>%
-        summarize(Count = n()) %>%
-        filter(Behavior %in% input$behavior_input) %>%
-        arrange(Name)
-      
-      
-      #Counts total observations per animal
-      animal_count <- numeric()
-      for(i in sort(unique(animal_data$Name))){
-        count <- sum(animal_data$Name == i)
-        animal_count <- append(animal_count, count)
-      }
-      
-      #Adding percentages column to the "visualization" data frame 
-      animal_behavior <- animal_behavior %>% 
-        cbind(Percentage = animal_behavior$Count/ rep(animal_count,
-                                                      times = rep(length(input$behavior_input), length(animal_count))))
-      
-      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      #regardless of the order in which we select them.
-      colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
-      names(colors) = levels(animal_behavior$Behavior)
-      colors <- colors[1:length(levels(animal_behavior$Behavior))]
-      
-      #Creating the visualization
-      ggplot(data = animal_behavior) +
-        geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
-        labs(title = "Barplot of Selected Behaviors per Animal",
-             caption = "Percentages are relative to each animal's total number of observations.",
-             x = "Animal Name", y = "Percentage") +
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
-                           limits = c(0,1)) +
-        scale_fill_manual(values = colors) +
-        theme(plot.title = element_text(size = 14, face = "bold"),
-              plot.subtitle = element_text(size = 12, face = "italic"),
-              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
-              axis.title = element_text(size = 12, face = "bold"),
-              axis.text = element_text(size = 10),
-              legend.title = element_blank(),
-              legend.text = element_text(size = 10))
-      
-    }
-  })
-  
-  #Add download link to UI
-  output$save_activities <- renderUI({
-    req(.activities_visual())
-    downloadLink("download_activities_graph", "Download Visual")
-  })
-  
-  #Specify download link
-  output$download_activities_graph <- downloadHandler(
-    filename = function() {
-      paste("activities.jpg")
-    }, 
-    content = function(file) {
-      jpeg(file, width = 900, height = 400)
-      plot(.activities_visual())
-      dev.off()
-    }
-  )
-  
-  
-  ######## Summary Table Sub Tab ########
-  output$activity_table <- renderTable({
-    
-    #Get updated data
-    animal_data <- data_input()
-    
-    #Require filter type input
-    req(input$filter_type)
-    
-    #When the filter option is Category
-    if(input$filter_type == "Category"){
-      
-      
-      #Display nothing if no Category checkboxes are selected
-      if(length(input$category_input) == 0){
-        animal_category_table <- data.frame()
-        
-      #If any of the Category checkboxes are selected, proceed to create a table
-      } else {
-        
-        #Data frame to create summary table for categories
-        animal_data$Category <- as.factor(animal_data$Category)
-        animal_category_table <- animal_data %>% 
-          group_by(Name, Category, .drop = FALSE) %>%
-          summarize(Count = n()) %>%
-          filter(Category %in% input$category_input) %>%
-          arrange(Name)
-        
-        
-        #Counts total observations per animal
-        animal_count <- numeric()
-        for(i in sort(unique(animal_data$Name))){
-          count <- sum(animal_data$Name == i)
-          animal_count <- append(animal_count, count)
-        }
-        
-        
-        #Adding a Percentages Column
-        animal_category_table <- animal_category_table %>% 
-          cbind(Percentage = (animal_category_table$Count/ rep(animal_count,
-                                                               times = rep(length(input$category_input), length(animal_count)))) * 100)
-        
-        #Formatting the Percentage Column
-        animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 2), nsmall = 2)
-        
-        
-        #Renaming the Percentage column
-        animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
-        
-      }
-      
-      #Returning the table
-      return(animal_category_table)
-      
-      
-    #When the filter option is Behavior
-    } else {
-      
-      
-      #Display nothing if no Behavior checkboxes are selected
-      if(length(input$behavior_input) == 0){
-        animal_behavior_table <- data.frame()
-        
-      #If any of the Category checkboxes are selected, proceed to create a table  
-      } else {
-        
-        
-        #Data frame to create summary table for behaviors
-        animal_data$Behavior <- as.factor(animal_data$Behavior)
-        animal_behavior_table <- animal_data %>% 
-          group_by(Name, Behavior, .drop = FALSE) %>%
-          summarize(Count = n()) %>%
-          filter(Behavior %in% input$behavior_input) %>%
-          arrange(Name)
-        
-        
-        #Counts total observations per animal  
-        animal_count <- numeric()
-        for(i in sort(unique(animal_data$Name))){
-          count <- sum(animal_data$Name == i)
-          animal_count <- append(animal_count, count)
-        }
-        
-        
-        #Adding a Percentages Column 
-        animal_behavior_table <- animal_behavior_table %>% 
-          cbind(Percentage = (animal_behavior_table$Count/ rep(animal_count,
-                                                               times = rep(length(input$behavior_input), length(animal_count))))*100)
-        
-        #Formatting the Percentage Column  
-        animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 2), nsmall = 2)
-        
-        #Renaming the Percentage column 
-        animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
-      }
-      
-      #Returning the table 
-      return(animal_behavior_table)
-      
-    }
-  })
-  
-  
-  ######## Raw Table Sub Tab ########
-  output$raw_activity_table <- renderTable({
-    
-    #Get updated data
-    animal_data <- data_input()
-    
-    #Require filter type input
-    req(input$filter_type)
-    
-    #When the filter option is Category
-    if(input$filter_type == "Category"){
-      
-      #Checking how many observations there are in total for selected categories
-      total_observations <- 0
-      
-      for(i in input$category_input){
-        total_observations <- total_observations + sum(animal_data$Category == i)
-      }
-      
-      #If there are less than 15 observations in total, and at least one category is selected
-      if(total_observations <= 15 & total_observations != 0){
-        
-        #Make the help text disappear
-        output$activity_text <- renderUI({
-          ""
-        })
-        
-        #Create raw table
-        animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
-          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
-          mutate(Time = str_sub(Time, 1,5))
-        
-        #Format the Date Column
-        animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
-        
-        
-        #If Social Modifier Column is empty, remove it from the raw table
-        if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
-          animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
-          
-        #If Social Modifer Column is not empty, rename the column
-        } else {
-          animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
-        }
-        
-        
-      #If there are more than 15 observations in total, or no categories selected
-      } else {
-        
-        #Display help text
-        output$activity_text <- renderUI(HTML(paste(
-          em("Table appears only if there are 15 or less observations in total for the selected categories")
-        )))
-        
-        #Create an empty table
-        animal_raw_category_table <- data.frame()
-      }
-      
-      #Return raw table
-      return(animal_raw_category_table)
-      
-      
-    #When the filter option is Behavior   
-    } else {
-      
-      #Checking how many observations there are in total for selected behaviors
-      total_observations <- 0
-      
-      for(i in input$behavior_input){
-        total_observations <- total_observations + sum(animal_data$Behavior == i)
-      }
-      
-      #If there are less than 15 observations in total, and at least one behavior is selected  
-      if(total_observations <= 15 & total_observations != 0){
-        
-        #Make the help text dissapear
-        output$activity_text <- renderUI({""})
-        
-        #Create raw table
-        animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
-          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
-          mutate(Time = str_sub(Time, 1,5))
-        
-        #Format the Date Column
-        animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
-        
-        
-        #If Social Modifier Column is empty, remove it from the raw table
-        if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
-          animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
-          
-        #If Social Modifer Column is not empty, rename the column  
-        } else {
-          animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
-        }
-        
-        
-      #If there are more than 15 observations in total, or no behaviors selected  
-      } else {
-        
-        #Display help text
-        output$activity_text <- renderUI(HTML(paste(
-          em("Table appears only if there are 15 or less observations in total for the selected behaviors")
-        )))
-        
-        #Create an empty table
-        animal_raw_behavior_table <- data.frame()
-        
-      }
-      
-      #Return raw table
-      return(animal_raw_behavior_table)
-      
-    } 
-  })
-  
-  
-  ######## Category Information Sub Tab ########
-  output$information_table <- renderTable({
-    
-    #Get updated data
-    animal_data <- data_input()
-    
-    #Require filter type input
-    req(input$filter_type)
-    
-    
-    #When the filter option is Category
-    if(input$filter_type == "Category"){
-      
-      #Make help text disappear
-      output$info_text <- renderUI({""})  
-      
-      #Requring category input
-      req(input$category_input)
-      
-      #Vector of selected categories
-      selected_categories <- input$category_input
-      
-      
-      #Finding the maximum number of behaviors from the selected categories
-      max_len <- 0
-      for(i in 1:length(selected_categories)){
-        select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
-          select(Category, Behavior)
-        check <- length(unique(select_data$Behavior))
-        
-        if(check > max_len){
-          max_len <- check
-        }
-      }      
-      
-      #Initiating an empty matrix
-      info_matrix <- matrix(nrow = max_len + 1, ncol = length(selected_categories))
-      
-      #Adding the selected categories and behaviors associated with those categories 
-      #as columns to the matrix
-      for(i in 1:length(selected_categories)){
-        select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
-          select(Category, Behavior)
-        b <- selected_categories[i]
-        b <- append(b, sort(unique(select_data$Behavior)))  
-        need <- max_len + 1 - length(b)
-        add <- rep("", times = need)
-        b <- append(b, add)
-        
-        info_matrix[ , i] <- b
-      }
-      
-      #Converting matrix to a dataframe and using the first row as the column names
-      info_data <- data.frame(info_matrix)
-      info_data <- info_data %>% row_to_names(row_number = 1)
-      
-      #Returning the information table
-      return(info_data)
-      
-      
-    #When the filter option is Behavior
-    } else {
-      
-      #Display help text
-      output$info_text <- renderUI(HTML(paste(
-        em("Information Table appears only if you are filtering by Category")
-      )))
-      
-      #Create an empty table
-      empty_table <- data.frame()
-      
-      #Return empty table so only the help text appears
-      return(empty_table)
-    }
-  })
-  
-  
+
   ############################### Faceted Barplots ###############################
   # Let user select names of the animals to include in the faceted barplots
   # When a new data file is uploaded, or when the 'deselect all' button is clicked, all checkboxes will be unchecked
@@ -1417,6 +920,504 @@ server <- function(input, output) {
       dev.off()
     }
   )
+  
+  
+  ############################### Activities ###############################
+  
+  #Creating Reactive Input for the Activities Tab
+  
+  #Making sure that everything is deselected when the filter input changes
+  #Making sure that everything is deselected when a new data set is uploaded
+  #Incorporating the Deselect All Functionality
+  
+  observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
+    
+    output$select_activity <- renderUI({
+      
+      #Get updated data
+      animal_data <- data_input()
+      
+      #Require filter type input
+      req(input$filter_type)
+      
+      #When the filter option is Category
+      if(input$filter_type == "Category"){
+        
+        #Create checkboxes for Categories
+        category <- sort(unique(animal_data$Category))
+        checkboxGroupInput(inputId = "category_input", 
+                           label= h4("Select Categories"),
+                           choices = category)
+        
+        #When the filter option is Behavior  
+      } else {
+        
+        #Create checkboxes for Behaviors
+        behavior_options <- sort(unique(animal_data$Behavior))
+        checkboxGroupInput(inputId = "behavior_input",
+                           label = h4("Select Behaviors"),
+                           choices = behavior_options)
+      }
+    })
+  })
+  
+  
+  #Select All Functionality
+  observeEvent(input$select_all, {
+    
+    output$select_activity <- renderUI({  
+      
+      #Get updated data
+      animal_data <- data_input()
+      
+      #When the filter option is Category
+      if(input$filter_type == "Category"){
+        
+        
+        #Ensure that all Category checkboxes are selected
+        category <- sort(unique(animal_data$Category))
+        checkboxGroupInput(inputId = "category_input", 
+                           label= h4("Select Categories"),
+                           choices = category, 
+                           selected = category)
+        
+        #When the filter option is Behavior  
+      } else { 
+        
+        #Ensure that all Behavior checkboxes are selected
+        behavior_options <- sort(unique(animal_data$Behavior))
+        checkboxGroupInput(inputId = "behavior_input",
+                           label = h4("Select Behaviors"),
+                           choices = behavior_options,
+                           selected = behavior_options)
+      }
+    })
+  })
+  
+  
+  ######## Visual Sub Tab ########
+  output$activity_visual <- renderPlot({ .activities_visual() })
+  
+  .activities_visual <- reactive({
+    
+    #Get updated data
+    animal_data <- data_input()
+    
+    #Require filter type input
+    req(input$filter_type)
+    
+    #When the filter option is Category
+    if(input$filter_type == "Category"){
+      
+      #Data frame to create visualization
+      animal_data$Category <- as.factor(animal_data$Category)
+      animal_category <- animal_data %>% 
+        group_by(Name, Category, .drop = FALSE) %>%
+        summarize(Count = n()) %>%
+        filter(Category %in% input$category_input) %>%
+        arrange(Name)
+      
+      #Counts total observations per animal
+      animal_count <- numeric()
+      for(i in sort(unique(animal_data$Name))){
+        count <- sum(animal_data$Name == i)
+        animal_count <- append(animal_count, count)
+      }
+      
+      #Adding percentages column to the "visualization" data frame 
+      animal_category <- animal_category %>% 
+        cbind(Percentage = animal_category$Count/ rep(animal_count,
+                                                      times = rep(length(input$category_input), length(animal_count))))
+      
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
+      colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+      names(colors) = levels(animal_category$Category)
+      colors <- colors[1:length(levels(animal_category$Category))]
+      
+      
+      #Creating the visualization
+      ggplot(data = animal_category) +
+        geom_bar(aes(x = Name, y = Percentage, fill = Category), stat = "identity", width = .4) +
+        labs(title = "Barplot of Selected Categories per Animal",
+             caption = "Percentages are relative to each animal's total number of observations.",
+             x = "Animal Name", y = "Percentage") +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
+      
+      
+      #When the filter option is Behavior  
+    } else {
+      
+      #Data frame to create visualization
+      animal_data$Behavior <- as.factor(animal_data$Behavior)
+      animal_behavior <- animal_data %>% 
+        group_by(Name, Behavior, .drop = FALSE) %>%
+        summarize(Count = n()) %>%
+        filter(Behavior %in% input$behavior_input) %>%
+        arrange(Name)
+      
+      
+      #Counts total observations per animal
+      animal_count <- numeric()
+      for(i in sort(unique(animal_data$Name))){
+        count <- sum(animal_data$Name == i)
+        animal_count <- append(animal_count, count)
+      }
+      
+      #Adding percentages column to the "visualization" data frame 
+      animal_behavior <- animal_behavior %>% 
+        cbind(Percentage = animal_behavior$Count/ rep(animal_count,
+                                                      times = rep(length(input$behavior_input), length(animal_count))))
+      
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
+      colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
+      names(colors) = levels(animal_behavior$Behavior)
+      colors <- colors[1:length(levels(animal_behavior$Behavior))]
+      
+      #Creating the visualization
+      ggplot(data = animal_behavior) +
+        geom_bar(aes(x = Name, y = Percentage, fill = Behavior), stat = "identity", width = .4) +
+        labs(title = "Barplot of Selected Behaviors per Animal",
+             caption = "Percentages are relative to each animal's total number of observations.",
+             x = "Animal Name", y = "Percentage") +
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
+                           limits = c(0,1)) +
+        scale_fill_manual(values = colors) +
+        theme(plot.title = element_text(size = 14, face = "bold"),
+              plot.subtitle = element_text(size = 12, face = "italic"),
+              plot.caption = element_text(size = 12, hjust = 0.5, vjust = -0.5, face = "italic"),
+              axis.title = element_text(size = 12, face = "bold"),
+              axis.text = element_text(size = 10),
+              legend.title = element_blank(),
+              legend.text = element_text(size = 10))
+      
+    }
+  })
+  
+  #Add download link to UI
+  output$save_activities <- renderUI({
+    req(.activities_visual())
+    downloadLink("download_activities_graph", "Download Visual")
+  })
+  
+  #Specify download link
+  output$download_activities_graph <- downloadHandler(
+    filename = function() {
+      paste("activities.jpg")
+    }, 
+    content = function(file) {
+      jpeg(file, width = 900, height = 400)
+      plot(.activities_visual())
+      dev.off()
+    }
+  )
+  
+  
+  ######## Summary Table Sub Tab ########
+  output$activity_table <- renderTable({
+    
+    #Get updated data
+    animal_data <- data_input()
+    
+    #Require filter type input
+    req(input$filter_type)
+    
+    #When the filter option is Category
+    if(input$filter_type == "Category"){
+      
+      
+      #Display nothing if no Category checkboxes are selected
+      if(length(input$category_input) == 0){
+        animal_category_table <- data.frame()
+        
+        #If any of the Category checkboxes are selected, proceed to create a table
+      } else {
+        
+        #Data frame to create summary table for categories
+        animal_data$Category <- as.factor(animal_data$Category)
+        animal_category_table <- animal_data %>% 
+          group_by(Name, Category, .drop = FALSE) %>%
+          summarize(Count = n()) %>%
+          filter(Category %in% input$category_input) %>%
+          arrange(Name)
+        
+        
+        #Counts total observations per animal
+        animal_count <- numeric()
+        for(i in sort(unique(animal_data$Name))){
+          count <- sum(animal_data$Name == i)
+          animal_count <- append(animal_count, count)
+        }
+        
+        
+        #Adding a Percentages Column
+        animal_category_table <- animal_category_table %>% 
+          cbind(Percentage = (animal_category_table$Count/ rep(animal_count,
+                                                               times = rep(length(input$category_input), length(animal_count)))) * 100)
+        
+        #Formatting the Percentage Column
+        animal_category_table$Percentage <- format(round(animal_category_table$Percentage, 2), nsmall = 2)
+        
+        
+        #Renaming the Percentage column
+        animal_category_table <- rename(animal_category_table, `Percentage (%)` = "Percentage")
+        
+      }
+      
+      #Returning the table
+      return(animal_category_table)
+      
+      
+      #When the filter option is Behavior
+    } else {
+      
+      
+      #Display nothing if no Behavior checkboxes are selected
+      if(length(input$behavior_input) == 0){
+        animal_behavior_table <- data.frame()
+        
+        #If any of the Category checkboxes are selected, proceed to create a table  
+      } else {
+        
+        
+        #Data frame to create summary table for behaviors
+        animal_data$Behavior <- as.factor(animal_data$Behavior)
+        animal_behavior_table <- animal_data %>% 
+          group_by(Name, Behavior, .drop = FALSE) %>%
+          summarize(Count = n()) %>%
+          filter(Behavior %in% input$behavior_input) %>%
+          arrange(Name)
+        
+        
+        #Counts total observations per animal  
+        animal_count <- numeric()
+        for(i in sort(unique(animal_data$Name))){
+          count <- sum(animal_data$Name == i)
+          animal_count <- append(animal_count, count)
+        }
+        
+        
+        #Adding a Percentages Column 
+        animal_behavior_table <- animal_behavior_table %>% 
+          cbind(Percentage = (animal_behavior_table$Count/ rep(animal_count,
+                                                               times = rep(length(input$behavior_input), length(animal_count))))*100)
+        
+        #Formatting the Percentage Column  
+        animal_behavior_table$Percentage <- format(round(animal_behavior_table$Percentage, 2), nsmall = 2)
+        
+        #Renaming the Percentage column 
+        animal_behavior_table <- rename(animal_behavior_table, `Percentage (%)` = "Percentage")
+      }
+      
+      #Returning the table 
+      return(animal_behavior_table)
+      
+    }
+  })
+  
+  
+  ######## Raw Table Sub Tab ########
+  output$raw_activity_table <- renderTable({
+    
+    #Get updated data
+    animal_data <- data_input()
+    
+    #Require filter type input
+    req(input$filter_type)
+    
+    #When the filter option is Category
+    if(input$filter_type == "Category"){
+      
+      #Checking how many observations there are in total for selected categories
+      total_observations <- 0
+      
+      for(i in input$category_input){
+        total_observations <- total_observations + sum(animal_data$Category == i)
+      }
+      
+      #If there are less than 15 observations in total, and at least one category is selected
+      if(total_observations <= 15 & total_observations != 0){
+        
+        #Make the help text disappear
+        output$activity_text <- renderUI({
+          ""
+        })
+        
+        #Create raw table
+        animal_raw_category_table <- animal_data %>% filter(Category %in% input$category_input) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
+          mutate(Time = str_sub(Time, 1,5))
+        
+        #Format the Date Column
+        animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
+        
+        
+        #If Social Modifier Column is empty, remove it from the raw table
+        if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
+          animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
+          
+          #If Social Modifer Column is not empty, rename the column
+        } else {
+          animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
+        }
+        
+        
+        #If there are more than 15 observations in total, or no categories selected
+      } else {
+        
+        #Display help text
+        output$activity_text <- renderUI(HTML(paste(
+          em("Table appears only if there are 15 or less observations in total for the selected categories")
+        )))
+        
+        #Create an empty table
+        animal_raw_category_table <- data.frame()
+      }
+      
+      #Return raw table
+      return(animal_raw_category_table)
+      
+      
+      #When the filter option is Behavior   
+    } else {
+      
+      #Checking how many observations there are in total for selected behaviors
+      total_observations <- 0
+      
+      for(i in input$behavior_input){
+        total_observations <- total_observations + sum(animal_data$Behavior == i)
+      }
+      
+      #If there are less than 15 observations in total, and at least one behavior is selected  
+      if(total_observations <= 15 & total_observations != 0){
+        
+        #Make the help text dissapear
+        output$activity_text <- renderUI({""})
+        
+        #Create raw table
+        animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
+          select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
+          mutate(Time = str_sub(Time, 1,5))
+        
+        #Format the Date Column
+        animal_raw_behavior_table$Date <- format(animal_raw_behavior_table$Date, format = "%B %d, %Y")
+        
+        
+        #If Social Modifier Column is empty, remove it from the raw table
+        if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
+          
+          #If Social Modifer Column is not empty, rename the column  
+        } else {
+          animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
+        }
+        
+        
+        #If there are more than 15 observations in total, or no behaviors selected  
+      } else {
+        
+        #Display help text
+        output$activity_text <- renderUI(HTML(paste(
+          em("Table appears only if there are 15 or less observations in total for the selected behaviors")
+        )))
+        
+        #Create an empty table
+        animal_raw_behavior_table <- data.frame()
+        
+      }
+      
+      #Return raw table
+      return(animal_raw_behavior_table)
+      
+    } 
+  })
+  
+  
+  ######## Category Information Sub Tab ########
+  output$information_table <- renderTable({
+    
+    #Get updated data
+    animal_data <- data_input()
+    
+    #Require filter type input
+    req(input$filter_type)
+    
+    
+    #When the filter option is Category
+    if(input$filter_type == "Category"){
+      
+      #Make help text disappear
+      output$info_text <- renderUI({""})  
+      
+      #Requring category input
+      req(input$category_input)
+      
+      #Vector of selected categories
+      selected_categories <- input$category_input
+      
+      
+      #Finding the maximum number of behaviors from the selected categories
+      max_len <- 0
+      for(i in 1:length(selected_categories)){
+        select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
+          select(Category, Behavior)
+        check <- length(unique(select_data$Behavior))
+        
+        if(check > max_len){
+          max_len <- check
+        }
+      }      
+      
+      #Initiating an empty matrix
+      info_matrix <- matrix(nrow = max_len + 1, ncol = length(selected_categories))
+      
+      #Adding the selected categories and behaviors associated with those categories 
+      #as columns to the matrix
+      for(i in 1:length(selected_categories)){
+        select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
+          select(Category, Behavior)
+        b <- selected_categories[i]
+        b <- append(b, sort(unique(select_data$Behavior)))  
+        need <- max_len + 1 - length(b)
+        add <- rep("", times = need)
+        b <- append(b, add)
+        
+        info_matrix[ , i] <- b
+      }
+      
+      #Converting matrix to a dataframe and using the first row as the column names
+      info_data <- data.frame(info_matrix)
+      info_data <- info_data %>% row_to_names(row_number = 1)
+      
+      #Returning the information table
+      return(info_data)
+      
+      
+      #When the filter option is Behavior
+    } else {
+      
+      #Display help text
+      output$info_text <- renderUI(HTML(paste(
+        em("Information Table appears only if you are filtering by Category")
+      )))
+      
+      #Create an empty table
+      empty_table <- data.frame()
+      
+      #Return empty table so only the help text appears
+      return(empty_table)
+    }
+  })
 }
 
 # Run the application 
