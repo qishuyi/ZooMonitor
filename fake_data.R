@@ -1,5 +1,3 @@
-library(manip)
-
 #Function that generates fake data
 create_fake_data <- function(data){
   #length of data
@@ -73,7 +71,7 @@ create_fake_data <- function(data){
 
 
 
-datasets <- c("African%20Penguin%20Report.csv", "Hanging_Parrot_report.csv", "report_study_1579790635.csv", "Hogs_report.csv", "Lion_report.csv")
+datasets <- c("Round%201/African%20Penguin%20Report.csv", "Round%201/Hanging_Parrot_report.csv", "Original%20Three/report_study_1579790635.csv", "Round%201/Hogs_report.csv", "Round%201/Lion_report.csv")
 
 for (i in 1:5) {
   inputFile <- paste("https://raw.githubusercontent.com/qishuyi/ZooMonitor/master/Data/", datasets[i], sep = "")
