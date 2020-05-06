@@ -1,6 +1,6 @@
 #Installing Packages 
-#Uncomment and install packages that are not already installed
-#Make sure to recomment after installing necessary packages
+  #Uncomment and install packages that are not already installed
+  #Make sure to recomment after installing necessary packages
 
 #install.packages("dplyr")
 #install.packages("DT")
@@ -956,7 +956,7 @@ server <- function(input, output) {
                            label= h4("Select Categories"),
                            choices = category)
         
-        #When the filter option is Behavior  
+      #When the filter option is Behavior  
       } else {
         
         #Create checkboxes for Behaviors
@@ -988,7 +988,7 @@ server <- function(input, output) {
                            choices = category, 
                            selected = category)
         
-        #When the filter option is Behavior  
+      #When the filter option is Behavior  
       } else { 
         
         #Ensure that all Behavior checkboxes are selected
@@ -1061,7 +1061,7 @@ server <- function(input, output) {
               legend.text = element_text(size = 10))
       
       
-      #When the filter option is Behavior  
+    #When the filter option is Behavior  
     } else {
       
       #Data frame to create visualization
@@ -1147,7 +1147,7 @@ server <- function(input, output) {
       if(length(input$category_input) == 0){
         animal_category_table <- data.frame()
         
-        #If any of the Category checkboxes are selected, proceed to create a table
+      #If any of the Category checkboxes are selected, proceed to create a table
       } else {
         
         #Data frame to create summary table for categories
@@ -1185,7 +1185,7 @@ server <- function(input, output) {
       return(animal_category_table)
       
       
-      #When the filter option is Behavior
+    #When the filter option is Behavior
     } else {
       
       
@@ -1193,7 +1193,7 @@ server <- function(input, output) {
       if(length(input$behavior_input) == 0){
         animal_behavior_table <- data.frame()
         
-        #If any of the Category checkboxes are selected, proceed to create a table  
+      #If any of the Category checkboxes are selected, proceed to create a table  
       } else {
         
         
@@ -1273,13 +1273,13 @@ server <- function(input, output) {
         if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
           animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
           
-          #If Social Modifer Column is not empty, rename the column
+        #If Social Modifer Column is not empty, rename the column
         } else {
           animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
         }
         
         
-        #If there are more than 15 observations in total, or no categories selected
+      #If there are more than 15 observations in total, or no categories selected
       } else {
         
         #Display help text
@@ -1295,7 +1295,7 @@ server <- function(input, output) {
       return(animal_raw_category_table)
       
       
-      #When the filter option is Behavior   
+    #When the filter option is Behavior   
     } else {
       
       #Checking how many observations there are in total for selected behaviors
@@ -1324,13 +1324,13 @@ server <- function(input, output) {
         if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
           animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
           
-          #If Social Modifer Column is not empty, rename the column  
+        #If Social Modifer Column is not empty, rename the column  
         } else {
           animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
         }
         
         
-        #If there are more than 15 observations in total, or no behaviors selected  
+      #If there are more than 15 observations in total, or no behaviors selected  
       } else {
         
         #Display help text
@@ -1410,7 +1410,7 @@ server <- function(input, output) {
       return(info_data)
       
       
-      #When the filter option is Behavior
+    #When the filter option is Behavior
     } else {
       
       #Display help text
