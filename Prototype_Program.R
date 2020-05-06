@@ -151,8 +151,8 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           
                           #Filters
                           sidebarPanel(
-                           
-                             #Filter by Category or Behavior
+                            
+                            #Filter by Category or Behavior
                             radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
                             
@@ -163,10 +163,9 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
                             
                             #Checkboxes
-                            uiOutput("select_activity")
-                            
-                            
-                          ),
+                            uiOutput("select_activity")),
+                          
+                          
                           mainPanel(
                             tabsetPanel(
                               
@@ -186,16 +185,11 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                                        uiOutput(outputId = "info_text"))
                               
                               
-                              
-                            )
-                          )
-                 )
-                 
-                 
+                            )))   
 )
 
-################# Server #################
 
+################# Server #################
 
 # Define server logic
 server <- function(input, output) {
@@ -244,6 +238,9 @@ server <- function(input, output) {
     if (!get("has_warning", env=globalenv())) {
       # Show spinner
       show_spinner(spin_id = "upload_busy")
+      
+      
+      ######### Generalized Cleaning Script #########      
       
       # Removing spaces and adding underscore
       names(animal_data) <- gsub(" ", "_", names(animal_data))
@@ -297,9 +294,9 @@ server <- function(input, output) {
       
       # Social Modifier Editing
       
-      # Do nothing if there is no social modifier column
       # If there is only one social modifier column, rename the column to Social_Modifier
       # If there are more than one social modifier column, unite it into a single column 
+      # If there is no social modifier column, create an empty social modifier column
       
       Social_Modifier_Vector <- character()
       
@@ -353,13 +350,15 @@ server <- function(input, output) {
                                             -Project_Animals, -Duration,
                                             -Notes, -Frame_Number)
       
-      # Combining potential same behaviors with slightly different names
+      # Combining potential same behaviors with slightly different names 
+      #(Using title case for Behavior)
       animal_data$Behavior <- toTitleCase(animal_data$Behavior)
       
       # Combining potential same categories with slightly
+      #(Using title case for Category)
       animal_data$Category <- toTitleCase(animal_data$Category)
       
-      # Use titlecase for animal names
+      # Using title case for animal names
       animal_data$Name <- toTitleCase(animal_data$Name)
       
       
@@ -373,6 +372,7 @@ server <- function(input, output) {
   })
   
   ############################### Upload Data ########################################
+  
   output$contents <- renderDT({
     data_input()
   })
@@ -489,13 +489,11 @@ server <- function(input, output) {
   
   ############################### Activity ###############################
   
-  
-  #Creating Reactive Input for Categories/Behaviors
+  #Creating Reactive Input for the Activity Tab
   
   #Making sure that everything is deselected when the filter input changes
   #Making sure that everything is deselected when a new data set is uploaded
-  #Incorporate the Deselect All Functionality
-  
+  #Incorporating the Deselect All Functionality
   
   observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
     
@@ -504,6 +502,7 @@ server <- function(input, output) {
       #Get updated data
       animal_data <- data_input()
       
+      #Require filter type input
       req(input$filter_type)
       
       #When the filter option is Category
@@ -523,13 +522,8 @@ server <- function(input, output) {
         checkboxGroupInput(inputId = "behavior_input",
                            label = h4("Select Behaviors"),
                            choices = behavior_options)
-        
-        
       }
-      
-      
     })
-    
   })
   
   
@@ -538,6 +532,7 @@ server <- function(input, output) {
     
     output$select_activity <- renderUI({  
       
+      #Get updated data
       animal_data <- data_input()
       
       #When the filter option is Category
@@ -565,8 +560,7 @@ server <- function(input, output) {
   })
   
   
-  
-  #Visual Sub Tab
+  ######## Visual Sub Tab ########
   output$activity_visual <- renderPlot({ .activities_visual() })
   
   .activities_visual <- reactive({
@@ -574,6 +568,7 @@ server <- function(input, output) {
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
@@ -599,11 +594,12 @@ server <- function(input, output) {
         cbind(Percentage = animal_category$Count/ rep(animal_count,
                                                       times = rep(length(input$category_input), length(animal_count))))
       
-      # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      # regardless of the order in which we select them.
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
       colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
       names(colors) = levels(animal_category$Category)
       colors <- colors[1:length(levels(animal_category$Category))]
+      
       
       #Creating the visualization
       ggplot(data = animal_category) +
@@ -647,8 +643,8 @@ server <- function(input, output) {
         cbind(Percentage = animal_behavior$Count/ rep(animal_count,
                                                       times = rep(length(input$behavior_input), length(animal_count))))
       
-      # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      # regardless of the order in which we select them.
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
       colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
       names(colors) = levels(animal_behavior$Behavior)
       colors <- colors[1:length(levels(animal_behavior$Behavior))]
@@ -673,7 +669,7 @@ server <- function(input, output) {
     }
   })
   
-  # Add download link to UI
+  #Add download link to UI
   output$save_activities <- renderUI({
     req(.activities_visual())
     downloadLink("download_activities_graph", "Download Visual")
@@ -692,13 +688,13 @@ server <- function(input, output) {
   )
   
   
-  
-  #Summary Table Sub Tab
+  ######## Summary Table Sub Tab ########
   output$activity_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
@@ -756,7 +752,7 @@ server <- function(input, output) {
         animal_behavior_table <- data.frame()
         
         #If any of the Category checkboxes are selected, proceed to create a table  
-      } else{
+      } else {
         
         
         #Data frame to create summary table for behaviors
@@ -792,23 +788,20 @@ server <- function(input, output) {
       return(animal_behavior_table)
       
     }
-    
-    
   })
   
   
-  
-  #Raw Table Sub Tab
+  ######## Raw Table Sub Tab ########
   output$raw_activity_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
     if(input$filter_type == "Category"){
-      
       
       #Checking how many observations there are in total for selected categories
       total_observations <- 0
@@ -834,15 +827,14 @@ server <- function(input, output) {
         #Format the Date Column
         animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
         
+        
         #If Social Modifier Column is empty, remove it from the raw table
         if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
           animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
           
           #If Social Modifer Column is not empty, rename the column
         } else {
-          
           animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
-          
         }
         
         
@@ -856,12 +848,10 @@ server <- function(input, output) {
         
         #Create an empty table
         animal_raw_category_table <- data.frame()
-        
       }
       
-      #Return empty table so only the help text appears
+      #Return raw table
       return(animal_raw_category_table)
-      
       
       
       #When the filter option is Behavior   
@@ -880,7 +870,6 @@ server <- function(input, output) {
         #Make the help text dissapear
         output$activity_text <- renderUI({""})
         
-        
         #Create raw table
         animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
           select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
@@ -896,7 +885,6 @@ server <- function(input, output) {
           
           #If Social Modifer Column is not empty, rename the column  
         } else {
-          
           animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
         }
         
@@ -914,21 +902,20 @@ server <- function(input, output) {
         
       }
       
-      #Return empty table so only the help text appears
+      #Return raw table
       return(animal_raw_behavior_table)
       
     } 
-    
   })
   
   
-  #Category Information Sub Tab
+  ######## Category Information Sub Tab ########
   output$information_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
-    
+    #Require filter type input
     req(input$filter_type)
     
     
@@ -938,13 +925,12 @@ server <- function(input, output) {
       #Make help text disappear
       output$info_text <- renderUI({""})  
       
-      
       #Requring category input
       req(input$category_input)
       
-      
-      #Vector of selected inputs
+      #Vector of selected categories
       selected_categories <- input$category_input
+      
       
       #Finding the maximum number of behaviors from the selected categories
       max_len <- 0
@@ -955,15 +941,13 @@ server <- function(input, output) {
         
         if(check > max_len){
           max_len <- check
-          
         }
       }      
       
       #Initiating an empty matrix
       info_matrix <- matrix(nrow = max_len + 1, ncol = length(selected_categories))
       
-      
-      #Adding selected categories and behaviors associated with those categories 
+      #Adding the selected categories and behaviors associated with those categories 
       #as columns to the matrix
       for(i in 1:length(selected_categories)){
         select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
@@ -975,10 +959,9 @@ server <- function(input, output) {
         b <- append(b, add)
         
         info_matrix[ , i] <- b
-        
       }
       
-      #Converting matrix to dataframe and using first row as column names
+      #Converting matrix to a dataframe and using the first row as the column names
       info_data <- data.frame(info_matrix)
       info_data <- info_data %>% row_to_names(row_number = 1)
       
@@ -989,7 +972,6 @@ server <- function(input, output) {
       #When the filter option is Behavior
     } else {
       
-      
       #Display help text
       output$info_text <- renderUI(HTML(paste(
         em("Information Table appears only if you are filtering by Category")
@@ -998,14 +980,9 @@ server <- function(input, output) {
       #Create an empty table
       empty_table <- data.frame()
       
-      
       #Return empty table so only the help text appears
       return(empty_table)
-      
-      
     }
-    
-    
   })
   
   
