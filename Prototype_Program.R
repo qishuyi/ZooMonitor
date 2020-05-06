@@ -68,7 +68,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Distribution of Observations")),
                           
                           sidebarLayout(
-                            # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the x-axis of the bar plot
                               radioButtons("select_general", h4("Show Observations by:"),
@@ -120,7 +119,6 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Impact of Events on Behavior")),
                           
                           sidebarLayout(
-                            # Add filters to take user inputs
                             sidebarPanel(
                               # Allow users to choose the event date
                               uiOutput("dateControls"),
@@ -1145,7 +1143,7 @@ server <- function(input, output) {
     }
   )
   
-  ############################### Pie Charts ##################################
+  ############################### Events ##################################
   
   ##Let users choose the event date
   output$dateControls <- renderUI({
@@ -1383,18 +1381,23 @@ server <- function(input, output) {
   
   #A text shown when ZERO animal was selected
   output$plz_select <- renderText({
+    
     if (length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") {
       "There is no plot to display. Please select at least one animal from the list."
     }
+    
   })
   
   #A text shown when ALL animals were selected
   output$no_plot <- renderText({
+    
     #Get updated data
     animal_data <- data_input()
+    
     if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") {
       "There is no plot to display. Please unselect at least one animal from the list."
     }
+    
   })
   
   #If there is no data to generate a valid plot, do not show the download link
