@@ -44,16 +44,16 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Upload a CSV File")),
                           
                           sidebarLayout(
-                            # Add filters to take user inputs
+                            # Filters to take user inputs
                             sidebarPanel(
-                              # Allow users to upload a csv file (users cannot upload multiple files)
+                              # Allow users to upload a csv file (cannot upload multiple files)
                               fileInput("file1", h4("Choose a CSV File"),
                                         multiple = FALSE,
                                         accept = c("text/csv",
                                                    "text/comma-separated-values,text/plain",
                                                    ".csv"))
                             ),
-                            # Display the data file
+                            # Display the data file in a data table
                             mainPanel(
                               dataTableOutput("contents"),
                               # Add busy spinner for data upload
@@ -89,7 +89,7 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                           titlePanel(h3("Frequency of Behaviors")),
                           
                           sidebarPanel(
-                            # Add date range
+                            # Add a date range
                             uiOutput("dateControls4"),
                             
                             # Allow users to show behaviors by day of week or hour of day
@@ -203,6 +203,8 @@ server <- function(input, output) {
     #Loading in Data
     tryCatch(
       {
+        # Read CSV file into a data frame and specify the column types because read_csv only looks at the first 1000 rows
+        # to determine the type of column values, but many columns' first 1000 rows are NAs.
         animal_data <- read_csv(input$file1$datapath,
                                 col_types = cols(.default = col_character(),
                                                  SessionID = col_double(), 
@@ -486,15 +488,16 @@ server <- function(input, output) {
   )
   
 
-  ############################### Faceted Barplots ###############################
+  ############################### Daily/Weekly ###############################
   # Let user select names of the animals to include in the faceted barplots
   # When a new data file is uploaded, or when the 'deselect all' button is clicked, all checkboxes will be unchecked
   observeEvent(c(input$deselect_all_faceted, input$file1), {
     
     output$nameControls4 <- renderUI({  
-      
+      # Get input/updated data
       animal_data <- data_input()
       
+      # Get a list of animal names from the input data, and create checkboxes based on the names
       names <- sort(unique(animal_data$Name))
       checkboxGroupInput(inputId = "names4", 
                          label= h4("Select Animals"),
@@ -507,9 +510,10 @@ server <- function(input, output) {
   observeEvent(input$select_all_faceted, {
     
     output$nameControls4 <- renderUI({  
-      
+      # Get input/updated data
       animal_data <- data_input()
       
+      # Get a list of animal names from the input data, and create checkboxes based on the names
       names <- sort(unique(animal_data$Name))
       checkboxGroupInput(inputId = "names4", 
                          label= h4("Select Animals"),
@@ -520,9 +524,10 @@ server <- function(input, output) {
   
   # Let user select a date range
   output$dateControls4 <- renderUI({
-    # Get updated data
+    # Get input/updated data
     animal_data <- data_input()
     
+    # Get max/min dates from the data and create date ranges based on the dates
     date <- animal_data$Date
     dateRangeInput("daterange4", h4("Select Date Range"),
                    start = min(animal_data$Date),
@@ -535,7 +540,7 @@ server <- function(input, output) {
   output$faceted_barplot <- renderPlot({ .daily_weekly() }, height = 600)
   
   .daily_weekly <- reactive({
-    # Get updated data
+    # Get input/updated data
     animal_data <- data_input()
     
     # Wait until the program loads up
@@ -575,7 +580,7 @@ server <- function(input, output) {
     # If the dataset is not empty, clear the error messages and continue to plot creation
     output$no_data_barplot <- renderUI ({ })
     
-    # Concatenate all animal names to include in the plot caption
+    # Concatenate all selected animal names to include in the plot caption
     name_in_subtitle <- ""
     for (i in 1:length(animal_name)) {
       name_in_subtitle <- paste(name_in_subtitle, animal_name[i], sep = "")
@@ -591,6 +596,7 @@ server <- function(input, output) {
       # Change caption of the plot
       plot_title <- paste(plot_title, "Day of Week")
       
+      # Create barplot of behaviors faceted by day of week
       ggplot(data = animal_data) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Day_of_Week, ncol = 2, dir = "v") + 
         labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
@@ -613,6 +619,7 @@ server <- function(input, output) {
       animal_data_hour <- animal_data[order(as.integer(animal_data$Hour)),]
       animal_data_hour$Hour <- sapply(animal_data_hour$Hour, function(x) as.factor(sprintf("%d:00", x)))
       
+      # Create barplot of behaviors faceted by hour of day
       ggplot(data = animal_data_hour) + geom_bar(aes(x = Behavior), fill = "salmon") + 
         facet_wrap(~ Hour, ncol = 2, dir = "v") + 
         labs(title = plot_title, subtitle = plot_subtitle, y = "Frequency") +
