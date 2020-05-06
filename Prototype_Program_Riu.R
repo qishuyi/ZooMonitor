@@ -1,6 +1,6 @@
 #Installing Packages 
-  #Uncomment and install packages that are not already installed
-  #Make sure to recomment after installing necessary packages
+#Uncomment and install packages that are not already installed
+#Make sure to recomment after installing necessary packages
 
 #install.packages("dplyr")
 #install.packages("DT")
@@ -37,7 +37,7 @@ library(tools)
 
 ################# UI #################
 ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
-                
+                 
                  ############################### Upload Data ###############################
                  tabPanel("Upload Data",
                           
@@ -148,37 +148,48 @@ ui <- navbarPage("ZooMonitor", theme = shinytheme("yeti"),
                  tabPanel("Activities",
                           
                           titlePanel(h3("Infographics of Activities")),
+                          
+                          #Filters
                           sidebarPanel(
+                            
+                            #Filter by Category or Behavior
                             radioButtons(inputId = "filter_type", label = h4("Filter by:"),
                                          c("Category", "Behavior"), selected = "Category"),
+                            
+                            #Select All Button
                             actionButton(inputId = "select_all", label = "Select All"),
+                            
+                            #Deselct All Button
                             actionButton(inputId = "deselect_all", label = "Deselect All"),
-                            uiOutput("select_activity")
+                            
+                            #Checkboxes
+                            uiOutput("select_activity")),
                             
                             
-                          ),
                           mainPanel(
                             tabsetPanel(
                               
+                              #Visual Sub Tab
                               tabPanel("Visual", plotOutput(outputId = "activity_visual"),
                                        uiOutput("save_activities")),
+                              
+                              #Summary Table Sub Tab
                               tabPanel("Summary Table", tableOutput(outputId = "activity_table")),
+                              
+                              #Raw Table Sub Tab
                               tabPanel("Raw Table", tableOutput(outputId = "raw_activity_table"), 
                                        uiOutput(outputId = "activity_text")),
+                              
+                              #Category Information Sub Tab
                               tabPanel("Category Information", tableOutput(outputId = "information_table"),
                                        uiOutput(outputId = "info_text"))
                               
                               
-                              
-                            )
-                          )
-                 )
-                 
-                 
-)
+                            )))   
+        )
 
-#################### Server ####################
 
+################# Server #################
 
 # Define server logic
 server <- function(input, output) {
@@ -227,6 +238,9 @@ server <- function(input, output) {
     if (!get("has_warning", env=globalenv())) {
       # Show spinner
       show_spinner(spin_id = "upload_busy")
+      
+      
+      ######### Generalized Cleaning Script #########      
       
       # Removing spaces and adding underscore
       names(animal_data) <- gsub(" ", "_", names(animal_data))
@@ -280,9 +294,9 @@ server <- function(input, output) {
       
       # Social Modifier Editing
       
-      # Do nothing if there is no social modifier column
       # If there is only one social modifier column, rename the column to Social_Modifier
       # If there are more than one social modifier column, unite it into a single column 
+      # If there is no social modifier column, create an empty social modifier column
       
       Social_Modifier_Vector <- character()
       
@@ -336,16 +350,18 @@ server <- function(input, output) {
                                             -Project_Animals, -Duration,
                                             -Notes, -Frame_Number)
       
-      # Combining potential same behaviors with slightly different names
+      # Combining potential same behaviors with slightly different names 
+      #(Using title case for Behavior)
       animal_data$Behavior <- toTitleCase(animal_data$Behavior)
       
       # Combining potential same categories with slightly
+      #(Using title case for Category)
       animal_data$Category <- toTitleCase(animal_data$Category)
       
-      # Use titlecase for animal names
+      # Using title case for animal names
       animal_data$Name <- toTitleCase(animal_data$Name)
       
-    
+      
       # Adding Day of Week
       animal_data <- mutate(animal_data, Day_of_Week = wday(Date, label = TRUE))
       
@@ -355,13 +371,15 @@ server <- function(input, output) {
     }
   })
   
-  ############################### Upload Data ###############################
+  ############################### Upload Data ########################################
+  
   output$contents <- renderDT({
     data_input()
   })
   
   ############################### General Observations ###############################
-  ##Bar plot of observation distribution
+  
+  ####Bar plot of observation distribution
   output$general_plot <- renderPlot({ .observations() })
   
   .observations <- reactive({
@@ -373,6 +391,7 @@ server <- function(input, output) {
     if (input$select_general == "Day of Week"){
       ggplot(data = animal_data, aes(x = Day_of_Week, y = ..count../nrow(animal_data))) +
         geom_bar(fill = "steelblue2", width = .5) +
+        #Fix x-axis
         scale_x_discrete(limits=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
         scale_y_continuous(labels = scales::percent_format(accuracy = 1L), 
                            limits = c(0,1)) +
@@ -403,6 +422,7 @@ server <- function(input, output) {
       #Plot with animal_data
       a <- ggplot(data = animal_data, aes(x = Hour, y = ..count../nrow(animal_data))) + 
         geom_bar(fill = "steelblue", width = .5) + 
+        #Fix x-axis
         scale_x_continuous(breaks = hour_breaks,
                            labels = as.character(hour_breaks),
                            limits = c(7,17)) +
@@ -469,13 +489,11 @@ server <- function(input, output) {
   
   ############################### Activity ###############################
   
-  
-  #Creating Reactive Input for Categories/Behaviors
+  #Creating Reactive Input for the Activity Tab
   
     #Making sure that everything is deselected when the filter input changes
     #Making sure that everything is deselected when a new data set is uploaded
-    #Incorporate the Deselect All Functionality
-  
+    #Incorporating the Deselect All Functionality
   
   observeEvent(c(input$filter_type, input$deselect_all, input$file1),  {
     
@@ -484,6 +502,7 @@ server <- function(input, output) {
       #Get updated data
       animal_data <- data_input()
       
+      #Require filter type input
       req(input$filter_type)
       
       #When the filter option is Category
@@ -495,7 +514,7 @@ server <- function(input, output) {
                            label= h4("Select Categories"),
                            choices = category)
         
-      #When the filter option is Behavior  
+        #When the filter option is Behavior  
       } else {
         
         #Create checkboxes for Behaviors
@@ -503,13 +522,8 @@ server <- function(input, output) {
         checkboxGroupInput(inputId = "behavior_input",
                            label = h4("Select Behaviors"),
                            choices = behavior_options)
-        
-        
       }
-      
-      
     })
-    
   })
   
   
@@ -518,6 +532,7 @@ server <- function(input, output) {
     
     output$select_activity <- renderUI({  
       
+      #Get updated data
       animal_data <- data_input()
       
       #When the filter option is Category
@@ -531,7 +546,7 @@ server <- function(input, output) {
                            choices = category, 
                            selected = category)
         
-      #When the filter option is Behavior  
+        #When the filter option is Behavior  
       } else { 
         
         #Ensure that all Behavior checkboxes are selected
@@ -545,8 +560,7 @@ server <- function(input, output) {
   })
   
   
-  
-  #Visual Sub Tab
+  ######## Visual Sub Tab ########
   output$activity_visual <- renderPlot({ .activities_visual() })
   
   .activities_visual <- reactive({
@@ -554,6 +568,7 @@ server <- function(input, output) {
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
@@ -579,11 +594,12 @@ server <- function(input, output) {
         cbind(Percentage = animal_category$Count/ rep(animal_count,
                                                       times = rep(length(input$category_input), length(animal_count))))
       
-      # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      # regardless of the order in which we select them.
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
       colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
       names(colors) = levels(animal_category$Category)
       colors <- colors[1:length(levels(animal_category$Category))]
+      
       
       #Creating the visualization
       ggplot(data = animal_category) +
@@ -627,8 +643,8 @@ server <- function(input, output) {
         cbind(Percentage = animal_behavior$Count/ rep(animal_count,
                                                       times = rep(length(input$behavior_input), length(animal_count))))
       
-      # Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
-      # regardless of the order in which we select them.
+      #Assign colors from a palette to each behavior so that colors remain unchanged in the stacked barplots
+      #regardless of the order in which we select them.
       colors <- c(brewer.pal(8, "Set2"), brewer.pal(12, "Paired"), brewer.pal(8, "Dark2"))
       names(colors) = levels(animal_behavior$Behavior)
       colors <- colors[1:length(levels(animal_behavior$Behavior))]
@@ -653,7 +669,7 @@ server <- function(input, output) {
     }
   })
   
-  # Add download link to UI
+  #Add download link to UI
   output$save_activities <- renderUI({
     req(.activities_visual())
     downloadLink("download_activities_graph", "Download Visual")
@@ -672,13 +688,13 @@ server <- function(input, output) {
   )
   
   
-  
-  #Summary Table Sub Tab
+  ######## Summary Table Sub Tab ########
   output$activity_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
@@ -688,10 +704,10 @@ server <- function(input, output) {
       #Display nothing if no Category checkboxes are selected
       if(length(input$category_input) == 0){
         animal_category_table <- data.frame()
-      
+        
       #If any of the Category checkboxes are selected, proceed to create a table
       } else {
-        
+         
         #Data frame to create summary table for categories
         animal_data$Category <- as.factor(animal_data$Category)
         animal_category_table <- animal_data %>% 
@@ -726,7 +742,7 @@ server <- function(input, output) {
       #Returning the table
       return(animal_category_table)
       
-     
+      
     #When the filter option is Behavior
     } else {
       
@@ -736,7 +752,7 @@ server <- function(input, output) {
         animal_behavior_table <- data.frame()
         
       #If any of the Category checkboxes are selected, proceed to create a table  
-      } else{
+      } else {
         
         
         #Data frame to create summary table for behaviors
@@ -772,23 +788,20 @@ server <- function(input, output) {
       return(animal_behavior_table)
       
     }
-    
-    
   })
   
   
-  
-  #Raw Table Sub Tab
+  ######## Raw Table Sub Tab ########
   output$raw_activity_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
+    #Require filter type input
     req(input$filter_type)
     
     #When the filter option is Category
     if(input$filter_type == "Category"){
-      
       
       #Checking how many observations there are in total for selected categories
       total_observations <- 0
@@ -814,16 +827,15 @@ server <- function(input, output) {
         #Format the Date Column
         animal_raw_category_table$Date <- format(animal_raw_category_table$Date, format = "%B %d, %Y")
         
+        
         #If Social Modifier Column is empty, remove it from the raw table
         if(sum(is.na(animal_raw_category_table$Social_Modifier)) == nrow(animal_raw_category_table)){
           animal_raw_category_table <- animal_raw_category_table %>% select(-Social_Modifier)
           
-        #If Social Modifer Column is not empty, rename the column
+          #If Social Modifer Column is not empty, rename the column
         } else {
-          
           animal_raw_category_table <- animal_raw_category_table %>% rename(`Social Modifier` = Social_Modifier)
-          
-        }
+               }
         
         
       #If there are more than 15 observations in total, or no categories selected
@@ -836,12 +848,10 @@ server <- function(input, output) {
         
         #Create an empty table
         animal_raw_category_table <- data.frame()
-        
       }
       
-      #Return empty table so only the help text appears
-      return(animal_raw_category_table)
-    
+    #Return raw table
+    return(animal_raw_category_table)
       
       
     #When the filter option is Behavior   
@@ -860,7 +870,6 @@ server <- function(input, output) {
         #Make the help text dissapear
         output$activity_text <- renderUI({""})
         
-        
         #Create raw table
         animal_raw_behavior_table <- animal_data %>% filter(Behavior %in% input$behavior_input) %>%
           select(Name, Category, Behavior, Social_Modifier, Date, Time) %>%
@@ -874,11 +883,10 @@ server <- function(input, output) {
         if(sum(is.na(animal_raw_behavior_table$Social_Modifier)) == nrow(animal_raw_behavior_table)){
           animal_raw_behavior_table <- animal_raw_behavior_table %>% select(-Social_Modifier)
           
-        #If Social Modifer Column is not empty, rename the column  
+          #If Social Modifer Column is not empty, rename the column  
         } else {
-          
           animal_raw_behavior_table <- animal_raw_behavior_table %>% rename(`Social Modifier` = Social_Modifier)
-        }
+               }
         
         
       #If there are more than 15 observations in total, or no behaviors selected  
@@ -894,21 +902,20 @@ server <- function(input, output) {
         
       }
       
-      #Return empty table so only the help text appears
-      return(animal_raw_behavior_table)
+    #Return raw table
+    return(animal_raw_behavior_table)
       
     } 
-    
   })
   
   
-  #Category Information Sub Tab
+  ######## Category Information Sub Tab ########
   output$information_table <- renderTable({
     
     #Get updated data
     animal_data <- data_input()
     
-    
+    #Require filter type input
     req(input$filter_type)
     
     
@@ -918,13 +925,12 @@ server <- function(input, output) {
       #Make help text disappear
       output$info_text <- renderUI({""})  
       
-      
       #Requring category input
       req(input$category_input)
       
-      
-      #Vector of selected inputs
+      #Vector of selected categories
       selected_categories <- input$category_input
+      
       
       #Finding the maximum number of behaviors from the selected categories
       max_len <- 0
@@ -935,16 +941,14 @@ server <- function(input, output) {
         
         if(check > max_len){
           max_len <- check
-          
         }
       }      
       
       #Initiating an empty matrix
       info_matrix <- matrix(nrow = max_len + 1, ncol = length(selected_categories))
       
-      
-      #Adding selected categories and behaviors associated with those categories 
-        #as columns to the matrix
+      #Adding the selected categories and behaviors associated with those categories 
+      #as columns to the matrix
       for(i in 1:length(selected_categories)){
         select_data <- animal_data %>% filter(Category == selected_categories[i]) %>%
           select(Category, Behavior)
@@ -955,10 +959,9 @@ server <- function(input, output) {
         b <- append(b, add)
         
         info_matrix[ , i] <- b
-        
       }
       
-      #Converting matrix to dataframe and using first row as column names
+      #Converting matrix to a dataframe and using the first row as the column names
       info_data <- data.frame(info_matrix)
       info_data <- info_data %>% row_to_names(row_number = 1)
       
@@ -969,7 +972,6 @@ server <- function(input, output) {
     #When the filter option is Behavior
     } else {
       
-      
       #Display help text
       output$info_text <- renderUI(HTML(paste(
         em("Information Table appears only if you are filtering by Category")
@@ -978,14 +980,9 @@ server <- function(input, output) {
       #Create an empty table
       empty_table <- data.frame()
       
-      
       #Return empty table so only the help text appears
       return(empty_table)
-      
-      
     }
-    
-    
   })
   
   
@@ -1149,8 +1146,9 @@ server <- function(input, output) {
     }
   )
   
-  ############################### Pie Charts ###############################
-  #Let users choose the event date
+  ############################### Pie Charts ##################################
+  
+  ##Let users choose the event date
   output$dateControls <- renderUI({
     
     #Get updated data
@@ -1164,20 +1162,19 @@ server <- function(input, output) {
               max = max(animal_data$Date))
   })
   
-  #Show Deselect All button when "Data Without the Subject Animal" is selected
+  #Show Deselect All button only when "Data Without the Subject Animal" is selected
   output$deselect_all_Pie <- renderUI({
     if(input$select_exclusion == "Data Without the Subject Animal") {
       actionButton("deselect_all_Pie", "Deselect All")}
   })
   
-  #Show Select All button when "Data Without the Subject Animal" is selected 
+  #Show Select All button only when "Data Without the Subject Animal" is selected 
   output$select_all_Pie <- renderUI({
     if(input$select_exclusion == "Data Without the Subject Animal") {
       actionButton("select_all_Pie", "Select All")}
   })
   
-  
-  #Let users choose the subject animal(s) to exclude (with the deselect all button)
+  ##Let users choose the subject animal(s) to exclude (with the deselect all button)
   observeEvent(c(input$select_exclusion, input$deselect_all_Pie, input$file1), {
     req(input$select_exclusion)
     
@@ -1192,7 +1189,7 @@ server <- function(input, output) {
       }
     })})
   
-  #Let users choose the subject animal(s) to exclude (with the select all button)
+  ##Let users choose the subject animal(s) to exclude (with the select all button)
   observeEvent(input$select_all_Pie, {
     req(input$select_exclusion)
     
@@ -1208,7 +1205,8 @@ server <- function(input, output) {
       }
     })})
   
-  ######### Pie Chart Plots
+  #########Pie Chart Plots#########
+  
   output$event_pie_plot <- renderPlot({ .events() })
   
   .events <- reactive({
@@ -1233,11 +1231,11 @@ server <- function(input, output) {
       #Calls the subject animal(s)
       req(input$subject_animal)
       
-      ####No plot if ZERO or ALL subject animals were selected when "Data Without the Subject Animal" selected
+      ####No plot if ZERO OR ALL subject animals were selected when "Data Without the Subject Animal" selected
       if(length(input$subject_animal) == 0 & input$select_exclusion == "Data Without the Subject Animal") return()
       if(length(input$subject_animal) == length(unique(animal_data$Name)) & input$select_exclusion == "Data Without the Subject Animal") return()
       
-      ####If one or more and less than all subject animals were selected when "Data Without the Subject Animal" selected
+      ####If mutiple (but less than all) subject animals were selected WITH "Data Without the Subject Animal" selected
       if(length(input$subject_animal) > 0 & length(input$subject_animal) < length(unique(animal_data$Name)) &
          input$select_exclusion == "Data Without the Subject Animal") {
         
