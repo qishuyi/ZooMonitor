@@ -539,7 +539,7 @@ summary_PP <- rbind(summary_Pistacio, summary_P)
 ggplot(summary_PP, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(Subject_Animal ~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Death and Activity (without Pistacio)", subtitle = "Raw Counts (With): Before = 760, After = 1760 \n Raw Counts (Without): Before = 591, After = 1673") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Pistacio's Death and Activity", subtitle = "Raw Counts (With): Before = 760, After = 1760 \n Raw Counts (Without): Before = 591, After = 1673") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
@@ -615,7 +615,7 @@ summary_SS <- rbind(summary_Squirt, summary_S)
 ggplot(summary_SS, aes(x="", y=percent, fill=fct_reorder(Activity, desc(percent)))) + geom_bar(stat="identity", width=1) +
   facet_grid(Subject_Animal ~ Period) +
   coord_polar("y", start=0) + 
-  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Joining and Activity (without Squirt)", subtitle = "Raw Counts (With): Before = 1296, After = 1224 \n Raw Counts (Without): Before = 1296, After = 1016") +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Squirt's Joining and Activity", subtitle = "Raw Counts (With): Before = 1296, After = 1224 \n Raw Counts (Without): Before = 1296, After = 1016") +
   guides(fill = guide_legend(reverse = TRUE, override.aes = list(size = 1))) +
   theme_classic() + theme(axis.line = element_blank(),
                           axis.text = element_blank(),
